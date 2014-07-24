@@ -1,0 +1,5 @@
+# gitignore
+
+*~
+TAPilot/stimuli/
+From_Eline/
