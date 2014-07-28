@@ -269,12 +269,6 @@ for iFrame = 1:numel(seqtiming)
     else
         targetTrig = NaN;
     end
-%     % make even frames always have trigger = 8
-%     if mod(iFrame,2)==0
-%         evenFrameTrig = 8;
-%     else
-%         evenFrameTrig = NaN;
-%     end
     
     trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
 end
