@@ -5,8 +5,11 @@ run = 1;
 saveStim = 1;
 
 %% screen setup
-screenWidth = 1024; % (px)
-screenHeight = 768; % (px)
+displayName = 'meg_lcd';
+d = loadDisplayParams(displayName);
+pixelsPerDegree = 1/d.pixelSize;
+screenWidth = d.numPixels(1); % (px)
+screenHeight = d.numPixels(2); % (px)
 cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
@@ -30,7 +33,6 @@ attBlockOrder = [1 2 1 3 1 2 1 3];
 nBlocks = numel(blockOrder);
 
 %% stim setup
-pixelsPerDegree = 90;
 stimSize = 4;
 spatialFreq = 1;
 orientation = 0;

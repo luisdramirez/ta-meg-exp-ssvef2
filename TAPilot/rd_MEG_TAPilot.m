@@ -27,6 +27,8 @@ function rd_MEG_TAPilot(n, stimfile)
 % Modified from runme_MEG_OnOffLeftRight_ET_M2008.m
 % RD, July 2014
 
+%% add paths
+addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
 
 %% 
 % initialize stim tracker for MEG
@@ -39,10 +41,11 @@ PTBTriggerLength = 0.001;
 Screen('Preference', 'SkipSyncTests', 0);
 
 %% Initialize Eyetracker and do Calibration
-cal = 'meg_lcd';
-d   = loadDisplayParams(cal);
+displayName = 'meg_lcd';
+frameRate = 75;
+d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 hz  = FrameRate(d.screenNumber);
-tr  = 1/hz*60; %% COME BACK
+tr  = 1/hz*frameRate;
 use_eyetracker = false;
 
 % Do we want to use the eyetracker?
@@ -81,7 +84,7 @@ params = retCreateDefaultGUIParams;
 params.modality         = 'MEG'; 
 params.prescanDuration  = 0;
 params.interleaves      = NaN;
-params.tr               = 1/hz*60;
+params.tr               = 1/hz*frameRate;
 params.calibration      = cal;
 params.framePeriod      = tr;
 params.startScan        = 0;
@@ -121,7 +124,7 @@ hold on; plot(diff(response.flip), 'r-');
 
 ylim(median(diff(response.flip)) + [-.001 .001])
 % frames between stimuli
-frames = round(diff(response.flip) / (1/60)); 
+frames = round(diff(response.flip) / (1/frameRate)); 
 
 % how many interstimulus frames differed from the median?
 disp(sum(frames ~= median(frames)))
