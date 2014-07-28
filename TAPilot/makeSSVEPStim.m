@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 1;
+run = 2;
 saveStim = 1;
 
 %% screen setup
@@ -211,35 +211,72 @@ for iFrame = 1:numel(seqtiming)
             error('attBlockName not recognized')
     end
     
-    % determine trigger
-    switch blockName
-        case 'blank'
-            trigSeq(iFrame,1) = 7;
-        case 'fast-left'
-            if strcmp(attBlockName,'att-left')
-                trigSeq(iFrame,1) = 3;
-            elseif strcmp(attBlockName,'att-right')
-                trigSeq(iFrame,1) = 4;
-            end
-        case 'slow-left'
-            if strcmp(attBlockName,'att-left')
-                trigSeq(iFrame,1) = 5;
-            elseif strcmp(attBlockName,'att-right')
-                trigSeq(iFrame,1) = 6;
-            end
-        otherwise
-            error('blockName not recognized')
+%     % determine trigger - condition ID
+%     switch blockName
+%         case 'blank'
+%             trigSeq(iFrame,1) = 7;
+%         case 'fast-left'
+%             if strcmp(attBlockName,'att-left')
+%                 trigSeq(iFrame,1) = 3;
+%             elseif strcmp(attBlockName,'att-right')
+%                 trigSeq(iFrame,1) = 4;
+%             end
+%         case 'slow-left'
+%             if strcmp(attBlockName,'att-left')
+%                 trigSeq(iFrame,1) = 5;
+%             elseif strcmp(attBlockName,'att-right')
+%                 trigSeq(iFrame,1) = 6;
+%             end
+%         otherwise
+%             error('blockName not recognized')
+%     end
+%     % make even frames always have trigger = 2
+%     if mod(iFrame,2)==0
+%         trigSeq(iFrame,1) = 2;
+%     end
+%     % if the target is on, set the trigger to show the target side
+%     if targetOnSeq(iFrame)==1
+%         trigSeq(iFrame,1) = 8; % target on left
+%     elseif targetOnSeq(iFrame)==2
+%         trigSeq(iFrame,1) = 9; % target on right
+%     end
+    
+    % determine trigger - combinatorial code
+    if strcmp(blockName,'blank')
+        blankTrig = 7;
+    else
+        blankTrig = NaN;
     end
-    % make even frames always have trigger = 2
-    if mod(iFrame,2)==0
-        trigSeq(iFrame,1) = 2;
+    if strcmp(blockName,'fast-left')
+        fastSideTrig = 1;
+    elseif strcmp(blockName,'slow-left')
+        fastSideTrig = 2;
+    else
+        fastSideTrig = NaN;
     end
-    % if the target is on, set the trigger to show the target side
+    if strcmp(attBlockName,'att-left')
+        attSideTrig = 3;
+    elseif strcmp(attBlockName,'att-right')
+        attSideTrig = 4;
+    else
+        attSideTrig = NaN;
+    end
+    % triger for target side
     if targetOnSeq(iFrame)==1
-        trigSeq(iFrame,1) = 8; % target on left
+        targetTrig = 5; % target on left
     elseif targetOnSeq(iFrame)==2
-        trigSeq(iFrame,1) = 9; % target on right
+        targetTrig = 6; % target on right
+    else
+        targetTrig = NaN;
     end
+%     % make even frames always have trigger = 8
+%     if mod(iFrame,2)==0
+%         evenFrameTrig = 8;
+%     else
+%         evenFrameTrig = NaN;
+%     end
+    
+    trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
 end
 
 % show targetOnSeq
