@@ -42,9 +42,12 @@ Screen('Preference', 'SkipSyncTests', 0);
 
 %% Initialize Eyetracker and do Calibration
 displayName = 'meg_lcd';
-frameRate = 75;
+frameRate = 60;
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
-hz  = FrameRate(d.screenNumber);
+hz  = FrameRate(d.screenNumber)
+if round(hz)~=frameRate
+    error('Frame rate not set correctly')
+end
 tr  = 1/hz*frameRate;
 use_eyetracker = false;
 
@@ -85,7 +88,7 @@ params.modality         = 'MEG';
 params.prescanDuration  = 0;
 params.interleaves      = NaN;
 params.tr               = 1/hz*frameRate;
-params.calibration      = cal;
+params.calibration      = displayName;
 params.framePeriod      = tr;
 params.startScan        = 0;
 params.motionSteps      = 2;
@@ -107,6 +110,7 @@ params = ret_rd(params);
 
 % adjust display params
 params.display = attInitFixParams(params.display);
+save params params
 
 % go
 doRetinotopyScan(params);

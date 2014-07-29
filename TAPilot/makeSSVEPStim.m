@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 2;
+run = 4;
 saveStim = 1;
 
 %% screen setup
@@ -14,7 +14,7 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% timing setup
-refrate = 75; % (Hz)
+refrate = 60; % (Hz)
 blockDur = 6; % (s)
 targetDur = 3/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
@@ -211,66 +211,66 @@ for iFrame = 1:numel(seqtiming)
             error('attBlockName not recognized')
     end
     
-%     % determine trigger - condition ID
-%     switch blockName
-%         case 'blank'
-%             trigSeq(iFrame,1) = 7;
-%         case 'fast-left'
-%             if strcmp(attBlockName,'att-left')
-%                 trigSeq(iFrame,1) = 3;
-%             elseif strcmp(attBlockName,'att-right')
-%                 trigSeq(iFrame,1) = 4;
-%             end
-%         case 'slow-left'
-%             if strcmp(attBlockName,'att-left')
-%                 trigSeq(iFrame,1) = 5;
-%             elseif strcmp(attBlockName,'att-right')
-%                 trigSeq(iFrame,1) = 6;
-%             end
-%         otherwise
-%             error('blockName not recognized')
-%     end
-%     % make even frames always have trigger = 2
-%     if mod(iFrame,2)==0
-%         trigSeq(iFrame,1) = 2;
-%     end
-%     % if the target is on, set the trigger to show the target side
-%     if targetOnSeq(iFrame)==1
-%         trigSeq(iFrame,1) = 8; % target on left
-%     elseif targetOnSeq(iFrame)==2
-%         trigSeq(iFrame,1) = 9; % target on right
-%     end
-    
-    % determine trigger - combinatorial code
-    if strcmp(blockName,'blank')
-        blankTrig = 7;
-    else
-        blankTrig = NaN;
+    % determine trigger - condition ID
+    switch blockName
+        case 'blank'
+            trigSeq(iFrame,1) = computeTrigger(1);
+        case 'fast-left'
+            if strcmp(attBlockName,'att-left')
+                trigSeq(iFrame,1) = computeTrigger(3);
+            elseif strcmp(attBlockName,'att-right')
+                trigSeq(iFrame,1) = computeTrigger(4);
+            end
+        case 'slow-left'
+            if strcmp(attBlockName,'att-left')
+                trigSeq(iFrame,1) = computeTrigger(5);
+            elseif strcmp(attBlockName,'att-right')
+                trigSeq(iFrame,1) = computeTrigger(6);
+            end
+        otherwise
+            error('blockName not recognized')
     end
-    if strcmp(blockName,'fast-left')
-        fastSideTrig = 1;
-    elseif strcmp(blockName,'slow-left')
-        fastSideTrig = 2;
-    else
-        fastSideTrig = NaN;
+    % make even frames always have trigger = 2
+    if mod(iFrame,2)==0
+        trigSeq(iFrame,1) = computeTrigger(2);
     end
-    if strcmp(attBlockName,'att-left')
-        attSideTrig = 3;
-    elseif strcmp(attBlockName,'att-right')
-        attSideTrig = 4;
-    else
-        attSideTrig = NaN;
-    end
-    % triger for target side
+    % if the target is on, set the trigger to show the target side
     if targetOnSeq(iFrame)==1
-        targetTrig = 5; % target on left
+        trigSeq(iFrame,1) = computeTrigger(7); % target on left
     elseif targetOnSeq(iFrame)==2
-        targetTrig = 6; % target on right
-    else
-        targetTrig = NaN;
+        trigSeq(iFrame,1) = computeTrigger(8); % target on right
     end
     
-    trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
+%     % determine trigger - combinatorial code
+%     if strcmp(blockName,'blank')
+%         blankTrig = 7;
+%     else
+%         blankTrig = NaN;
+%     end
+%     if strcmp(blockName,'fast-left')
+%         fastSideTrig = 1;
+%     elseif strcmp(blockName,'slow-left')
+%         fastSideTrig = 2;
+%     else
+%         fastSideTrig = NaN;
+%     end
+%     if strcmp(attBlockName,'att-left')
+%         attSideTrig = 3;
+%     elseif strcmp(attBlockName,'att-right')
+%         attSideTrig = 4;
+%     else
+%         attSideTrig = NaN;
+%     end
+%     % triger for target side
+%     if targetOnSeq(iFrame)==1
+%         targetTrig = 5; % target on left
+%     elseif targetOnSeq(iFrame)==2
+%         targetTrig = 6; % target on right
+%     else
+%         targetTrig = NaN;
+%     end
+%     
+%     trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
 end
 
 % show targetOnSeq
