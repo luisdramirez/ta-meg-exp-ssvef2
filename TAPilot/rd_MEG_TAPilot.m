@@ -94,7 +94,8 @@ params = ret_rd(params);
 
 % adjust display params
 params.display = attInitFixParams(params.display);
-save params params
+% params = rotateFixCoords(params, pi/4); % rotate fix 45 deg
+% save params params
 
 % go
 doRetinotopyScan(params);
@@ -108,9 +109,10 @@ figure(101); clf
 plot(diff(stimulus.seqtiming));
 
 % measured inter-stimulus duration
-hold on; plot(diff(response.flip), 'r-'); 
+hold on
+plot(diff(response.flip), 'r-'); 
+ylim(median(diff(response.flip)) + [-.01 .01])
 
-ylim(median(diff(response.flip)) + [-.001 .001])
 % frames between stimuli
 frames = round(diff(response.flip) / (1/frameRate)); 
 

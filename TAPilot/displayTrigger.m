@@ -1,5 +1,22 @@
-function displayTrigger(trigSeq)
+function displayTrigger(trigSeq, nBlocks)
+%
+% function displayTrigger(trigSeq, nBlocks)
+%
+% Given a trigger sequence, displays the triggers as they should appear in 
+% the MEG channels
+%
+% trigSeq is the trigger sequence
+% nBlocks (optional) is the number of blocks for plotting = number of subplots
+%
+% Rachel Denison
+% 29 July 2014
 
+%% deal with inputs
+if nargin==1
+    nBlocks = [];
+end
+
+%% make trigger channel matrix
 nTrigs = length(trigSeq);
 nTrigChannels = 8;
 trigMat = zeros(nTrigChannels, nTrigs);
@@ -13,9 +30,15 @@ for iTrig = 1:nTrigs
     trigMat(b, iTrig) = 1;
 end
 
-% plot
-nTimesPerPlot = 500;
-nSubplots = ceil(nTrigs/nTimesPerPlot);
+%% plot
+if isempty(nBlocks)
+    nTimesPerPlot = 500;
+    nSubplots = ceil(nTrigs/nTimesPerPlot);
+else
+    nSubplots = nBlocks;
+    nTimesPerPlot = round(nTrigs/nBlocks);
+end
+
 figure
 for i = 1:nSubplots
     subplot(nSubplots,1,i)
