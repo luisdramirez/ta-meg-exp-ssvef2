@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 7;
+run = 5;
 saveStim = 1;
 
 %% screen setup
@@ -14,7 +14,7 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% timing setup
-refrate = 75; % (Hz)
+refrate = 60; % (Hz)
 blockDur = 7; % (s)
 targetDur = 3/refrate; % (s)
 targetLeadTime = 1; % (s) % no targets in first part of block
@@ -23,9 +23,15 @@ targetCushion = 1; % (s) % min interval between targets
 maxTargetsPerBlock = 3;
 attCueLeadTime = 0; % (s)
 respDur = 1; % (s)
-% SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
-fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
-slowUnit = [1 1 1 2 2];
+if refrate==75
+    % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
+    fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
+    slowUnit = [1 1 1 2 2];
+else
+    % 60 Hz SSVEP unit sequences: 3 frames (60/3=20 Hz) and 4 frames (60/4=15 Hz)
+    fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
+    slowUnit = [1 1 2 2];
+end
 
 %% blocks setup
 blockNames = {'blank','fast-left','slow-left'};
@@ -326,7 +332,7 @@ displayTrigger(trigSeq, nBlocks)
 cmap = repmat((0:255)',1,3);
 srcRect = [0 0 size(images,2) size(images,1)];
 destRect = CenterRectOnPoint(srcRect, cx, cy+stimPos(2)*pixelsPerDegree);
-diodeSeq = repmat([0 1], 1, ceil(length(seq)/2))';
+diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
 
 % store in stimulus structure
 stimulus.images = images*255;

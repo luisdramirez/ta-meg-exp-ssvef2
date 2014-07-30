@@ -31,13 +31,14 @@ Screen('Preference', 'SkipSyncTests', skipSyncTests);
 
 %% Initialize Eyetracker and do Calibration
 displayName = 'meg_lcd';
-frameRate = 75;
+frameRate = 60;
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
 end
 % tr  = 1/hz*frameRate;
+useKbQueue = 0;
 use_eyetracker = false;
 
 % Do we want to use the eyetracker?
@@ -96,7 +97,21 @@ params = ret_rd(params);
 % rd version has white stick on bottom to work with rotated cross
 params.display = attInitFixParams_rd(params.display);
 params = rotateFixCoords(params, pi/4); % rotate fix 45 deg
-% save params params
+
+% set button box device
+if useKbQueue
+    params.display.devices.keyInputExternal = [];
+    devices = PsychHID('devices');
+    for iD=1:numel(devices)
+        if strcmp(devices(iD).usageName,'Keyboard') && ...
+                strcmp(devices(iD).product,'904')
+            params.display.devices.keyInputExternal = iD;
+        end
+    end
+    if isempty(params.display.devices.keyInputExternal)
+        error('Did not find button box')
+    end
+end
 
 % go
 doRetinotopyScan(params);
