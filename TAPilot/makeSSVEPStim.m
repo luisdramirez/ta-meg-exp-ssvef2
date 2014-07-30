@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 5;
+run = 1;
 saveStim = 1;
 
 %% screen setup
@@ -55,7 +55,7 @@ stimPos = [6 4]; % [x y]
 stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
 
 %% trigger setup
-triggerOption = 'combinatorial'; % 'conditionID','combinatorial'
+triggerOption = 'conditionID'; % 'conditionID','combinatorial'
 
 %% Store all stim params
 % sorry this is kind of a horrible way to do this
@@ -244,34 +244,39 @@ for iFrame = 1:numel(seqtiming)
     switch triggerOption
         case 'conditionID'
             % determine trigger - condition ID
-            switch blockName
-                case 'blank'
-                    trigSeq(iFrame,1) = computeTrigger(1);
-                case 'fast-left'
-                    if strcmp(attBlockName,'att-left')
-                        trigSeq(iFrame,1) = computeTrigger(3);
-                    elseif strcmp(attBlockName,'att-right')
-                        trigSeq(iFrame,1) = computeTrigger(4);
-                    end
-                case 'slow-left'
-                    if strcmp(attBlockName,'att-left')
-                        trigSeq(iFrame,1) = computeTrigger(5);
-                    elseif strcmp(attBlockName,'att-right')
-                        trigSeq(iFrame,1) = computeTrigger(6);
-                    end
-                otherwise
-                    error('blockName not recognized')
+            if newBlock % only give condition trigger at the first frame of the block
+                switch blockName
+                    case 'blank'
+                        trig = 7;
+                    case 'fast-left'
+                        if strcmp(attBlockName,'att-left')
+                            trig = 1;
+                        elseif strcmp(attBlockName,'att-right')
+                            trig = 2;
+                        end
+                    case 'slow-left'
+                        if strcmp(attBlockName,'att-left')
+                            trig = 3;
+                        elseif strcmp(attBlockName,'att-right')
+                            trig = 4;
+                        end
+                    otherwise
+                        error('blockName not recognized')
+                end
+            elseif targetOnSeq(iFrame)~=0
+                % triger for target side, only on first target frame
+                if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
+                    trig = 5; % target on left
+                elseif targetOnSeq(iFrame)==2 && targetOnSeq(iFrame-1)==0
+                    trig = 6; % target on right
+                else
+                    trig = NaN;
+                end
+            else
+                trig = NaN;
             end
-            % make even frames always have trigger = 2
-            if mod(iFrame,2)==0
-                trigSeq(iFrame,1) = computeTrigger(2);
-            end
-            % if the target is on, set the trigger to show the target side
-            if targetOnSeq(iFrame)==1
-                trigSeq(iFrame,1) = computeTrigger(7); % target on left
-            elseif targetOnSeq(iFrame)==2
-                trigSeq(iFrame,1) = computeTrigger(8); % target on right
-            end
+            
+            trigSeq(iFrame,1) = computeTrigger(trig);
             
         case 'combinatorial'
             % determine trigger - combinatorial code
