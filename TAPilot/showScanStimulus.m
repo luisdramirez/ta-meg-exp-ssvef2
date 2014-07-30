@@ -118,9 +118,9 @@ for frame = 1:nFrames
         %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
         [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck;
         if(ssKeyIsDown)
-            %            kc = find(ssKeyCode);
-            %            response.keyCode(frame) = kc(1);
-            response.keyCode(frame) = 1; % binary response for now
+            kc = find(ssKeyCode);
+            response.keyCode(frame) = kc(1);
+            %             response.keyCode(frame) = 1; % binary response for now
             response.secs(frame)    = ssSecs - t0;
             
             if(ssKeyCode(quitProgKey)),

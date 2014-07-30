@@ -1,28 +1,16 @@
 function rd_MEG_TAPilot(n, stimfile)
 % rd_MEG_TAPilot(n, stimfile)
 %
-% MEG Full-field on-off, left/right flicker experiment (steady state)
+% MEG SSVEP left/right flicker rate x attention expt
+% with exo targets
 % ------
-%   Run time per experiment = 72 seconds
-%   6 cycles at 12 s each
-%   6 cycles are randomly orderd full-full-left-left-right-right, with
-%       blanks between each
+%   Run time per experiment = 63 seconds
+%       9 blocks with 7 s/block
 %
 % INPUTS
 %   n is the runnumber [1 15]
-%   stimfile is the prefix for the stimulus fils containing images, and can
-%            be either
-%               - attention_onOffLeftRight_params 
-%               - onOffLeftRight_params
-% The actual stim files have names like
-%   attention_onOffLeftRight_params1.mat
-%   onOffLeftRight_params9.mat
-%   etc
-%
-%
-% Example
-%   runme_MEG_OnOffLeftRight_ET_M2008(1, 'attention_onOffLeftRight_params');
-%   runme_MEG_OnOffLeftRight_ET_M2008(1, 'onOffLeftRight_params');
+%   stimfile is the prefix for the stimulus file containing images, stored
+%       in vistadisp/Applications2/Retinotopy/standard/storedImageMatrices
 %
 % Modified from runme_MEG_OnOffLeftRight_ET_M2008.m
 % RD, July 2014
@@ -38,23 +26,23 @@ PTBTriggerLength = 0.001;
 
 % debug mode?
 % PsychDebugWindowConfiguration
-Screen('Preference', 'SkipSyncTests', 0);
+skipSyncTests = 0;
+Screen('Preference', 'SkipSyncTests', skipSyncTests);
 
 %% Initialize Eyetracker and do Calibration
 displayName = 'meg_lcd';
-frameRate = 60;
+frameRate = 75;
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
 end
-tr  = 1/hz*frameRate;
+% tr  = 1/hz*frameRate;
 use_eyetracker = false;
 
 % Do we want to use the eyetracker?
 if n == 1; % Only for the first run
-    
-    use_eyetracker = false;
+%     use_eyetracker = false;
     
     % You have to open a screen first (to get a window pointer), to start
     % the PTBInitEyeTracker;
@@ -62,9 +50,7 @@ if n == 1; % Only for the first run
     global PTBTheWindowPtr
     PTBTheWindowPtr = d.windowPtr;
     
-
     if use_eyetracker
-
         %Open the screen
         PTBInitEyeTracker;
         % paragraph = {'Eyetracker initialized.','Get ready to calibrate.'};
@@ -82,23 +68,21 @@ Screen('CloseAll');
 %% Default parameters
 params = retCreateDefaultGUIParams;
 
-
 %% Hemifield and ONOFF mixture
 params.modality         = 'MEG'; 
-params.prescanDuration  = 0;
-params.interleaves      = NaN;
-params.tr               = 1/hz*frameRate;
 params.calibration      = displayName;
-params.framePeriod      = tr;
-params.startScan        = 0;
-params.motionSteps      = 2;
-params.tempFreq         = 6/tr;
-params.repetitions      = 1;
 params.experiment       = 'Experiment From File';
-params.period           = 12*params.tr;
-params.numCycles        = 6;
-
-% params.fixation = 'large cross'; % this would work, but there's a bug
+params.skipSyncTests    = skipSyncTests;
+% params.prescanDuration  = 0;
+% params.interleaves      = NaN;
+% params.tr               = 1/hz*frameRate;
+% params.framePeriod      = tr;
+% params.startScan        = 0;
+% params.motionSteps      = 2;
+% params.tempFreq         = 6/tr;
+% params.repetitions      = 1;
+% params.period           = 12*params.tr;
+% params.numCycles        = 6;
 
 %% ********************
 %  ***** GO ***********

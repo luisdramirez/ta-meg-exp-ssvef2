@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 4;
+run = 7;
 saveStim = 1;
 
 %% screen setup
@@ -14,22 +14,24 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% timing setup
-refrate = 60; % (Hz)
-blockDur = 6; % (s)
+refrate = 75; % (Hz)
+blockDur = 7; % (s)
 targetDur = 3/refrate; % (s)
-targetLeadTime = 1.5; % (s) % no targets in first part of block
+targetLeadTime = 1; % (s) % no targets in first part of block
+targetEndTime = 1; % (s) % no targets in last part of block
 targetCushion = 1; % (s) % min interval between targets
 maxTargetsPerBlock = 3;
 attCueLeadTime = 0; % (s)
+respDur = 1; % (s)
 % SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
 fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
 slowUnit = [1 1 1 2 2];
 
 %% blocks setup
 blockNames = {'blank','fast-left','slow-left'};
-blockOrder = [1 2 1 2 1 3 1 3];
+blockOrder = [1 2 1 2 1 3 1 3 1];
 attBlockNames = {'no-att','att-left','att-right'};
-attBlockOrder = [1 2 1 3 1 2 1 3];
+attBlockOrder = [1 2 1 3 1 2 1 3 1];
 nBlocks = numel(blockOrder);
 
 %% stim setup
@@ -110,7 +112,7 @@ targetStartTimes = [];
 for iBlock = 1:nBlocks
     if ~strcmp(blockNames{blockOrder(iBlock)},'blank')
         nTargets = ceil(rand*maxTargetsPerBlock); % 1 to max targets
-        targetTimes = choosePseudoRandomTargetTimes(blockDur-targetLeadTime, nTargets, targetCushion);
+        targetTimes = choosePseudoRandomTargetTimes(blockDur-targetLeadTime-targetEndTime, nTargets, targetCushion);
         targetTimes = targetTimes + blockStartTimes(iBlock) + targetLeadTime;
         targetStartTimes = [targetStartTimes; targetTimes'];
     end
@@ -143,14 +145,20 @@ for iFrame = 1:numel(seqtiming)
         blockName = blockNames{blockOrder(blockIdx)};
         attBlockName = attBlockNames{attBlockOrder(blockIdx)};
         phaseSeqIdx = 1;
+        newBlock = 1; % used to decide whether block triggers will be on
+    else
+        newBlock = 0;
+    end
+    if iFrame==1 % make sure newBlock is 1 on the first frame
+        newBlock = 1;
     end
     
     % determine if target is on
     % turn it on when it is time and leave on until time to turn off
-    if targetIdx <= nTargets && targetStartTimes(targetIdx)-time < 1/refrate 
+    if targetIdx <= nTargets && targetStartTimes(targetIdx)-time < 1/refrate
         targetOn = 1;
     end
-    if targetIdx <= nTargets && targetEndTimes(targetIdx)-time < 1/refrate 
+    if targetIdx <= nTargets && targetEndTimes(targetIdx)-time < 1/refrate
         targetOn = 0;
         targetIdx = targetIdx + 1;
     end
@@ -176,11 +184,11 @@ for iFrame = 1:numel(seqtiming)
         case 'fast-left'
             p1 = fastPhaseSeq(phaseSeqIdx); % left
             p2 = slowPhaseSeq(phaseSeqIdx); % right
-%             c1 = 1; c2 = 1;
+            %             c1 = 1; c2 = 1;
         case 'slow-left'
             p1 = slowPhaseSeq(phaseSeqIdx); % left
             p2 = fastPhaseSeq(phaseSeqIdx); % right
-%             c1 = 1; c2 = 1;
+            %             c1 = 1; c2 = 1;
         otherwise
             error('blockName not recognized')
     end
@@ -192,8 +200,11 @@ for iFrame = 1:numel(seqtiming)
     % determine cue
     switch attBlockName
         case 'no-att'
-            % cue the next attention block right before it starts
-            if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime)
+            if time-blockStartTimes(blockIdx) < respDur
+                % give a response window at the beginning of blank blocks
+                fixSeq(iFrame,1) = 2;
+            elseif blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime)
+                % cue the next attention block right before it starts
                 switch attBlockNames{attBlockOrder(blockIdx+1)}
                     case 'att-left'
                         fixSeq(iFrame,1) = 4;
@@ -211,74 +222,84 @@ for iFrame = 1:numel(seqtiming)
             error('attBlockName not recognized')
     end
     
-    % determine trigger - condition ID
-    switch blockName
-        case 'blank'
-            trigSeq(iFrame,1) = computeTrigger(1);
-        case 'fast-left'
-            if strcmp(attBlockName,'att-left')
-                trigSeq(iFrame,1) = computeTrigger(3);
-            elseif strcmp(attBlockName,'att-right')
-                trigSeq(iFrame,1) = computeTrigger(4);
-            end
-        case 'slow-left'
-            if strcmp(attBlockName,'att-left')
-                trigSeq(iFrame,1) = computeTrigger(5);
-            elseif strcmp(attBlockName,'att-right')
-                trigSeq(iFrame,1) = computeTrigger(6);
-            end
-        otherwise
-            error('blockName not recognized')
-    end
-    % make even frames always have trigger = 2
-    if mod(iFrame,2)==0
-        trigSeq(iFrame,1) = computeTrigger(2);
-    end
-    % if the target is on, set the trigger to show the target side
-    if targetOnSeq(iFrame)==1
-        trigSeq(iFrame,1) = computeTrigger(7); % target on left
-    elseif targetOnSeq(iFrame)==2
-        trigSeq(iFrame,1) = computeTrigger(8); % target on right
+    %     % determine trigger - condition ID
+    %     switch blockName
+    %         case 'blank'
+    %             trigSeq(iFrame,1) = computeTrigger(1);
+    %         case 'fast-left'
+    %             if strcmp(attBlockName,'att-left')
+    %                 trigSeq(iFrame,1) = computeTrigger(3);
+    %             elseif strcmp(attBlockName,'att-right')
+    %                 trigSeq(iFrame,1) = computeTrigger(4);
+    %             end
+    %         case 'slow-left'
+    %             if strcmp(attBlockName,'att-left')
+    %                 trigSeq(iFrame,1) = computeTrigger(5);
+    %             elseif strcmp(attBlockName,'att-right')
+    %                 trigSeq(iFrame,1) = computeTrigger(6);
+    %             end
+    %         otherwise
+    %             error('blockName not recognized')
+    %     end
+    %     % make even frames always have trigger = 2
+    %     if mod(iFrame,2)==0
+    %         trigSeq(iFrame,1) = computeTrigger(2);
+    %     end
+    %     % if the target is on, set the trigger to show the target side
+    %     if targetOnSeq(iFrame)==1
+    %         trigSeq(iFrame,1) = computeTrigger(7); % target on left
+    %     elseif targetOnSeq(iFrame)==2
+    %         trigSeq(iFrame,1) = computeTrigger(8); % target on right
+    %     end
+    
+    % determine trigger - combinatorial code
+    if newBlock % only give condition trigger at the first frame of the block
+        if strcmp(blockName,'blank')
+            blankTrig = 7;
+        else
+            blankTrig = NaN;
+        end
+        if strcmp(blockName,'fast-left')
+            fastSideTrig = 1;
+        elseif strcmp(blockName,'slow-left')
+            fastSideTrig = 2;
+        else
+            fastSideTrig = NaN;
+        end
+        if strcmp(attBlockName,'att-left')
+            attSideTrig = 3;
+        elseif strcmp(attBlockName,'att-right')
+            attSideTrig = 4;
+        else
+            attSideTrig = NaN;
+        end
+    else
+        blankTrig = NaN;
+        fastSideTrig = NaN;
+        attSideTrig = NaN;
     end
     
-%     % determine trigger - combinatorial code
-%     if strcmp(blockName,'blank')
-%         blankTrig = 7;
-%     else
-%         blankTrig = NaN;
-%     end
-%     if strcmp(blockName,'fast-left')
-%         fastSideTrig = 1;
-%     elseif strcmp(blockName,'slow-left')
-%         fastSideTrig = 2;
-%     else
-%         fastSideTrig = NaN;
-%     end
-%     if strcmp(attBlockName,'att-left')
-%         attSideTrig = 3;
-%     elseif strcmp(attBlockName,'att-right')
-%         attSideTrig = 4;
-%     else
-%         attSideTrig = NaN;
-%     end
-%     % triger for target side
-%     if targetOnSeq(iFrame)==1
-%         targetTrig = 5; % target on left
-%     elseif targetOnSeq(iFrame)==2
-%         targetTrig = 6; % target on right
-%     else
-%         targetTrig = NaN;
-%     end
-%     
-%     trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
+    % triger for target side, only on first target frame
+    if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
+        targetTrig = 5; % target on left
+    elseif targetOnSeq(iFrame)==2 && targetOnSeq(iFrame-1)==0
+        targetTrig = 6; % target on right
+    else
+        targetTrig = NaN;
+    end
+    
+    trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
 end
 
-% show targetOnSeq
+% show targetOnSeq and trigSeq
 figure
 subplot(2,1,1)
 plot(seqtiming,targetOnSeq)
 subplot(2,1,2)
 plot(seqtiming,trigSeq)
+
+% display triggers by channel
+displayTrigger(trigSeq)
 
 %% Create stimulus strucutre
 % set remaining stimulus variables
