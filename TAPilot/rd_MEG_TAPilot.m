@@ -93,8 +93,9 @@ params.loadMatrix = sprintf('%s%d.mat', stimfile, n);
 params = ret_rd(params); 
 
 % adjust display params
-params.display = attInitFixParams(params.display);
-% params = rotateFixCoords(params, pi/4); % rotate fix 45 deg
+% rd version has white stick on bottom to work with rotated cross
+params.display = attInitFixParams_rd(params.display);
+params = rotateFixCoords(params, pi/4); % rotate fix 45 deg
 % save params params
 
 % go
