@@ -100,17 +100,20 @@ params = rotateFixCoords(params, pi/4); % rotate fix 45 deg
 
 % set button box device
 if useKbQueue
-    params.display.devices.keyInputExternal = [];
-    devices = PsychHID('devices');
-    for iD=1:numel(devices)
-        if strcmp(devices(iD).usageName,'Keyboard') && ...
-                strcmp(devices(iD).product,'904')
-            params.display.devices.keyInputExternal = iD;
-        end
-    end
-    if isempty(params.display.devices.keyInputExternal)
-        error('Did not find button box')
-    end
+    params.display.devices.useKbQueue = 1;
+%     params.display.devices.keyInputExternal = [];
+%     devices = PsychHID('devices');
+%     for iD=1:numel(devices)
+%         if strcmp(devices(iD).usageName,'Keyboard') && ...
+%                 strcmp(devices(iD).product,'904')
+%             params.display.devices.keyInputExternal = iD;
+%         end
+%     end
+%     if isempty(params.display.devices.keyInputExternal)
+%         error('Did not find button box')
+%     end
+else
+    params.display.devices.useKbQueue = 0;
 end
 
 % go
@@ -135,6 +138,15 @@ frames = round(diff(response.flip) / (1/frameRate));
 % how many interstimulus frames differed from the median?
 disp(sum(frames ~= median(frames)))
 
+%% Check responses
+figure
+subplot(2,1,1)
+plot(stimulus.seqtiming, stimulus.trigSeq)
+title('triggers')
+subplot(2,1,2)
+plot(stimulus.seqtiming, response.keyCode)
+title('key presses')
+xlabel('seconds')
 
 %% Stop Eyetracker when done with experiment
 if n == 15;
