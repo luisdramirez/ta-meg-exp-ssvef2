@@ -1,4 +1,4 @@
-function [response, timing, quitProg] = showScanStimulus(display,...
+function [response, timing, quitProg] = showScanStimulus_test(display,...
     stimulus, t0, timeFromT0)
 % [response, timing, quitProg] = showStimulus(display,stimulus, ...
 %           [time0 = GetSecs], [timeFromT0 = true])
@@ -50,6 +50,13 @@ end;
 
 if notDefined('timeFromT0'), timeFromT0 = true; end
 
+% kbQueue
+if ~isfield(display.devices,'useKbQueue')
+    useKbQueue = 0;
+else
+    useKbQueue = display.devices.useKbQueue;
+end
+
 % some more checks
 if ~isfield(stimulus,'textures')
     % Generate textures for each image
@@ -75,6 +82,12 @@ response.keyCode = zeros(length(stimulus.seq),1); % get 1 buttons max
 response.secs = zeros(size(stimulus.seq));        % timing
 quitProg = 0;
 response.flip = [];
+
+% set up KbQueue if desired
+if useKbQueue
+    KbQueueCreate(display.devices.keyInputExternal);
+    KbQueueStart();
+end
 
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
@@ -115,18 +128,28 @@ for frame = 1:nFrames
     %--- get inputs (subject or experimentor)
     while(waitTime<0),
         % Scan the keyboard for subject response
-        %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
-        [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck;
-        if(ssKeyIsDown)
-            kc = find(ssKeyCode);
-            response.keyCode(frame) = kc(1);
-            %             response.keyCode(frame) = 1; % binary response for now
-            response.secs(frame)    = ssSecs - t0;
-            
-            if(ssKeyCode(quitProgKey)),
-                quitProg = 1;
-                break; % out of while loop
+        if useKbQueue
+            % Use KbQueue
+            [keyIsDown firstPress] = KbQueueCheck();
+            secs = min(firstPress(firstPress~=0));
+            ssKeyCode = firstPress==secs;
+            response.keyCode(frame) = find(ssKeyCode);
+            response.secs(frame) = secs - t0;
+        else
+            % Use KbCheck
+            %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
+            [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck;
+            if(ssKeyIsDown)
+                kc = find(ssKeyCode);
+                response.keyCode(frame) = kc(1);
+                % response.keyCode(frame) = 1; % binary response for now
+                response.secs(frame)    = ssSecs - t0;
             end;
+        end
+        
+        if(ssKeyCode(quitProgKey)),
+            quitProg = 1;
+            break; % out of while loop
         end;
         
         % if there is time release cpu
@@ -163,6 +186,12 @@ for frame = 1:nFrames
     response.flip(frame) = VBLTimestamp;
     
 end;
+
+% clean up KbQueue
+if useKbQueue
+    KbQueueStop();
+    KbQueueRelease();
+end
 
 % that's it
 ShowCursor;
