@@ -1,4 +1,4 @@
-function [response, timing, quitProg] = showScanStimulus_test(display,...
+function [response, timing, quitProg] = showScanStimulus(display,...
     stimulus, t0, timeFromT0)
 % [response, timing, quitProg] = showStimulus(display,stimulus, ...
 %           [time0 = GetSecs], [timeFromT0 = true])
@@ -131,10 +131,17 @@ for frame = 1:nFrames
         if useKbQueue
             % Use KbQueue
             [keyIsDown firstPress] = KbQueueCheck();
-            secs = min(firstPress(firstPress~=0));
-            ssKeyCode = firstPress==secs;
-            response.keyCode(frame) = find(ssKeyCode);
-            response.secs(frame) = secs - t0;
+            if keyIsDown
+                secs = min(firstPress(firstPress~=0));
+                ssKeyCode = firstPress==secs;
+                response.keyCode(frame) = find(ssKeyCode);
+                response.secs(frame) = secs - t0;
+                
+                if(ssKeyCode(quitProgKey)),
+                    quitProg = 1;
+                    break; % out of while loop
+                end;
+            end
         else
             % Use KbCheck
             %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
@@ -144,13 +151,13 @@ for frame = 1:nFrames
                 response.keyCode(frame) = kc(1);
                 % response.keyCode(frame) = 1; % binary response for now
                 response.secs(frame)    = ssSecs - t0;
+                
+                if(ssKeyCode(quitProgKey)),
+                    quitProg = 1;
+                    break; % out of while loop
+                end;
             end;
         end
-        
-        if(ssKeyCode(quitProgKey)),
-            quitProg = 1;
-            break; % out of while loop
-        end;
         
         % if there is time release cpu
         if(waitTime<-0.03), WaitSecs(0.01); end;

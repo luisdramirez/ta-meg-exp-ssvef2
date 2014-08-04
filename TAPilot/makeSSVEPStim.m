@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 2;
+run = 1;
 saveStim = 1;
 
 %% screen setup
@@ -21,7 +21,7 @@ targetLeadTime = 1; % (s) % no targets in first part of block
 targetEndTime = 1; % (s) % no targets in last part of block
 targetCushion = 1; % (s) % min interval between targets
 maxTargetsPerBlock = 3;
-attCueLeadTime = 0; % (s)
+attCueLeadTime = 0.5; % (s)
 respDur = 1; % (s)
 if refrate==75
     % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)

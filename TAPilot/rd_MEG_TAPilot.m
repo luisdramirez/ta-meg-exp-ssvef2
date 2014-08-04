@@ -38,7 +38,7 @@ if round(hz)~=frameRate
     error('Frame rate not set correctly')
 end
 % tr  = 1/hz*frameRate;
-useKbQueue = 0;
+useKbQueue = 1;
 use_eyetracker = false;
 
 % Do we want to use the eyetracker?
@@ -101,20 +101,24 @@ params = rotateFixCoords(params, pi/4); % rotate fix 45 deg
 % set button box device
 if useKbQueue
     params.display.devices.useKbQueue = 1;
-%     params.display.devices.keyInputExternal = [];
-%     devices = PsychHID('devices');
-%     for iD=1:numel(devices)
-%         if strcmp(devices(iD).usageName,'Keyboard') && ...
-%                 strcmp(devices(iD).product,'904')
-%             params.display.devices.keyInputExternal = iD;
-%         end
-%     end
-%     if isempty(params.display.devices.keyInputExternal)
-%         error('Did not find button box')
-%     end
+    params.display.devices.keyInputInternal = [];
+    params.display.devices.keyInputExternal = [];
+    devices = PsychHID('devices');
+    for iD=1:numel(devices)
+        if strcmp(devices(iD).usageName,'Keyboard') && ...
+                strcmp(devices(iD).product,'904')
+            params.display.devices.keyInputExternal = iD;
+        end
+    end
+    if isempty(params.display.devices.keyInputExternal)
+        error('Did not find button box')
+    end
 else
     params.display.devices.useKbQueue = 0;
 end
+
+% also make sure params.devices is set the same
+params.devices = params.display.devices;
 
 % go
 doRetinotopyScan(params);
