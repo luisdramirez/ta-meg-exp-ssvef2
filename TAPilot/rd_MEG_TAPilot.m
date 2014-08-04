@@ -17,7 +17,7 @@ function rd_MEG_TAPilot(n, stimfile)
 
 %% add paths
 addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
-0/0
+
 %% 
 % initialize stim tracker for MEG
 PTBInitStimTracker;
