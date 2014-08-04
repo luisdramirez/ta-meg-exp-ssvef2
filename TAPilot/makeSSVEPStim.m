@@ -1,7 +1,7 @@
 % makeSSVEPStim.m
 
 %% run setup
-run = 1;
+run = 2;
 saveStim = 1;
 
 %% screen setup
@@ -277,6 +277,7 @@ for iFrame = 1:numel(seqtiming)
             end
             
             trigSeq(iFrame,1) = computeTrigger(trig);
+%             trigSeq(iFrame,1) = 0;
             
         case 'combinatorial'
             % determine trigger - combinatorial code
@@ -316,6 +317,7 @@ for iFrame = 1:numel(seqtiming)
             end
             
             trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
+%             trigSeq(iFrame,1) = 0;
  
         otherwise
             error('triggerOption not recognized')
