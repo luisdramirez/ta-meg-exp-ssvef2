@@ -15,10 +15,16 @@ function rd_MEG_TAPilot(n, stimfile)
 % Modified from runme_MEG_OnOffLeftRight_ET_M2008.m
 % RD, July 2014
 
-%% add paths
+%% Add paths
 addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
 
-%% 
+%% Settings
+displayName = 'meg_lcd';
+frameRate = 60;
+useKbQueue = 1;
+use_eyetracker = true;
+
+%% Configurations
 % initialize stim tracker for MEG
 PTBInitStimTracker;
 global PTBTriggerLength 
@@ -30,16 +36,12 @@ skipSyncTests = 0;
 Screen('Preference', 'SkipSyncTests', skipSyncTests);
 
 %% Initialize Eyetracker and do Calibration
-displayName = 'meg_lcd';
-frameRate = 60;
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
 end
 % tr  = 1/hz*frameRate;
-useKbQueue = 1;
-use_eyetracker = false;
 
 % Do we want to use the eyetracker?
 if n == 1; % Only for the first run

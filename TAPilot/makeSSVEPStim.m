@@ -1,8 +1,13 @@
-% makeSSVEPStim.m
+function makeSSVEPStim(run)
 
 %% run setup
-run = 1;
+% run = 3;
 saveStim = 1;
+saveFigs = 1;
+
+%% file i/o
+stimDir = 'stimuli';
+stimFile = sprintf('taPilot%d', run);
 
 %% screen setup
 displayName = 'meg_lcd';
@@ -35,9 +40,11 @@ end
 
 %% blocks setup
 blockNames = {'blank','fast-left','slow-left'};
-blockOrder = [1 2 1 2 1 3 1 3 1];
+% blockOrder = [1 2 1 2 1 3 1 3 1];
+blockOrder = [1 2 1 2 1 3 1 3 1 2 1 2 1 3 1 3 1];
 attBlockNames = {'no-att','att-left','att-right'};
-attBlockOrder = [1 2 1 3 1 2 1 3 1];
+% attBlockOrder = [1 2 1 3 1 2 1 3 1];
+attBlockOrder = [1 2 1 3 1 2 1 3 1 2 1 3 1 2 1 3 1];
 nBlocks = numel(blockOrder);
 
 %% stim setup
@@ -325,14 +332,15 @@ for iFrame = 1:numel(seqtiming)
 end
 
 % show targetOnSeq and trigSeq
-figure
+f(1) = figure;
 subplot(2,1,1)
 plot(seqtiming,targetOnSeq)
 subplot(2,1,2)
 plot(seqtiming,trigSeq)
 
 % display triggers by channel
-displayTrigger(trigSeq, nBlocks)
+f(2) = displayTrigger(trigSeq, nBlocks);
+set(f(2),'Position',[0 0 1200 900]);
 
 %% Create stimulus strucutre
 % set remaining stimulus variables
@@ -354,6 +362,11 @@ stimulus.diodeSeq = diodeSeq;
 
 % save stimulus
 if saveStim
-    save(sprintf('%s%d.mat', 'stimuli/taStimSample', run), 'stimulus', 'p')
+    save(sprintf('%s/%s.mat', stimDir, stimFile), 'stimulus', 'p')
+end
+
+% save figs
+if saveFigs
+    rd_saveAllFigs(f, {'trigplot','trigchan'}, stimFile);
 end
 

@@ -1,4 +1,4 @@
-function displayTrigger(trigSeq, nBlocks)
+function f = displayTrigger(trigSeq, nBlocks)
 %
 % function displayTrigger(trigSeq, nBlocks)
 %
@@ -39,7 +39,7 @@ else
     nTimesPerPlot = round(nTrigs/nBlocks);
 end
 
-figure
+f = figure;
 for i = 1:nSubplots
     subplot(nSubplots,1,i)
     if i < nSubplots
