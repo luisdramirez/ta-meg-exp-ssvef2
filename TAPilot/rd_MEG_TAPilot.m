@@ -23,6 +23,7 @@ displayName = 'meg_lcd';
 frameRate = 60;
 useKbQueue = 1;
 use_eyetracker = true;
+eyeFile = sprintf('TA%02d%s', n, datestr(now, 'mmdd')); % 8 characters max
 
 %% Configurations
 % initialize stim tracker for MEG
@@ -44,9 +45,7 @@ end
 % tr  = 1/hz*frameRate;
 
 % Do we want to use the eyetracker?
-if n == 1; % Only for the first run
-%     use_eyetracker = false;
-    
+% if n == 1; % Only for the first run
     % You have to open a screen first (to get a window pointer), to start
     % the PTBInitEyeTracker;
     d = openScreen(d);
@@ -62,9 +61,9 @@ if n == 1; % Only for the first run
 
         % actually starts the recording
         % name correponding to MEG file (can only be 8 characters!!, no extension)
-        PTBStartEyeTrackerRecording('eyelink');
+        PTBStartEyeTrackerRecording(eyeFile);
     end
-end
+% end
 
 Screen('CloseAll');
 
@@ -76,16 +75,6 @@ params.modality         = 'MEG';
 params.calibration      = displayName;
 params.experiment       = 'Experiment From File';
 params.skipSyncTests    = skipSyncTests;
-% params.prescanDuration  = 0;
-% params.interleaves      = NaN;
-% params.tr               = 1/hz*frameRate;
-% params.framePeriod      = tr;
-% params.startScan        = 0;
-% params.motionSteps      = 2;
-% params.tempFreq         = 6/tr;
-% params.repetitions      = 1;
-% params.period           = 12*params.tr;
-% params.numCycles        = 6;
 
 %% ********************
 %  ***** GO ***********
@@ -127,7 +116,8 @@ doRetinotopyScan(params);
 
 %% Check timing results
 f = dir('~/Desktop/2014*.mat');
-load(fullfile('~', 'Desktop', f(end).name));
+fileName = fullfile('~', 'Desktop', f(end).name);
+load(fileName);
 figure(101); clf
 
 % desired inter-stimulus duration
@@ -154,19 +144,13 @@ plot(stimulus.seqtiming, response.keyCode)
 title('key presses')
 xlabel('seconds')
 
+%% Rename data file with run name and number
+newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, n);
+movefile(fileName, newFileName)
+
 %% Stop Eyetracker when done with experiment
-if n == 15;
+% if n == 15;
     if use_eyetracker
-
         PTBStopEyeTrackerRecording; % <----------- (can take a while)
-        
-        % move the file to the logs directory
-        destination = '~/Desktop/MEG_eyelink_';
-        i = 0;
-        while exist([destination num2str(i) '.edf'], 'file')
-            i = i + 1;
-        end
-        movefile('eyelink.edf', [destination num2str(i) '.edf'])
-
     end
-end
+% end
