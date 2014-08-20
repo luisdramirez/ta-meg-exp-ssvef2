@@ -9,7 +9,7 @@
 % Date: 10/12/11
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function PTBStopEyeTrackerRecording
+function PTBStopEyeTrackerRecording(eyeDir)
 
 global PTBEyeTrackerRecording;
 global PTBEyeTrackerInitialized;
@@ -48,12 +48,13 @@ end
 % PTBEyeTrackerFileName = 'test';
 
 % status = Eyelink('ReceiveFile',PTBEyeTrackerFileName, PTBEyeTrackerFileName);
-status = Eyelink('ReceiveFile', PTBEyeTrackerFileName, '~/Desktop', 1);
+% eyeDir = 'eyedata';
+status = Eyelink('ReceiveFile', PTBEyeTrackerFileName, eyeDir, 1);
 disp(['Got status ' num2str(status) ' for command for receive file.']);
 if status < 0
     error('Eyetracker file not received.');
 end
-if ~exist(PTBEyeTrackerFileName, 'file')
+if ~exist(sprintf('%s/%s.edf', eyeDir, PTBEyeTrackerFileName), 'file')
     error('Eyetracker file not found.');
 end
 

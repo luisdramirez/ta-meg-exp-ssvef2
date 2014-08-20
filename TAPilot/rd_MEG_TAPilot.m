@@ -24,6 +24,7 @@ frameRate = 60;
 useKbQueue = 1;
 use_eyetracker = true;
 eyeFile = sprintf('TA%02d%s', n, datestr(now, 'mmdd')); % 8 characters max
+eyeDir = 'eyedata';
 
 %% Configurations
 % initialize stim tracker for MEG
@@ -151,6 +152,6 @@ movefile(fileName, newFileName)
 %% Stop Eyetracker when done with experiment
 % if n == 15;
     if use_eyetracker
-        PTBStopEyeTrackerRecording; % <----------- (can take a while)
+        PTBStopEyeTrackerRecording(eyeDir); % <----------- (can take a while)
     end
 % end
