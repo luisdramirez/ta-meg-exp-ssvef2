@@ -270,6 +270,7 @@ for iFrame = 1:numel(seqtiming)
                     otherwise
                         error('blockName not recognized')
                 end
+%                 blockTrig = trig;
             elseif targetOnSeq(iFrame)~=0
                 % triger for target side, only on first target frame
                 if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
@@ -279,11 +280,15 @@ for iFrame = 1:numel(seqtiming)
                 else
                     trig = NaN;
                 end
+%                 targetTrig = trig;
             else
                 trig = NaN;
+%                 blockTrig = NaN;
+%                 targetTrig = NaN;
             end
             
             trigSeq(iFrame,1) = computeTrigger(trig);
+%             trigSeq(iFrame,1) = computeTrigger(blockTrig, targetTrig);
 %             trigSeq(iFrame,1) = 0;
             
         case 'combinatorial'
