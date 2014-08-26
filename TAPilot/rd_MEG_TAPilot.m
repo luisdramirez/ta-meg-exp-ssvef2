@@ -1,5 +1,5 @@
-function rd_MEG_TAPilot(n, stimfile)
-% rd_MEG_TAPilot(n, stimfile)
+function rd_MEG_TAPilot(run, stimfile)
+% rd_MEG_TAPilot(run, stimfile)
 %
 % MEG SSVEP left/right flicker rate x attention expt
 % with exo targets
@@ -8,7 +8,7 @@ function rd_MEG_TAPilot(n, stimfile)
 %       9 blocks with 7 s/block
 %
 % INPUTS
-%   n is the runnumber [1 15]
+%   run is the runnumber [1 15]
 %   stimfile is the prefix for the stimulus file containing images, stored
 %       in vistadisp/Applications2/Retinotopy/standard/storedImageMatrices
 %
@@ -23,7 +23,7 @@ displayName = 'meg_lcd';
 frameRate = 60;
 useKbQueue = 1;
 use_eyetracker = true;
-eyeFile = sprintf('TA%02d%s', n, datestr(now, 'mmdd')); % 8 characters max
+eyeFile = sprintf('TA%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 
 %% Configurations
@@ -76,7 +76,7 @@ params.skipSyncTests    = skipSyncTests;
 %% ********************
 %  ***** GO ***********
 %  *********************
-params.loadMatrix = sprintf('%s%d.mat', stimfile, n);
+params.loadMatrix = sprintf('%s%d.mat', stimfile, run);
 
 % load the rest of the params, but don't start yet (rd version)
 params = ret_rd(params); 
@@ -142,7 +142,7 @@ title('key presses')
 xlabel('seconds')
 
 %% Rename data file with run name and number
-newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, n);
+newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, run);
 movefile(fileName, newFileName)
 
 %% Stop Eyetracker when done with experiment
