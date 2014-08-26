@@ -43,28 +43,24 @@ hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
 end
-% tr  = 1/hz*frameRate;
 
-% Do we want to use the eyetracker?
-% if n == 1; % Only for the first run
-    % You have to open a screen first (to get a window pointer), to start
-    % the PTBInitEyeTracker;
-    d = openScreen(d);
-    global PTBTheWindowPtr
-    PTBTheWindowPtr = d.windowPtr;
+% You have to open a screen first (to get a window pointer), to start
+% the PTBInitEyeTracker;
+d = openScreen(d);
+global PTBTheWindowPtr
+PTBTheWindowPtr = d.windowPtr;
+
+if use_eyetracker
+    %Open the screen
+    PTBInitEyeTracker;
+    % paragraph = {'Eyetracker initialized.','Get ready to calibrate.'};
+    % PTBDisplayParagraph(paragraph, {'center',30}, {'a'});
+    PTBCalibrateEyeTracker;
     
-    if use_eyetracker
-        %Open the screen
-        PTBInitEyeTracker;
-        % paragraph = {'Eyetracker initialized.','Get ready to calibrate.'};
-        % PTBDisplayParagraph(paragraph, {'center',30}, {'a'});
-        PTBCalibrateEyeTracker;
-
-        % actually starts the recording
-        % name correponding to MEG file (can only be 8 characters!!, no extension)
-        PTBStartEyeTrackerRecording(eyeFile);
-    end
-% end
+    % actually starts the recording
+    % name correponding to MEG file (can only be 8 characters!!, no extension)
+    PTBStartEyeTrackerRecording(eyeFile);
+end
 
 Screen('CloseAll');
 
@@ -150,8 +146,6 @@ newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, n);
 movefile(fileName, newFileName)
 
 %% Stop Eyetracker when done with experiment
-% if n == 15;
-    if use_eyetracker
-        PTBStopEyeTrackerRecording(eyeDir); % <----------- (can take a while)
-    end
-% end
+if use_eyetracker
+    PTBStopEyeTrackerRecording(eyeDir); % <----------- (can take a while)
+end
