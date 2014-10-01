@@ -35,6 +35,7 @@ cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-c
 attCueLeadTime = 0.5; % (s)
 respDur = 1.4; % (s)
 feedbackDur = 0.3;
+cueDur = 0.1;
 if refrate==75
     % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
     fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
@@ -69,6 +70,14 @@ phases = [0 pi];
 
 stimPos = [6 4]; % [x y]
 stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
+
+%% sound setup
+Fs = 44100;
+cueFreqs = [1046.5 440]; % [higher high C = target 1, lower A = target 2]
+for iTone = 1:numel(cueFreqs)
+    tone = MakeBeep(cueFreqs(iTone), cueDur, Fs);
+    cueTones(iTone,:) = applyEnvelope(tone, Fs);
+end
 
 %% trigger setup
 triggerOption = 'conditionID'; % 'conditionID','combinatorial'
@@ -463,6 +472,7 @@ diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
 
 % store in stimulus structure
 stimulus.images = images*255;
+stimulus.sounds = cueTones;
 stimulus.cmap = cmap;
 stimulus.seq = seq;
 stimulus.seqtiming = seqtiming;
@@ -472,6 +482,10 @@ stimulus.destRect = destRect;
 stimulus.trigSeq = trigSeq;
 stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
+
+a = zeros(size(trigSeq));
+a(trigSeq==computeTrigger(6)) = 1;
+stimulus.soundSeq = a;
 
 % save stimulus
 if saveStim

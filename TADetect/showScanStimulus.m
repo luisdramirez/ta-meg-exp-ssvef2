@@ -89,6 +89,17 @@ if useKbQueue
     KbQueueStart();
 end
 
+% set up sound if desired
+if isfield(stimulus, 'soundSeq')
+    % Perform basic initialization of the sound driver
+    InitializePsychSound(1); % 1 for precise timing
+    
+    % Open audio device for low-latency output
+    Fs = 44100;
+    reqlatencyclass = 2; % Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
+    pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
+end
+
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
 
@@ -127,6 +138,13 @@ for frame = 1:nFrames
         % If we are doing eCOG, then flash photodiode if requested
         if isfield(stimulus, 'diodeSeq')
             colIndex = drawTrig(display,stimulus.diodeSeq(frame));
+        end
+        
+        % Play a sound if requested
+        if isfield(stimulus, 'soundSeq')
+            if stimulus.soundSeq(frame)~=0
+                playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:))
+            end
         end
         
     elseif stimulus.seq(frame)<0
