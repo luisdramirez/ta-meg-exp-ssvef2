@@ -3,7 +3,7 @@ function makeTADetectStim(run)
 %% run setup
 % run = 3;
 saveStim = 1;
-saveFigs = 1;
+saveFigs = 0;
 
 %% add paths
 addpath('../TAPilot')
@@ -21,14 +21,17 @@ screenHeight = d.numPixels(2); % (px)
 cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
+%% keys setup
+keyNames = {'1!','2@'}; % [present absent]
+keyCodes = KbName(keyNames);
+
 %% timing setup
 refrate = 60; % (Hz)
 blockDur = 5; % (s)
 targetDur = 3/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetEndTime = 2.7; % (s) % no targets in last part of block
 targetSOA = 0.8; % (s) % SOA between targets
-maxTargetsPerBlock = 2;
+cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.4; % (s)
 feedbackDur = 0.3;
@@ -49,6 +52,8 @@ attBlockNames = {'no-att','att-right'};
 attBlockOrder = [1 2 2 2 2 1];
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 targetBlockOrder = [1 2 3 4 5 1]; % order should be unpredictable
+cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockOrder = [1 2 3 4 5 1]; % should also be randomized and counterbalanced with target order
 nBlocks = numel(blockOrder);
 
 %% stim setup
@@ -72,8 +77,9 @@ triggerOption = 'conditionID'; % 'conditionID','combinatorial'
 % sorry this is kind of a horrible way to do this
 p = v2struct(...
     displayName, pixelsPerDegree, screenWidth, screenHeight, cx, cy, ...
-    refrate, blockDur, targetDur, targetLeadTime, targetEndTime, targetSOA, ...
-    maxTargetsPerBlock, attCueLeadTime, respDur, feedbackDur, fastUnit, slowUnit, ...
+    keyNames, keyCodes, ...
+    refrate, blockDur, targetDur, targetLeadTime, targetSOA, ...
+    attCueLeadTime, respDur, feedbackDur, fastUnit, slowUnit, ...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
     stimSize, spatialFreq, orientation, stimContrast, targetContrast, ...
     contrasts, blurRadius, backgroundColor, phases, triggerOption);
@@ -298,19 +304,49 @@ for iFrame = 1:numel(seqtiming)
         case 'att-left'
             if blockStartTimes(blockIdx+1)-time < feedbackDur
                 % display feedback at the end of the block
-                fixSeq(iFrame,1) = 7; % COME BACK
-            else
+                fixSeq(iFrame,1) = 8; % blue
+             else
                 fixSeq(iFrame,1) = 4;
             end
         case 'att-right'
             if blockStartTimes(blockIdx+1)-time < feedbackDur
                 % display feedback at the end of the block
-                fixSeq(iFrame,1) = 7; % COME BACK
+                fixSeq(iFrame,1) = 8; % blue
             else
                 fixSeq(iFrame,1) = 5;
             end
         otherwise
             error('attBlockName not recognized')
+    end
+    
+    % determine correct response keycode
+    cueBlock = cueBlockNames{cueBlockOrder(blockIdx)};
+    if ~strcmp(cueBlock, 'no-cue') && ...
+            time-blockStartTimes(blockIdx) > targetLeadTime + targetSOA + cueTargetSOA && ...
+            blockStartTimes(blockIdx+1)-time > feedbackDur
+        % which target is post-cued?
+        responseCue = str2double(cueBlock(end));
+        switch targetBlockNames{targetBlockOrder(blockIdx)}
+            case 'pres-pres'
+                correctResponse = 1; % present
+            case 'pres-abs'
+                if responseCue==1
+                    correctResponse = 1; % present
+                else
+                    correctResponse = 2; % absent
+                end
+            case 'abs-pres'
+                if responseCue==1
+                    correctResponse = 2; % absent
+                else
+                    correctResponse = 1; % present
+                end
+            case 'abs-abs'
+                correctResponse = 2; % absent
+        end
+        keyCodeSeq(iFrame,1) = keyCodes(correctResponse);
+    else
+        keyCodeSeq(iFrame,1) = 0;
     end
     
     switch triggerOption
@@ -407,10 +443,12 @@ end
 
 % show targetOnSeq and trigSeq
 f(1) = figure;
-subplot(2,1,1)
+subplot(3,1,1)
 plot(seqtiming,targetOnSeq)
-subplot(2,1,2)
+subplot(3,1,2)
 plot(seqtiming,trigSeq)
+subplot(3,1,3)
+plot(seqtiming,keyCodeSeq)
 
 % display triggers by channel
 f(2) = displayTrigger(trigSeq, nBlocks);
@@ -433,6 +471,7 @@ stimulus.srcRect = srcRect;
 stimulus.destRect = destRect;
 stimulus.trigSeq = trigSeq;
 stimulus.diodeSeq = diodeSeq;
+stimulus.keyCodeSeq = keyCodeSeq;
 
 % save stimulus
 if saveStim

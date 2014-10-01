@@ -105,6 +105,22 @@ for frame = 1:nFrames
         % put in an image
         imgNum = mod(stimulus.seq(frame)-1,nImages)+1;
         Screen('DrawTexture', display.windowPtr, stimulus.textures(imgNum), stimulus.srcRect, stimulus.destRect);
+        
+        % determine feedback according to response accuracy
+        % sorry some of this is hard-coded for now
+        if stimulus.fixSeq(frame)==8 % feedback period
+            responseWindow = response.correct(frame-120:frame-1); % look 2 s back
+            correct = responseWindow(responseWindow~=0);
+            if ~isempty(correct)
+                correct = correct(1); % take first response
+                if correct==1
+                    stimulus.fixSeq(frame) = 7; % green
+                elseif correct==-1
+                    stimulus.fixSeq(frame) = 6; % red
+                end
+            end
+        end
+        
         drawFixation_rd(display,stimulus.fixSeq(frame));
         
         % If we are doing eCOG, then flash photodiode if requested
@@ -137,10 +153,18 @@ for frame = 1:nFrames
                 response.keyCode(frame) = find(ssKeyCode);
                 response.secs(frame) = secs - t0;
                 
+                if response.keyCode(frame)==stimulus.keyCodeSeq(frame)
+                    response.correct(frame) = 1;
+                else
+                    response.correct(frame) = -1;
+                end
+                
                 if(ssKeyCode(quitProgKey)),
                     quitProg = 1;
                     break; % out of while loop
                 end;
+            else
+                response.correct(frame) = 0;
             end
         else
             % Use KbCheck
@@ -152,11 +176,19 @@ for frame = 1:nFrames
                 % response.keyCode(frame) = 1; % binary response for now
                 response.secs(frame)    = ssSecs - t0;
                 
+                if response.keyCode(frame)==stimulus.keyCodeSeq(frame)
+                    response.correct(frame) = 1;
+                else
+                    response.correct(frame) = -1;
+                end
+                
                 if(ssKeyCode(quitProgKey)),
                     quitProg = 1;
                     break; % out of while loop
                 end;
-            end;
+            else
+                response.correct(frame) = 0;
+            end
         end
         
         % if there is time release cpu
