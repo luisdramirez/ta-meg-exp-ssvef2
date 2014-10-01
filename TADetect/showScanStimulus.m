@@ -109,7 +109,8 @@ for frame = 1:nFrames
         % determine feedback according to response accuracy
         % sorry some of this is hard-coded for now
         if stimulus.fixSeq(frame)==8 % feedback period
-            responseWindow = response.correct(frame-120:frame-1); % look 2 s back
+            nRespFrames = display.frameRate*1.7; % look 1.7 s back
+            responseWindow = response.correct(frame-nRespFrames:frame-1);
             correct = responseWindow(responseWindow~=0);
             if ~isempty(correct)
                 correct = correct(1); % take first response
