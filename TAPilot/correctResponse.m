@@ -1,22 +1,24 @@
-% Determine correct/incorrect responses for MEG data.
-
-%% To do
-% Replace hard-coded numbers with named variables
-% Make trial headers cell array
-% What happens if someone misses a trial (doesn't press any key)?
+%% Determine correct/incorrect responses for MEG data.
+    %% Revisions: how to deal with no reponse
 
 %% Just get the data from one file
-load('20140806T103117_taPilot7.mat');
+load('20140806T101303_taPilot1.mat');
 trialCount = 8;
-%keyIndex = ([1:8]*840)+1
-% attendIndex = ([1:8]*420)+1
 respSecs = 2;
 refreshRate = 60;
+blockLength = 840; % in frames
+cueLeft = {1 4};
+cueRight = {2 8};
+maxCue = max(max(cell2mat(cueLeft)), max(cell2mat(cueRight)));
+keyCode = [30, 31, 32, 33]; % for response button box
+targetLeft = 16;
+targetRight = 32;
 
 %% Key-code response search loop
+
 for trialNum = 1 : trialCount
     % Search from begSearchIdx to endSearchIdx
-    begSearchIdx = (840 * trialNum) + 1;
+    begSearchIdx = (blockLength * trialNum) + 1;
     endSearchIdx = begSearchIdx + (respSecs * refreshRate);
     
     % Find the index for ALL non-zero key-codes
@@ -25,57 +27,63 @@ for trialNum = 1 : trialCount
     if length(foundIdxArr) < 1
         % Didn't find activity ... just skip over to the next trial
         sprintf('Trial %d: No KeyCode value found', trialNum)
+        rData.keyCode(trialNum,:) = NaN;
+        rData.RT(trialNum,:) = NaN;
+        rData.response(trialNum,:) = NaN;
         continue
     end
-    
+
     % This is the first key-code found
     fidx = foundIdxArr(1);
     keyVal = response.keyCode(fidx);
     % We DID find a KeyCode and it's here ...
-    fprintf('\nTrial %d: KeyCode %d found at Idx = %d', trialNum, keyVal, fidx))
-    
+    sprintf('Trial %d: KeyCode %d found at Idx = %d', trialNum, keyVal, fidx)
+
     % Your key-code related code goes here
-    rData.RT(trialNum,:) = response.secs(fidx) - (840 * trialNum +1)/60 ;
+    rData.RT(trialNum,:) = response.secs(fidx) - (blockLength * trialNum +1)/refreshRate ;
     rData.keyCode(trialNum,:) = keyVal;
+    
+    % Create translation column for what keyCode means (response)
     switch keyVal
-        case 30
+        case keyCode(1)
             rData.response(trialNum,:) = 0;
-        case 31
+        case keyCode(2)
             rData.response(trialNum,:) = 1;
-        case 32
+        case keyCode(3)
             rData.response(trialNum,:) = 2;
-        case 33
+        case keyCode(4)
             rData.response(trialNum,:) = 3;
     end
 end
 
-%% The cue search loop
-% for trialNum = 1 : trialCount
-%     cueIdx = 421 + (trialNum - 1) * 840;
-cond = response.trig~=0 & response.trig<10;
-cueVal = response.trig(cond);
-cueIdx = find(cond);
-% We DID find a cue and it's here ...
-fprintf('\nTrial %d: cue = %d found at Idx = %d', trialNum, cueVal, cueIdx)
+%% The attentional cue search loop
 
-% Your key-code related code goes here
-rData.cueVal = cueVal';
-
-for trialNum = 1:length(rData.cueVal)
-    switch rData.cueVal(trialNum)
-        case {1, 4}
-            rData.cueSide(trialNum,:) = 1; % 1= left
-        case {2, 8}
-            rData.cueSide(trialNum,:) = 2; % 2 = right
+    cond = response.trig~=0 & response.trig<=maxCue ; 
+    cueVal = response.trig(cond);
+    cueIdx = find(cond);
+    % We DID find a cue and it's here ...
+    fprintf('Trial %d: cue = %d found at Idx = %d', trialNum, cueVal, cueIdx);
+    % Your key-code related code goes here
+    rData.cueVal = cueVal';
+    
+    %Create translation column for what cueVal mean (cue side)
+    for trialNum = 1:length(rData.cueVal)
+        switch rData.cueVal(trialNum)
+            case cueLeft
+                rData.cueSide(trialNum,:) = 1; % 1= left
+            case cueRight
+                rData.cueSide(trialNum,:) = 2; % 2 = right
+        end
     end
-end
-% end
+
 
 %% Trigger type search loop
 for trialNum = 1 : trialCount
+    
     % Search from begSearchIdx to endSearchIdx
-    begSearchIdx = 1 + 421 + (trialNum - 1) * 840;
-    endSearchIdx = 840 * trialNum;
+    begSearchIdx = cueIdx(trialNum) +1; % +1 to start one further than cue trigger
+    endSearchIdx = blockLength * trialNum;  % this is one before blank trigger
+    
     % AVOID: Exceed matrix dimensions
     if endSearchIdx > length(response.trig)
         endSearchIdx = length(response.trig);
@@ -91,37 +99,39 @@ for trialNum = 1 : trialCount
         continue
     end
     % Count the trigger types in different arrays
-    sixteenCount = 0;
-    thirtytwoCount = 0;
+    targetLeftCount = 0;
+    targetRightCount = 0;
     for trigIdx = foundIdxArr
         trigType = response.trig(trigIdx);
-        if trigType == 16
-            sixteenCount = sixteenCount + 1;
-        elseif trigType == 32
-            thirtytwoCount = thirtytwoCount + 1;
+        if trigType == targetLeft
+            targetLeftCount = targetLeftCount + 1;
+        elseif trigType == targetRight
+            targetRightCount = targetRightCount + 1;
         else
             sprintf('WARNING: What?  Bad trigger type value: %d', trigType)
         end
     end
     % Put them in an array for each trial
     switch rData.cueVal(trialNum)
-        case {1, 4}
-            rData.attendedStim(trialNum,:) = sixteenCount;
-            rData.unattendedStim(trialNum,:) = thirtytwoCount;
-        case {2, 8}
-            rData.attendedStim(trialNum,:) = thirtytwoCount;
-            rData.unattendedStim(trialNum,:) = sixteenCount;
+        case cueLeft
+            rData.attendedStim(trialNum,:) = targetLeftCount;
+            rData.unattendedStim(trialNum,:) = targetRightCount;
+        case cueRight
+            rData.attendedStim(trialNum,:) = targetRightCount;
+            rData.unattendedStim(trialNum,:) = targetLeftCount;
     end
 end
 
 %% The accuracy loop
 for trialNum = 1 : trialCount;
     if rData.response(trialNum) == rData.attendedStim(trialNum);
-        rData.accuracy(trialNum,:) = 1;
+        rData.accuracy(trialNum,:) = 1; %correct
     else
-        rData.accuracy(trialNum,:) = 0;
+        rData.accuracy(trialNum,:) = 0; % incorrect
     end
 end
 
-trial = horzcat( (1:8)' , rData.cueVal , rData.cueSide , rData.attendedStim , rData.unattendedStim , rData.keyCode , rData.response , rData.accuracy , rData.RT );
+%% Create final output matrix
+trial = horzcat( (1:trialCount)' , rData.cueVal , rData.cueSide , rData.attendedStim , rData.unattendedStim , rData.keyCode , rData.response , rData.accuracy , rData.RT );
 
+trialLabels = {'trial number', 'cue trigger', 'cued side', 'attended targets', 'unattended targets', 'key code', 'response', 'accuracy', 'RT'};
