@@ -1,4 +1,4 @@
-function display = attInitFixParams(display)
+function display = attInitFixParams_rd(display)
 %Set the fixation parameters for meg attention experiment
 %
 %  display = attInitFixParams(display)
@@ -8,6 +8,9 @@ display.fixSizePixels  = 2;
 
 display.fixColorRgb    = [0     0    0    255; ... % black 
                           255   255  255  255; ... % white 
+                          255   0    0    255; ... % red
+                          0     255  0    255; ... % green
+                          0     0    255  255; ... % blue
                         ];
 
 % Center the fixation in the middle of the screen

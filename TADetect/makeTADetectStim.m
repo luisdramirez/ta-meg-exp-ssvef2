@@ -298,14 +298,14 @@ for iFrame = 1:numel(seqtiming)
         case 'att-left'
             if blockStartTimes(blockIdx+1)-time < feedbackDur
                 % display feedback at the end of the block
-                fixSeq(iFrame,1) = NaN; % COME BACK
+                fixSeq(iFrame,1) = 7; % COME BACK
             else
                 fixSeq(iFrame,1) = 4;
             end
         case 'att-right'
             if blockStartTimes(blockIdx+1)-time < feedbackDur
                 % display feedback at the end of the block
-                fixSeq(iFrame,1) = NaN; % COME BACK
+                fixSeq(iFrame,1) = 7; % COME BACK
             else
                 fixSeq(iFrame,1) = 5;
             end

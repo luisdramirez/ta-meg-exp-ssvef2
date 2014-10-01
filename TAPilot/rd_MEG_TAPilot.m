@@ -21,8 +21,8 @@ addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
 %% Settings
 displayName = 'meg_lcd';
 frameRate = 60;
-useKbQueue = 1;
-use_eyetracker = true;
+useKbQueue = 0;
+use_eyetracker = false;
 eyeFile = sprintf('TA%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 

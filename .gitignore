@@ -1,9 +1,9 @@
 # gitignore
 
 *~
-TAPilot/stimuli/
-TAPilot/figures/
-TAPilot/data/
+*/stimuli/
+*/figures/
+*/data/
 From_Eline/
 SingleTone/
 .DS_Store
