@@ -3,7 +3,7 @@ function makeTADetectStim(run)
 %% run setup
 % run = 3;
 saveStim = 1;
-saveFigs = 0;
+saveFigs = 1;
 
 %% add paths
 addpath('../TAPilot')
@@ -147,7 +147,7 @@ imageIDs(end+1) = 0;
 %     pause(1);
 % end
 
-%% Generate the stimulus sequence
+%% Determine the stimulus times
 runDur = blockDur*nBlocks;
 blockStartTimes = 0:blockDur:runDur-blockDur;
 nFramesPerBlock = blockDur*refrate;
@@ -155,9 +155,11 @@ nFramesPerBlock = blockDur*refrate;
 % fixed target times (T1 and T2) on the attended (right-side) stimulus
 targetStartTimes = [];
 targetAbsStartTimes = [];
+cueStartTimes = [];
 for iBlock = 1:nBlocks
     if ~strcmp(blockNames{blockOrder(iBlock)},'blank')
         targetTimes = [0 targetSOA];
+        cueTimes = [targetTimes(1)-cueTargetSOA targetTimes(2)+cueTargetSOA];
         
         % eliminate "absent" targets, depending on condition
         targetBlockName = targetBlockNames{targetBlockOrder(iBlock)};
@@ -184,6 +186,10 @@ for iBlock = 1:nBlocks
         % target absent
         targetAbsTimes = targetAbsTimes + blockStartTimes(iBlock) + targetLeadTime;
         targetAbsStartTimes = [targetAbsStartTimes; targetAbsTimes'];
+        
+        % pre- and post-cues
+        cueTimes = cueTimes + blockStartTimes(iBlock) + targetLeadTime;
+        cueStartTimes = [cueStartTimes; cueTimes'];
     end
 end
 targetEndTimes = targetStartTimes + targetDur;
@@ -196,6 +202,10 @@ targetAbsEndTimes = targetAbsStartTimes + targetDur;
 nAbsTargets = numel(targetAbsStartTimes);
 targetAbsSides = ones(1,nAbsTargets)*2;
 
+% tone cues
+nCues = numel(cueStartTimes);
+
+%% Generate the stimulus sequence
 % time points
 seqtiming = (0:1/refrate:runDur-1/refrate)';
 
@@ -212,6 +222,7 @@ targetIdx = 1; % target present (on either side)
 targetOn = 0;
 targetAbsIdx = 1; % target absent
 targetAbsOn = 0;
+cueIdx = 1;
 for iFrame = 1:numel(seqtiming)
     time = seqtiming(iFrame);
     % start a new block when it's time
@@ -227,6 +238,23 @@ for iFrame = 1:numel(seqtiming)
     end
     if iFrame==1 % make sure newBlock is 1 on the first frame
         newBlock = 1;
+    end
+    
+    % determine if is time to turn on the tone cue
+    if cueIdx <= nCues && cueStartTimes(cueIdx)-time < 1/refrate
+        cueBlockName = cueBlockNames{cueBlockOrder(blockIdx)};
+        if mod(cueIdx,2) % odd cues are pre-cues
+            cueType = str2double(cueBlockName(1));
+        else % even cues are response cues
+            cueType = str2double(cueBlockName(end));
+        end
+        if isnan(cueType)
+            error('cues should not be presented during no-cue blocks. check code.')
+        end
+        cueSeq(iFrame,1) = cueType;
+        cueIdx = cueIdx + 1;
+    else
+        cueSeq(iFrame,1) = 0;
     end
     
     % determine if target is on
@@ -293,7 +321,7 @@ for iFrame = 1:numel(seqtiming)
     
     seq(iFrame,1) = find(imageIDs==imageID);
     
-    % determine cue
+    % determine spatial attention cue
     switch attBlockName
         case 'no-att'
             if time-blockStartTimes(blockIdx) < respDur
@@ -398,6 +426,8 @@ for iFrame = 1:numel(seqtiming)
                 else
                     trig = NaN;
                 end
+            elseif cueSeq(iFrame)~=0
+                trig = 8; % pre- or post-cue
             else
                 trig = NaN;
             end
@@ -482,10 +512,7 @@ stimulus.destRect = destRect;
 stimulus.trigSeq = trigSeq;
 stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
-
-a = zeros(size(trigSeq));
-a(trigSeq==computeTrigger(6)) = 1;
-stimulus.soundSeq = a;
+stimulus.soundSeq = cueSeq;
 
 % save stimulus
 if saveStim
