@@ -48,13 +48,13 @@ end
 
 %% blocks setup
 blockNames = {'blank','fast-left','slow-left'};
-blockOrder = [1 2 3 2 3 1];
+blockOrder = [1 2 3 2 3 1 2 3 2 3 1];
 attBlockNames = {'no-att','att-right'};
-attBlockOrder = [1 2 2 2 2 1];
+attBlockOrder = [1 2 2 2 2 1 2 2 2 2 1];
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-targetBlockOrder = [1 2 3 4 5 1]; % order should be unpredictable
+targetBlockOrder = [1 2 3 4 5 1 2 3 4 5 1]; % order should be unpredictable
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-cueBlockOrder = [1 2 3 4 5 1]; % should also be randomized and counterbalanced with target order
+cueBlockOrder = [1 2 3 4 5 1 2 3 4 5 1]; % should also be randomized and counterbalanced with target order
 nBlocks = numel(blockOrder);
 
 %% stim setup
@@ -73,7 +73,8 @@ stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
 
 %% sound setup
 Fs = 44100;
-cueFreqs = [1046.5 440]; % [higher high C = target 1, lower A = target 2]
+cueFreqs = [784 523];
+% cueFreqs = [1046.5 440]; % [higher high C = target 1, lower A = target 2]
 for iTone = 1:numel(cueFreqs)
     tone = MakeBeep(cueFreqs(iTone), cueDur, Fs);
     cueTones(iTone,:) = applyEnvelope(tone, Fs);
