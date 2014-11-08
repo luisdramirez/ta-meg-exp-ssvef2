@@ -48,27 +48,28 @@ accuracy_all = responseData_all(:,9);
 
 for n = 1:length(df)
     
+    runIndx = run == n;
+    
     % postCue = T1; cueBlockNames is valid '1-1' or invalid '2-1'
 
-    valid_T1 = accuracy_all(run == n & cueBlockOrder == 2);
+    valid_T1 = accuracy_all(runIndx & cueBlockOrder == 2);
     Pc.valid_T1(:,n) = sum (valid_T1 == 1) / numel(valid_T1);
 
-    invalid_T1 = accuracy_all(run == n & cueBlockOrder == 4);
+    invalid_T1 = accuracy_all(runIndx & cueBlockOrder == 4);
     Pc.invalid_T1(:,n) = sum(invalid_T1 == 1) / numel(invalid_T1);
-
 
     % postCue = T2; cueBlockNames is valid '2-2 or invalid '1-2'
 
-    valid_T2 = accuracy_all(run == n & cueBlockOrder == 5);
+    valid_T2 = accuracy_all(runIndx & cueBlockOrder == 5);
     Pc.valid_T2(:,n) = sum(valid_T1 == 1) / numel(valid_T2);
 
-    invalid_T2 = accuracy_all(run == n & cueBlockOrder == 3);
+    invalid_T2 = accuracy_all(runIndx & cueBlockOrder == 3);
     Pc.invalid_T2(:,n) = sum(invalid_T2 == 1) / numel(invalid_T2);
 
     % overall accuracy
-    Pc.all(:,n) = sum(run == n & accuracy_all == 1)/sum(run == n &...
-        responseData_all(:,2) ~= 1);
-
+    correctPerRun  = accuracy_all(runIndx) == 1;
+    Pc.all(:,n) = sum(correctPerRun) / sum(responseData_all(runIndx, ...
+        3) ~= 1);
 end
 
 %% calculate means and stes
