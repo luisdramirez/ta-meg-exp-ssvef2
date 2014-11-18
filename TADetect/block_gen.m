@@ -1,11 +1,19 @@
-function [targetBlockOrder, cueBlockOrder] = block_gen( targetBlockNames ,cueBlockNames )
-% Target and cue block random generator for one run (32 trials in one 
+function [blockOrder,attBlockOrder,targetBlockOrder, cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames ,cueBlockNames )
+% Random block generator for makeTADetectStim: one run (32 trials in one 
 % repetition = 4 trials for each target (4) x cue (2) condition ) with
 % added blank trials every 4 target trials 
-% Assume cue validity = 75% ( 3 trials with post-cue = cue or valid and 1 
-% trial with post ~= cue or invalid)
+% Assume cue validity = 75% ( 3 trials valid and 1 trial invalid )
+% One blockOrder condition: fast-left or slow-left
+% One attBlockOrder condition: att-right
+
 
 %% define indices
+
+blank = find(ismember(blockNames,'blank'));
+fast_side = find(ismember(blockNames,{'fast-left','slow-left'}));
+
+no_att = find(ismember(attBlockNames,'no-att'));
+att_right = find(ismember(attBlockNames,'att-right'));
 
 nt = find(ismember(targetBlockNames,'no-targ'));
 pp = find(ismember(targetBlockNames,'pres-pres'));
@@ -57,6 +65,13 @@ targetBlockOrder = ind;
 ind2(ind2 == 0) = cueBlockOrder;
 cueBlockOrder = ind2;
 
+
+%% block order (one condition) and attention order
+block = [blank,repmat(fast_side,1,4)];
+blockOrder = [repmat(block,1,8),blank];
+
+att = [no_att,repmat(att_right,1,4)];
+attBlockOrder = [repmat(att,1,8),no_att];
 
 
 end
