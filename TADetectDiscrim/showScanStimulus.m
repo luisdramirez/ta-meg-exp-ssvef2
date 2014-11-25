@@ -39,6 +39,10 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
+% target tilts
+tilts = [-5 5]; % relative to the base orientation
+fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
+
 % input checks
 if nargin < 2,
     help(mfilename);
@@ -100,6 +104,11 @@ if isfield(stimulus, 'soundSeq')
     pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
 end
 
+% set up target if desired
+if isfield(stimulus, 'target')
+    target = stimulus.target;
+end
+
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
 
@@ -116,6 +125,16 @@ for frame = 1:nFrames
         % put in an image
         imgNum = mod(stimulus.seq(frame)-1,nImages)+1;
         Screen('DrawTexture', display.windowPtr, stimulus.textures(imgNum), stimulus.srcRect, stimulus.destRect);
+
+        % add target
+        if isfield(stimulus, 'target')
+            if target.seq(frame)>0
+                rot = target.baseOrient + tilts(target.seq(frame));
+                xy = rotateCoords(target.xy0, rot);
+                Screen('DrawLines', display.windowPtr, xy, target.width, ...
+                    target.colors, target.center);
+            end
+        end
         
         % determine feedback according to response accuracy
         % sorry some of this is hard-coded for now

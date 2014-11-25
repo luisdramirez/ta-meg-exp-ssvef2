@@ -2,17 +2,16 @@ function makeTADetectDiscrimStim(run)
 
 %% run setup
 % run = 3;
-saveStim = 0;
+saveStim = 1;
 saveFigs = 0;
 
 %% add paths
 addpath(genpath('/../vistadisp'))
 addpath('../TAPilot')
 
-
 %% file i/o
 stimDir = 'stimuli';
-stimFile = sprintf('taDetect%d', run);
+stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
 displayName = 'meg_lcd';
@@ -53,7 +52,7 @@ blockNames = {'blank','fast-left'}; % fast-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-[blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames ,cueBlockNames );
+[blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames);
 nBlocks = numel(blockOrder);
 
 %% stim setup   
@@ -61,7 +60,7 @@ stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
 stimContrast = 0.64;
-targetContrast = 0.84;
+targetContrast = 0.64;
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
@@ -90,7 +89,7 @@ p = v2struct(...
     refrate, blockDur, targetDur, targetLeadTime, targetSOA, ...
     attCueLeadTime, respDur, feedbackDur, fastUnit, slowUnit, ...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
-    stimSize, spatialFreq, orientation, stimContrast, targetContrast, ...
+    stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
     contrasts, blurRadius, backgroundColor, phases, triggerOption);
 
 %% Make the stimuli
@@ -493,6 +492,36 @@ plot(seqtiming,keyCodeSeq)
 f(2) = displayTrigger(trigSeq, nBlocks);
 set(f(2),'Position',[0 0 1200 900]);
 
+%% Set up orientation target
+% choose target types (orientations) for all targets at random
+targetIdx = find(trigSeq==computeTrigger(6));
+nTargets = numel(targetIdx);
+targetTypes = randi(2, [1 nTargets]);
+nFramesPerTarget = round(targetDur*refrate);
+targets = reshape(repmat(targetTypes,nFramesPerTarget,1),...
+    nTargets*nFramesPerTarget,1);
+targetFrames = [];
+for i = 1:nFramesPerTarget
+    targetFrames = [targetFrames; targetIdx + i - 1];
+end
+targetFrames = sort(targetFrames);
+targetTypeSeq = zeros(size(targetOnSeq));
+targetTypeSeq(targetFrames) = targets;
+
+% set up lines, just vertical and horizontal of the right size, centered on
+% (0,0)
+xy0 = round([0 0 stimSize/2 -stimSize/2; ...
+    stimSize/2 -stimSize/2 0 0].*pixelsPerDegree*0.85); % so it doesn't go all the way to the edge of the patch
+targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
+
+% store in target structure
+target.seq = targetTypeSeq;
+target.xy0 = xy0;
+target.center = targetCenter;
+target.width = 2;
+target.colors = [1 0 0]*255;
+target.baseOrient = 45;
+
 %% Create stimulus strucutre
 % set remaining stimulus variables
 cmap = repmat((0:255)',1,3);
@@ -513,12 +542,13 @@ stimulus.trigSeq = trigSeq;
 stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
+stimulus.target = target;
 
 % store in order structure
 order.blockorder = blockOrder;
 order.attBlockOrder = attBlockOrder;
 order.targetBlockOrder = targetBlockOrder;
-order.cueBlockOrder = cueBlockOrder;
+order.cueBlockOrder = cueBlockOrder; 
 
 % save stimulus
 if saveStim
