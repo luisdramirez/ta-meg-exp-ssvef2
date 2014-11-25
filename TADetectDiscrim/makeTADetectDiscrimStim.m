@@ -23,13 +23,14 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-keyNames = {'1!','2@'}; % [present absent]
+keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
 keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
 blockDur = 5; % (s)
-targetDur = 3/refrate; % (s)
+nFramesPerTarget = 3;
+targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.8; % (s) % SOA between targets
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
@@ -89,6 +90,7 @@ p = v2struct(...
     refrate, blockDur, targetDur, targetLeadTime, targetSOA, ...
     attCueLeadTime, respDur, feedbackDur, fastUnit, slowUnit, ...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
+    cueBlockNames, cueBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
     contrasts, blurRadius, backgroundColor, phases, triggerOption);
 
@@ -145,6 +147,20 @@ imageIDs(end+1) = 0;
 %     imshow(images(:,:,iIm));
 %     pause(1);
 % end
+
+%% Set up targets
+% set up lines, just vertical and horizontal of the right size, centered on
+% (0,0)
+xy0 = round([0 0 stimSize/2 -stimSize/2; ...
+    stimSize/2 -stimSize/2 0 0].*pixelsPerDegree*0.85); % so it doesn't go all the way to the edge of the patch
+targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
+
+% store in target structure
+target.xy0 = xy0;
+target.center = targetCenter;
+target.width = 2;
+target.colors = [1 0 0]*255;
+target.baseOrient = 45;
 
 %% Determine the stimulus times
 runDur = blockDur*nBlocks;
@@ -279,6 +295,18 @@ for iFrame = 1:numel(seqtiming)
         c1 = 1; c2 = 1;
         targetOnSeq(iFrame,1) = 0;
     end
+    % specify the target type (for discrimination)
+    if targetOn
+        if targetOnSeq(iFrame-1)==0 % first frame of target
+            targetType = randi(2); % 1 or 2
+            targetTypeSeq(iFrame,1) = targetType;
+            targetTypes(targetIdx) = targetType;
+        else
+            targetTypeSeq(iFrame,1) = targetTypeSeq(iFrame-1);
+        end
+    else
+        targetTypeSeq(iFrame,1) = 0;
+    end
     
     % determine if an absent target is "on" (if it is time for that target)
     % treat it the same way as real targets, in order to determine
@@ -364,22 +392,33 @@ for iFrame = 1:numel(seqtiming)
         responseCue = str2double(cueBlock(end));
         switch targetBlockNames{targetBlockOrder(blockIdx)}
             case 'pres-pres'
-                correctResponse = 1; % present
+                targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget*2,'last'));
+                targets = targetFrames([1 end])';
+                correctResponse = targets(responseCue);
             case 'pres-abs'
+                targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget,'last'));
+                targets = [targetFrames(1) 0];
                 if responseCue==1
-                    correctResponse = 1; % present
+                    correctResponse = targetFrames(end);
                 else
-                    correctResponse = 2; % absent
+                    correctResponse = 3; % absent
                 end
             case 'abs-pres'
+                targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget,'last'));
+                targets = [0 targetFrames(1)];
                 if responseCue==1
-                    correctResponse = 2; % absent
+                    correctResponse = 3; % absent
                 else
-                    correctResponse = 1; % present
+                    correctResponse = targetFrames(end);
                 end
             case 'abs-abs'
-                correctResponse = 2; % absent
+                targets = [0 0];
+                correctResponse = 3; % absent
         end
+        trialsPresented(blockIdx).targets = targets;
         keyCodeSeq(iFrame,1) = keyCodes(correctResponse);
     else
         keyCodeSeq(iFrame,1) = 0;
@@ -492,42 +531,13 @@ plot(seqtiming,keyCodeSeq)
 f(2) = displayTrigger(trigSeq, nBlocks);
 set(f(2),'Position',[0 0 1200 900]);
 
-%% Set up orientation target
-% choose target types (orientations) for all targets at random
-targetIdx = find(trigSeq==computeTrigger(6));
-nTargets = numel(targetIdx);
-targetTypes = randi(2, [1 nTargets]);
-nFramesPerTarget = round(targetDur*refrate);
-targets = reshape(repmat(targetTypes,nFramesPerTarget,1),...
-    nTargets*nFramesPerTarget,1);
-targetFrames = [];
-for i = 1:nFramesPerTarget
-    targetFrames = [targetFrames; targetIdx + i - 1];
-end
-targetFrames = sort(targetFrames);
-targetTypeSeq = zeros(size(targetOnSeq));
-targetTypeSeq(targetFrames) = targets;
-
-% set up lines, just vertical and horizontal of the right size, centered on
-% (0,0)
-xy0 = round([0 0 stimSize/2 -stimSize/2; ...
-    stimSize/2 -stimSize/2 0 0].*pixelsPerDegree*0.85); % so it doesn't go all the way to the edge of the patch
-targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
-
-% store in target structure
-target.seq = targetTypeSeq;
-target.xy0 = xy0;
-target.center = targetCenter;
-target.width = 2;
-target.colors = [1 0 0]*255;
-target.baseOrient = 45;
-
 %% Create stimulus strucutre
 % set remaining stimulus variables
 cmap = repmat((0:255)',1,3);
 srcRect = [0 0 size(images,2) size(images,1)];
 destRect = CenterRectOnPoint(srcRect, cx, cy+stimPos(2)*pixelsPerDegree);
 diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
+target.seq = targetTypeSeq;
 
 % store in stimulus structure
 stimulus.images = images*255;
@@ -545,10 +555,12 @@ stimulus.soundSeq = cueSeq;
 stimulus.target = target;
 
 % store in order structure
-order.blockorder = blockOrder;
+order.blockOrder = blockOrder;
 order.attBlockOrder = attBlockOrder;
 order.targetBlockOrder = targetBlockOrder;
 order.cueBlockOrder = cueBlockOrder; 
+order.targetTypes = targetTypes;
+order.trialsPresented = trialsPresented;
 
 % save stimulus
 if saveStim
