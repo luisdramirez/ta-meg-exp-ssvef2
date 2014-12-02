@@ -9,12 +9,12 @@ respTime = 198;  % frames to respond period
 keyCodes = [30 31];
 
 %% combine responseData for all runs 
-rootDir = '/Users/liusirui/Documents/MATLAB/MEG';
-dataDir = [rootDir '/data/TADetect_data/TADetect_Rachel/'];
-stimDir = [rootDir '/TA_EXP/TADetect/stimuli/TADetect_Rachel_Stim/'];
+rootDir = '/Users/liusirui/Documents/MATLAB/MEG/data/TADetect_data/pilot';
+dataDir = [rootDir '/sl/21-30/'];
+stimDir = [rootDir '/sl/stimuli/21-30/'];
 df = dir([dataDir,'*.mat']);
 sf = dir([stimDir,'*.mat']);
-
+%%
 if length(df) ~= length(sf)
     warning('inconsistent number of stim files and dataset')
 end
