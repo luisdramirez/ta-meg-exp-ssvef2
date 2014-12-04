@@ -10,8 +10,8 @@ keyCodes = [30 31];
 
 %% combine responseData for all runs 
 rootDir = '/Users/liusirui/Documents/MATLAB/MEG/data/TADetect_data/pilot';
-dataDir = [rootDir '/sl/21-30/'];
-stimDir = [rootDir '/sl/stimuli/21-30/'];
+dataDir = [rootDir '/rd/11-20/'];
+stimDir = [rootDir '/rd/stimuli/11-20/'];
 df = dir([dataDir,'*.mat']);
 sf = dir([stimDir,'*.mat']);
 %%
