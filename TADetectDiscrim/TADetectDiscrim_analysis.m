@@ -35,7 +35,6 @@ end
 %% extract block order from responseData_all
 run = responseData_all(:,1);
 cueBlockOrder = responseData_all(:,4);
-targetBlockOrder = responseData_all(:,6);
 accuracy_all = responseData_all(:,9);
 response_all = responseData_all(:,8);
 
@@ -55,38 +54,31 @@ for n = 1:length(df)
 
     valid_T1 = accuracy_all(runIndx & cueBlockOrder == 2);
     response_valid_T1 = response_all(runIndx & cueBlockOrder == 2);
-    Pc.discrim_valid_T1(:,n) = sum (valid_T1 == 1 & ...
-        response_valid_T1 ~= 3) / sum(response_valid_T1 ~= 3);
+    Pc.discrim_valid_T1(:,n) = sum (valid_T1 == 1 & response_valid_T1 ~= 3) / sum(response_valid_T1 ~= 3);
     Pc.detect_valid_T1(:,n) = sum (valid_T1 == 1) / numel(valid_T1);
 
     invalid_T1 = accuracy_all(runIndx & cueBlockOrder == 4);
     response_invalid_T1 = response_all(runIndx & cueBlockOrder == 4);
-    Pc.discrim_invalid_T1(:,n) = sum (invalid_T1 == 1 & ...
-        response_invalid_T1 ~= 3) / sum(response_invalid_T1 ~= 3);
+    Pc.discrim_invalid_T1(:,n) = sum (invalid_T1 == 1 & response_invalid_T1 ~= 3) / sum(response_invalid_T1 ~= 3);
     Pc.detect_invalid_T1(:,n) = sum(invalid_T1 == 1) / numel(invalid_T1);
 
     % postCue = T2; cueBlockNames is valid '2-2 or invalid '1-2'
 
     valid_T2 = accuracy_all(runIndx & cueBlockOrder == 5);
     response_valid_T2 = response_all(runIndx & cueBlockOrder == 5);
-    Pc.discrim_valid_T2(:,n) = sum (valid_T2 == 1 & ...
-        response_valid_T2 ~= 3) / sum(response_valid_T2 ~= 3);
+    Pc.discrim_valid_T2(:,n) = sum (valid_T2 == 1 & response_valid_T2 ~= 3) / sum(response_valid_T2 ~= 3);
     Pc.detect_valid_T2(:,n) = sum(valid_T2 == 1) / numel(valid_T2);
 
     invalid_T2 = accuracy_all(runIndx & cueBlockOrder == 3);
     response_invalid_T2 = response_all(runIndx & cueBlockOrder == 3);
-    Pc.discrim_invalid_T2(:,n) = sum (invalid_T2 == 1 & ...
-        response_invalid_T2 ~= 3) / sum(response_invalid_T2 ~= 3);
+    Pc.discrim_invalid_T2(:,n) = sum (invalid_T2 == 1 & response_invalid_T2 ~= 3) / sum(response_invalid_T2 ~= 3);
     Pc.detect_invalid_T2(:,n) = sum(invalid_T2 == 1) / numel(invalid_T2);
 
     % overall accuracy
     Detect_correctPerRun  = accuracy_all(runIndx) == 1;
-    Discrim_correctPerRun = accuracy_all(runIndx) == 1 & ...
-        response_all(runIndx) ~= 3;
-    Pc.Detect_all(:,n) = sum(Detect_correctPerRun) /...
-        sum(responseData_all(runIndx, 3) ~= 1);
-    Pc.Discrim_all(:,n) = sum(Discrim_correctPerRun) / ...
-        sum(responseData_all(runIndx,3) ~= 1 & response_all (runIndx)~= 3);
+    Discrim_correctPerRun = accuracy_all(runIndx) == 1 & response_all(runIndx) ~= 3;
+    Pc.Detect_all(:,n) = sum(Detect_correctPerRun) /sum(responseData_all(runIndx, 3) ~= 1);
+    Pc.Discrim_all(:,n) = sum(Discrim_correctPerRun) / sum(responseData_all(runIndx,3) ~= 1 & response_all (runIndx)~= 3);
 end
 
 %% calculate means and stes
@@ -108,7 +100,9 @@ Pc.detect_stes = Pc.detect_stds ./ sqrt (length(df));
 
 
 %% plot
-figure
+scrsz=get(0,'ScreenSize');                                 
+figure('Position', [1 scrsz(4)*1/3 scrsz(3)*1/3 scrsz(4)])
+
 hold on
 subplot(2,1,1)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);

@@ -35,7 +35,6 @@ end
 %% extract block order from responseData_all
 run = responseData_all(:,1);
 cueBlockOrder = responseData_all(:,4);
-targetBlockOrder = responseData_all(:,6);
 accuracy_all = responseData_all(:,9);
 
 %% For each run calculate accuracy for: 
