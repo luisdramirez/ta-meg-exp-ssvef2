@@ -61,16 +61,20 @@ for trialNum = 1 : trialCount
             rData.response(trialNum,:) = 3;
     end
 end
+%% extract target presented order for each trial
 
-
+mycellarray  = squeeze(struct2cell(order.trialsPresented));   
+emptyIndex = cellfun(@isempty,mycellarray); 
+mycellarray(emptyIndex) = {[NaN,NaN]}; 
+targetPresented = [cell2mat(mycellarray);[NaN,NaN]];
 
 %% Create final output matrix
 
 runLabels = {'run number', 'trial number','fast side','cue condition','attended side',... 
-    'target condition','key code', 'response', 'correct', 'RT'};
+    'target condition','target type T1','target type T2','key code', 'response', 'correct', 'RT'};
 responseData = horzcat(repmat(runNum,trialCount,1),(1:trialCount)', order.blockOrder', ...
     order.cueBlockOrder',order.attBlockOrder',order.targetBlockOrder', ...
-    rData.keyCode, rData.response,rData.correct, rData.RT);
+    targetPresented,rData.keyCode, rData.response,rData.correct,rData.RT);
 
 end
 
