@@ -4,8 +4,10 @@ trialCount = 41;
 respSecs = 1.4;
 feedbackDur = 0.3;
 refreshRate = 60;  %(frames)
-blockLength = 300; %(frames)
-respTime = 198;  % frames to respond period
+%blockLength = 300; %(frames)
+blockLength = (5-0.55)*60;
+%respTime = 198;  % frames to respond period
+respTime = (5-0.55-1.7)*60;
 keyCodes = [30 31 32];
 %% add path
 
@@ -13,8 +15,8 @@ addpath /Users/liusirui/Documents/MATLAB/MEG/ta-meg-exp/TADetectDiscrim
 
 %% combine responseData for all runs 
 rootDir = '/Users/liusirui/Documents/MATLAB/MEG/data/TADetectDiscrim/pilot';
-dataDir = [rootDir '/',subject,'/11-20/'];
-stimDir = [rootDir '/',subject,'/stimuli/11-20/'];
+dataDir = [rootDir '/',subject,'/21-30/'];
+stimDir = [rootDir '/',subject,'/stimuli/21-30/'];
 df = dir([dataDir,'*.mat']);
 sf = dir([stimDir,'*.mat']);
 %%
