@@ -4,10 +4,10 @@ trialCount = 41;
 respSecs = 1.4;
 feedbackDur = 0.3;
 refreshRate = 60;  %(frames)
-%blockLength = 300; %(frames)
-blockLength = (5-0.55)*60;
-%respTime = 198;  % frames to respond period
-respTime = (5-0.55-1.7)*60;
+%blockLength = 300; %(frames) - 800ms SOA
+blockLength = (5-0.55)*60; %(frames) - 250ms SOA
+%respTime = 198;  % frames to respond period - 800ms SOA
+respTime = (5-0.55-1.7)*60; %frames to respond period - 250 SOA
 keyCodes = [30 31 32];
 %% add path
 
@@ -15,21 +15,17 @@ addpath /Users/liusirui/Documents/MATLAB/MEG/ta-meg-exp/TADetectDiscrim
 
 %% combine responseData for all runs 
 rootDir = '/Users/liusirui/Documents/MATLAB/MEG/data/TADetectDiscrim/pilot';
-dataDir = [rootDir '/',subject,'/21-30/'];
+dataDir = [rootDir '/',subject,'/21-30(2)/'];
 stimDir = [rootDir '/',subject,'/stimuli/21-30/'];
 df = dir([dataDir,'*.mat']);
-sf = dir([stimDir,'*.mat']);
-%%
-if length(df) ~= length(sf)
-    warning('inconsistent number of stim files and dataset')
-end
 
 responseData_all = [];
 
 for n = 1:length(df); 
-    dd = load([dataDir,df(n).name]);
-    stim = load([stimDir,sf(n).name]);
-    runNum = repmat(n,trialCount,1);
+    name = df(n).name;
+    dd = load([dataDir,name]);
+    expNum = regexp(name,'_taDetectDiscrim(\d*).mat','tokens');
+    stim = load([stimDir,'taDetectDiscrim',char(expNum{1})]);
     [temp, responseData_labels] = sl_responseDiscrimData(respTime,trialCount,...
         respSecs,feedbackDur,refreshRate, blockLength, keyCodes, dd.response, ...
         stim.order,n);
