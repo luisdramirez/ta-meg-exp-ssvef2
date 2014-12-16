@@ -2,8 +2,8 @@ function makeTADetectStim(run)
 
 %% run setup
 % run = 3;
-saveStim = 1;
-saveFigs = 1;
+saveStim = 0;
+saveFigs = 0;
 
 %% add paths
 addpath('../TAPilot')

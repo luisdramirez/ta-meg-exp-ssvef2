@@ -39,9 +39,9 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
-% target tilts
+% set target difficulty
 tilts = [-5 5]; % relative to the base orientation
-fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
+dotSize = 0.5; % in degrees
 
 % input checks
 if nargin < 2,
@@ -107,6 +107,16 @@ end
 % set up target if desired
 if isfield(stimulus, 'target')
     target = stimulus.target;
+    dotSizePx = dotSize*target.pixelsPerDegree;
+    
+    switch target.type
+        case 'lines'
+            fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
+        case 'dot'
+            fprintf('\n[showScanStimulus] dot size = %1.1f degrees\n\n', dotSize)
+        otherwise
+            error('target.type not recognized')
+    end
 end
 
 % go
@@ -129,10 +139,25 @@ for frame = 1:nFrames
         % add target
         if isfield(stimulus, 'target')
             if target.seq(frame)>0
-                rot = target.baseOrient + tilts(target.seq(frame));
-                xy = rotateCoords(target.xy0, rot);
-                Screen('DrawLines', display.windowPtr, xy, target.width, ...
-                    target.colors, target.center);
+                switch target.type
+                    case 'lines'
+                        rot = target.baseOrient + tilts(target.seq(frame));
+                        xy = rotateCoords(target.xy0, rot);
+                        Screen('DrawLines', display.windowPtr, xy, target.width, ...
+                            target.colors, target.center);
+                    case 'dot'
+                        if target.seq(frame-1)==0 % update only for new targets
+                            r = target.maxRadiusPx*rand;
+                            theta = 2*pi*rand;
+                            [x y] = pol2cart(theta, r);
+                            y = abs(y)*target.dotLocs(target.seq(frame)); % pos or neg y
+                            rect(1:2) = target.center + [x y] - dotSizePx/2;
+                            rect(3:4) = rect(1:2) + dotSizePx;
+                        end
+                        Screen('FillOval', display.windowPtr, target.colors, rect);
+                    otherwise
+                        error('target.type not recognized');
+                end
             end
         end
         

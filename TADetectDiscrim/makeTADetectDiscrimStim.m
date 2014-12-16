@@ -29,7 +29,7 @@ keyCodes = KbName(keyNames);
 %% timing setup
 refrate = 60; % (Hz)
 blockDur = 5; % (s)
-nFramesPerTarget = 3;
+nFramesPerTarget = 1;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.8; % (s) % SOA between targets
@@ -156,11 +156,21 @@ xy0 = round([0 0 stimSize/2 -stimSize/2; ...
 targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
 
 % store in target structure
-target.xy0 = xy0;
+% for all targets
+target.type = 'dot';
 target.center = targetCenter;
+% target.colors = [1 0 0]*255; % red
+target.colors = [1 1 1]*255/2; % gray
+
+% specific to lines
+target.xy0 = xy0;
 target.width = 2;
-target.colors = [1 0 0]*255;
 target.baseOrient = 45;
+
+% specific to dots
+target.maxRadiusPx = stimSize/2*pixelsPerDegree*0.85;
+target.pixelsPerDegree = pixelsPerDegree;
+target.dotLocs = [-1 1]; % upper or lower part of target
 
 %% Determine the stimulus times
 runDur = blockDur*nBlocks;
