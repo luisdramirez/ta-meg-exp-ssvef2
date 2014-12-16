@@ -16,10 +16,10 @@ function rd_MEG_TAPilot(run, stimfile)
 % RD, July 2014
 
 %% Add paths
-addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
+% addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
 
 %% Settings
-displayName = 'meg_lcd';
+displayName = 'Carrasco_L2'; % 'meg_lcd'
 frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = false;
@@ -140,6 +140,12 @@ subplot(2,1,2)
 plot(stimulus.seqtiming, response.keyCode)
 title('key presses')
 xlabel('seconds')
+
+if isfield(response,'correct')
+    idx = diff(response.correct)==1;
+    roughAcc = response.correct(idx) + 1;
+    fprintf('Estimated accuracy = %d%%\n\n', round(mean(roughAcc)*100))
+end
 
 %% Rename data file with run name and number
 newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, run);
