@@ -119,6 +119,11 @@ if isfield(stimulus, 'target')
     end
 end
 
+% respose duration
+if isfield(stimulus, 'respDur')
+    respDur = stimulus.respDur;
+end
+
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
 
@@ -164,9 +169,13 @@ for frame = 1:nFrames
         % determine feedback according to response accuracy
         % sorry some of this is hard-coded for now
         if stimulus.fixSeq(frame)==8 % feedback period
-            nRespFrames = display.frameRate*1.7; % look 1.7 s back
-            responseWindow = response.correct(frame-nRespFrames:frame-1);
-            correct = responseWindow(responseWindow~=0);
+            % if first frame of feedback period, determine accuracy
+            if stimulus.fixSeq(frame-1)~=8 
+                nRespFrames = display.frameRate*respDur; % look respDur s back
+                responseWindow = response.correct(frame-nRespFrames:frame-1);
+                correct = responseWindow(responseWindow~=0);
+            end
+            % change fixation according to accuracy
             if ~isempty(correct)
                 correct = correct(1); % take first response
                 if correct==1

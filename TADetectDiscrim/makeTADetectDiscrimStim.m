@@ -564,6 +564,7 @@ stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 stimulus.target = target;
+stimulus.respDur = respDur;
 
 % store in order structure
 order.blockOrder = blockOrder;
