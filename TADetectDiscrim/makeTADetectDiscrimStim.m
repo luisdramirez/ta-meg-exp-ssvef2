@@ -6,7 +6,7 @@ saveStim = 1;
 saveFigs = 0;
 
 %% add paths
-addpath(genpath('/../vistadisp'))
+addpath(genpath('../../vistadisp'))
 addpath('../TAPilot')
 
 %% file i/o
