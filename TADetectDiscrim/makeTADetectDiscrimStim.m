@@ -51,7 +51,8 @@ end
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
 attBlockNames = {'no-att','att-right'}; % att-right
-targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
+targetBlockNames = {'no-targ','pres-pres'};
+% targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames);
 nBlocks = numel(blockOrder);
@@ -266,7 +267,7 @@ for iFrame = 1:numel(seqtiming)
     end
     
     % determine if is time to turn on the tone cue
-    if cueIdx <= nCues && cueStartTimes(cueIdx)-time < 1/refrate
+    if cueIdx <= nCues && cueStartTimes(cueIdx)-time < 1/refrate - 0.00001
         cueBlockName = cueBlockNames{cueBlockOrder(blockIdx)};
         if mod(cueIdx,2) % odd cues are pre-cues
             cueType = str2double(cueBlockName(1));
@@ -284,10 +285,10 @@ for iFrame = 1:numel(seqtiming)
     
     % determine if target is on
     % turn it on when it is time and leave on until time to turn off
-    if targetIdx <= nTargets && targetStartTimes(targetIdx)-time < 1/refrate
+    if targetIdx <= nTargets && targetStartTimes(targetIdx)-time < 1/refrate - 0.00001
         targetOn = 1;
     end
-    if targetIdx <= nTargets && targetEndTimes(targetIdx)-time < 1/refrate
+    if targetIdx <= nTargets && targetEndTimes(targetIdx)-time < 1/refrate - 0.00001
         targetOn = 0;
         targetIdx = targetIdx + 1;
     end
@@ -321,10 +322,10 @@ for iFrame = 1:numel(seqtiming)
     % determine if an absent target is "on" (if it is time for that target)
     % treat it the same way as real targets, in order to determine
     % triggers, but do not change the stimulus contrast
-    if targetAbsIdx <= nAbsTargets && targetAbsStartTimes(targetAbsIdx)-time < 1/refrate
+    if targetAbsIdx <= nAbsTargets && targetAbsStartTimes(targetAbsIdx)-time < 1/refrate - 0.00001
         targetAbsOn = 1;
     end
-    if targetAbsIdx <= nAbsTargets && targetAbsEndTimes(targetAbsIdx)-time < 1/refrate
+    if targetAbsIdx <= nAbsTargets && targetAbsEndTimes(targetAbsIdx)-time < 1/refrate - 0.00001
         targetAbsOn = 0;
         targetAbsIdx = targetAbsIdx + 1;
     end
@@ -361,10 +362,10 @@ for iFrame = 1:numel(seqtiming)
     % determine spatial attention cue
     switch attBlockName
         case 'no-att'
-            if time-blockStartTimes(blockIdx) < respDur
+            if time-blockStartTimes(blockIdx) < respDur - 0.00001
                 % give a response window at the beginning of blank blocks
                 fixSeq(iFrame,1) = 2;
-            elseif blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime)
+            elseif blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime - 0.00001)
                 % cue the next attention block right before it starts
                 switch attBlockNames{attBlockOrder(blockIdx+1)}
                     case 'att-left'
@@ -376,14 +377,14 @@ for iFrame = 1:numel(seqtiming)
                 fixSeq(iFrame,1) = 1;
             end
         case 'att-left'
-            if blockStartTimes(blockIdx+1)-time < feedbackDur
+            if blockStartTimes(blockIdx+1)-time < feedbackDur - 0.00001
                 % display feedback at the end of the block
                 fixSeq(iFrame,1) = 8; % blue
              else
                 fixSeq(iFrame,1) = 4;
             end
         case 'att-right'
-            if blockStartTimes(blockIdx+1)-time < feedbackDur
+            if blockStartTimes(blockIdx+1)-time < feedbackDur - 0.00001
                 % display feedback at the end of the block
                 fixSeq(iFrame,1) = 8; % blue
             else
