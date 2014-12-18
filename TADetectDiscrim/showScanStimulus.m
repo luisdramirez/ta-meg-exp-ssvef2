@@ -41,7 +41,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 
 % set target difficulty
 tilts = [-5 5]; % relative to the base orientation
-dotSize = 2; % in degrees
+dotSize = 0.4; % in degrees
 
 % input checks
 if nargin < 2,

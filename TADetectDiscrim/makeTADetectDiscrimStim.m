@@ -29,7 +29,7 @@ keyCodes = KbName(keyNames);
 %% timing setup
 refrate = 60; % (Hz)
 blockDur = 5; % (s)
-nFramesPerTarget = 1;
+nFramesPerTarget = 2;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.8; % (s) % SOA between targets
@@ -51,8 +51,8 @@ end
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
 attBlockNames = {'no-att','att-right'}; % att-right
-targetBlockNames = {'no-targ','pres-pres'};
-% targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
+% targetBlockNames = {'no-targ','pres-pres'};
+targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames);
 nBlocks = numel(blockOrder);
@@ -171,7 +171,7 @@ target.baseOrient = 45;
 % specific to dots
 target.maxRadiusPx = stimSize/2*pixelsPerDegree*0.85;
 target.pixelsPerDegree = pixelsPerDegree;
-target.dotLocs = [-1 1]; % upper or lower part of target
+target.dotLocs = [1 -1]; % lower or upper part of target
 
 %% Determine the stimulus times
 runDur = blockDur*nBlocks;
