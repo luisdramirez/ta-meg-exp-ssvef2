@@ -1,35 +1,58 @@
-function [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject)
+function [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date)
+
+% [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, [date])
+% 
+% subject is the subject ID, e.g. 'sl'
+% runs is the run numbers to analyze, e.g. 1:10
+% date (optional) is a string with the date of the experiment, e.g. '20141219'
+%   if date is not given, will look for runs from all dates.
+
 %% exp setup
 trialCount = 41;  
 respSecs = 1.4;
 feedbackDur = 0.3;
 refreshRate = 60;  %(frames)
-%blockLength = 300; %(frames) - 800ms SOA
-blockLength = (5-0.55)*60; %(frames) - 250ms SOA
-%respTime = 198;  % frames to respond period - 800ms SOA
-respTime = (5-0.55-1.7)*60; %frames to respond period - 250 SOA
+blockLength = 300; %(frames) - 800ms SOA
+% blockLength = (5-0.55)*60; %(frames) - 250ms SOA
+respTime = 198;  % frames to respond period - 800ms SOA
+% respTime = (5-0.55-1.7)*60; %frames to respond period - 250 SOA
 keyCodes = [30 31 32];
-%% add path
 
-addpath /Users/liusirui/Documents/MATLAB/MEG/ta-meg-exp/TADetectDiscrim
+%% add path
+% addpath /Users/liusirui/Documents/MATLAB/MEG/ta-meg-exp/TADetectDiscrim
 
 %% combine responseData for all runs 
-rootDir = '/Users/liusirui/Documents/MATLAB/MEG/data/TADetectDiscrim/pilot';
-dataDir = [rootDir '/',subject,'/21-30(2)/'];
-stimDir = [rootDir '/',subject,'/stimuli/21-30/'];
-df = dir([dataDir,'*.mat']);
+% get the data from the server using pathToExpt
+rootDir = pathToExpt;
+dataDir = sprintf('%s/data/%s', rootDir, subject);
+stimDir = sprintf('%s/stimuli', rootDir);
+% df = dir([dataDir,'*.mat']);
+
+if ~exist('date','var')
+    date = [];
+end
+
+for iRun = 1:numel(runs)
+    run = runs(iRun);
+    d = dir(sprintf('%s/%s*%d.mat', dataDir, date, run));
+    if numel(d)~=1
+        error('More or fewer than one matching data file: %s/*%d.mat', dataDir, run)
+    else
+        df(iRun) = d;
+    end
+end
 
 responseData_all = [];
 
 for n = 1:length(df); 
     name = df(n).name;
-    dd = load([dataDir,name]);
+    dd = load(sprintf('%s/%s',dataDir,name));
     expNum = regexp(name,'_taDetectDiscrim(\d*).mat','tokens');
-    stim = load([stimDir,'taDetectDiscrim',char(expNum{1})]);
+    stim = load(sprintf('%s/taDetectDiscrim%s.mat', stimDir, expNum{1}{1}));
     [temp, responseData_labels] = sl_responseDiscrimData(respTime,trialCount,...
         respSecs,feedbackDur,refreshRate, blockLength, keyCodes, dd.response, ...
         stim.order,n);
-    responseData_all = [responseData_all;temp];  
+    responseData_all = [responseData_all; temp];  
 end
 
 %% extract block order from responseData_all
