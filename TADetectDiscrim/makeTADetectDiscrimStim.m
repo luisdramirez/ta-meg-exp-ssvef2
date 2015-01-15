@@ -158,7 +158,7 @@ targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
 
 % store in target structure
 % for all targets
-target.type = 'dot';
+target.type = 'grating-orient'; % 'dot','lines','grating-orient'
 target.center = targetCenter;
 % target.colors = [1 0 0]*255; % red
 target.colors = [1 1 1]*255/2; % gray
@@ -166,12 +166,15 @@ target.colors = [1 1 1]*255/2; % gray
 % specific to lines
 target.xy0 = xy0;
 target.width = 2;
-target.baseOrient = 45;
+% target.baseOrient = 45; % toggle with grating-orient
 
 % specific to dots
 target.maxRadiusPx = stimSize/2*pixelsPerDegree*0.85;
 target.pixelsPerDegree = pixelsPerDegree;
 target.dotLocs = [1 -1]; % lower or upper part of target
+
+% specific to grating-orient
+target.baseOrient = 0; % toggle with lines
 
 %% Determine the stimulus times
 runDur = blockDur*nBlocks;

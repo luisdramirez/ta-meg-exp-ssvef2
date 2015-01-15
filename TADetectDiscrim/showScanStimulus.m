@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-5 5]; % relative to the base orientation
+tilts = [-30 30]; % relative to the base orientation
 dotSize = 0.4; % in degrees
 
 % input checks
@@ -160,6 +160,12 @@ for frame = 1:nFrames
                             rect(3:4) = rect(1:2) + dotSizePx;
                         end
                         Screen('FillOval', display.windowPtr, target.colors, rect);
+                    case 'grating-orient'
+                        rot = target.baseOrient + tilts(target.seq(frame));
+                        Screen('DrawTexture', display.windowPtr, stimulus.textures(imgNum), ...
+                            stimulus.srcRect, stimulus.destRect, rot);
+                    case 'grating-phase'
+%                         Screen('DrawTexture', display.windowPtr, target.textures(target.seq(frame)), stimulus.srcRect, stimulus.destRect);
                     otherwise
                         error('target.type not recognized');
                 end
