@@ -12,10 +12,10 @@ trialCount = 41;
 respSecs = 1.4;
 feedbackDur = 0.3;
 refreshRate = 60;  %(frames)
-blockLength = 300; %(frames) - 800ms SOA
-% blockLength = (5-0.55)*60; %(frames) - 250ms SOA
-respTime = 198;  % frames to respond period - 800ms SOA
-% respTime = (5-0.55-1.7)*60; %frames to respond period - 250 SOA
+% blockLength = 300; %(frames) - 800ms SOA
+blockLength = (5-0.5)*60; %(frames) - other SOA (difference from 800)
+% respTime = 198;  % frames to respond period - 800ms SOA
+respTime = (5-0.5-1.7)*60; %frames to respond period - other SOA (difference from 800)
 keyCodes = [30 31 32];
 
 %% add path
@@ -23,7 +23,8 @@ keyCodes = [30 31 32];
 
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
-rootDir = pathToExpt;
+% rootDir = pathToExpt;
+rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 % df = dir([dataDir,'*.mat']);

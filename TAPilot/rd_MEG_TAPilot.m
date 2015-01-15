@@ -112,7 +112,7 @@ params.devices = params.display.devices;
 doRetinotopyScan(params);
 
 %% Check timing results
-f = dir('~/Desktop/2014*.mat');
+f = dir('~/Desktop/2015*.mat');
 fileName = fullfile('~', 'Desktop', f(end).name);
 load(fileName);
 figure(101); clf
