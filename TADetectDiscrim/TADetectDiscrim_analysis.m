@@ -7,16 +7,16 @@ function [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(su
 % date (optional) is a string with the date of the experiment, e.g. '20141219'
 %   if date is not given, will look for runs from all dates.
 
-%% exp setup
-trialCount = 41;  
-respSecs = 1.4;
-feedbackDur = 0.3;
-refreshRate = 60;  %(frames)
-% blockLength = 300; %(frames) - 800ms SOA
-blockLength = (5-0.5)*60; %(frames) - other SOA (difference from 800)
-% respTime = 198;  % frames to respond period - 800ms SOA
-respTime = (5-0.5-1.7)*60; %frames to respond period - other SOA (difference from 800)
-keyCodes = [30 31 32];
+%% exp setup (now read from stim file, below)
+% trialCount = 41;  
+% respSecs = 1.4;
+% feedbackDur = 0.3;
+% refreshRate = 60;  %(frames)
+% % blockLength = 300; %(frames) - 800ms SOA
+% blockLength = (5-0.5)*60; %(frames) - other SOA (difference from 800)
+% % respTime = 198;  % frames to respond period - 800ms SOA
+% respTime = (5-1.7)*60; %frames to respond period - other SOA (difference from 800)
+% keyCodes = [30 31 32];
 
 %% add path
 % addpath /Users/liusirui/Documents/MATLAB/MEG/ta-meg-exp/TADetectDiscrim
@@ -43,6 +43,20 @@ for iRun = 1:numel(runs)
     end
 end
 
+%% load exp params from a sample run
+% assumes all runs have identical params
+expNum = regexp(df(1).name, '_taDetectDiscrim(\d*).mat','tokens');
+stim = load(sprintf('%s/taDetectDiscrim%s.mat', stimDir, expNum{1}{1}));
+
+trialCount = length(stim.p.blockOrder);  
+respSecs = stim.p.respDur;
+feedbackDur = stim.p.feedbackDur;
+refreshRate = stim.p.refrate;  %(frames)
+blockLength = stim.p.blockDur*refreshRate; %(frames)
+respTime = blockLength-(respSecs+feedbackDur)*refreshRate; %frames to respond period
+keyCodes = stim.p.keyCodes;
+
+%% analyze each run
 responseData_all = [];
 
 for n = 1:length(df); 
