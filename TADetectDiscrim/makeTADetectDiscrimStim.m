@@ -14,7 +14,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'meg_lcd';
+displayName = 'Carrasco_L2'; % 'meg_lcd','Carrasco_L2'
 d = loadDisplayParams(displayName);
 pixelsPerDegree = 1/d.pixelSize;
 screenWidth = d.numPixels(1); % (px)
@@ -28,11 +28,11 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-blockDur = 5 - 0.5; % (s)
+blockDur = 5; % (s) (- difference from .8)
 nFramesPerTarget = 2;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 0.8 - 0.5; % (s) % SOA between targets
+targetSOA = 0.8; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.4; % (s)
@@ -47,6 +47,9 @@ else
     fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
     slowUnit = [1 1 2 2];
 end
+
+%% target setup
+target.type = 'grating'; % 'dot','lines','grating'
 
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
@@ -157,8 +160,6 @@ xy0 = round([0 0 stimSize/2 -stimSize/2; ...
 targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
 
 % store in target structure
-target.type = 'grating'; % 'dot','lines','grating'
-
 switch target.type
     case 'lines'
         target.center = targetCenter;
