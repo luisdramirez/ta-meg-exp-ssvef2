@@ -40,8 +40,9 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-30 30]; % relative to the base orientation
+tilts = [-5 5]; % relative to the base orientation
 dotSize = 0.4; % in degrees
+shifts = [0 0];
 
 % input checks
 if nargin < 2,
@@ -114,6 +115,28 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
         case 'dot'
             fprintf('\n[showScanStimulus] dot size = %1.1f degrees\n\n', dotSize)
+        case 'grating'
+            fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f], shift = [%1.2f %1.2f]\n\n', tilts(1), tilts(2), shifts(1)/pi, shifts(2)/pi)
+            for iShift = 1:numel(shifts);
+                for iP1 = 1:numel(target.phases)
+                    for iP2 = 1:numel(target.phases)
+                        p2 = target.phases(iP2) + shifts(iShift);
+                        o2 = target.orientation + tilts(iShift);
+                        
+                        targ0 = buildColorGrating(target.pixelsPerDegree, [target.stimSize target.stimSize], ...
+                            target.spatialFreq, o2, p2, target.contrast, ...
+                            1, 'bw', 1, 1);
+                        
+                        targ1 = maskWithAnnulus(targ0, length(targ0), ...
+                            0, target.blurRadius, target.backgroundColor);
+                        
+                        targ{iP1, iP2, iShift} = [target.stim{iP1,1} target.spacer targ1];
+                        
+                        target.textures(iP1, iP2, iShift) = Screen('MakeTexture', ...
+                            display.windowPtr, targ{iP1,iP2,iShift}.*255);
+                    end
+                end
+            end
         otherwise
             error('target.type not recognized')
     end
@@ -160,12 +183,11 @@ for frame = 1:nFrames
                             rect(3:4) = rect(1:2) + dotSizePx;
                         end
                         Screen('FillOval', display.windowPtr, target.colors, rect);
-                    case 'grating-orient'
-                        rot = target.baseOrient + tilts(target.seq(frame));
-                        Screen('DrawTexture', display.windowPtr, stimulus.textures(imgNum), ...
-                            stimulus.srcRect, stimulus.destRect, rot);
-                    case 'grating-phase'
-%                         Screen('DrawTexture', display.windowPtr, target.textures(target.seq(frame)), stimulus.srcRect, stimulus.destRect);
+                    case 'grating'
+                        ph = target.phSeq(frame,:); % phase
+                        sh = target.seq(frame); % shift
+                        Screen('DrawTexture', display.windowPtr, target.textures(ph(1),ph(2),sh), ...
+                            stimulus.srcRect, stimulus.destRect);
                     otherwise
                         error('target.type not recognized');
                 end

@@ -157,24 +157,35 @@ xy0 = round([0 0 stimSize/2 -stimSize/2; ...
 targetCenter = [cx cy] + stimPos.*pixelsPerDegree;
 
 % store in target structure
-% for all targets
-target.type = 'grating-orient'; % 'dot','lines','grating-orient'
-target.center = targetCenter;
-% target.colors = [1 0 0]*255; % red
-target.colors = [1 1 1]*255/2; % gray
+target.type = 'grating'; % 'dot','lines','grating'
 
-% specific to lines
-target.xy0 = xy0;
-target.width = 2;
-% target.baseOrient = 45; % toggle with grating-orient
-
-% specific to dots
-target.maxRadiusPx = stimSize/2*pixelsPerDegree*0.85;
-target.pixelsPerDegree = pixelsPerDegree;
-target.dotLocs = [1 -1]; % lower or upper part of target
-
-% specific to grating-orient
-target.baseOrient = 0; % toggle with lines
+switch target.type
+    case 'lines'
+        target.center = targetCenter;
+        target.colors = [1 0 0]*255; % red
+        target.xy0 = xy0;
+        target.width = 2;
+        target.baseOrient = 45;
+    case 'dot'
+        target.center = targetCenter;
+        target.colors = [1 1 1]*255/2; % gray
+        target.maxRadiusPx = stimSize/2*pixelsPerDegree*0.85;
+        target.pixelsPerDegree = pixelsPerDegree;
+        target.dotLocs = [1 -1]; % lower or upper part of target
+    case 'grating'
+        target.contrast = contrasts(1);
+        target.phases = phases;
+        target.pixelsPerDegree = pixelsPerDegree;
+        target.stimSize = stimSize;
+        target.spatialFreq = spatialFreq;
+        target.orientation = orientation;
+        target.blurRadius = blurRadius;
+        target.backgroundColor = backgroundColor;
+        target.spacer = spacer;
+        target.stim = stim;
+    otherwise
+        error('target.type not recognized')
+end
 
 %% Determine the stimulus times
 runDur = blockDur*nBlocks;
@@ -361,6 +372,10 @@ for iFrame = 1:numel(seqtiming)
     imageID = 1000*p1 + 100*c1 + 10*p2 + c2;
     
     seq(iFrame,1) = find(imageIDs==imageID);
+    
+    if strcmp(target.type,'grating')
+        target.phSeq(iFrame,:) = [p1 p2]; % keep track of phase of right grating
+    end
     
     % determine spatial attention cue
     switch attBlockName
