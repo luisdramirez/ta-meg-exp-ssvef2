@@ -42,7 +42,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 % set target difficulty
 tilts = [-5 5]; % relative to the base orientation
 dotSize = 0.4; % in degrees
-shifts = [0 0];
+shifts = [0 0]; % phase shifts
 
 % input checks
 if nargin < 2,
@@ -117,7 +117,7 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] dot size = %1.1f degrees\n\n', dotSize)
         case 'grating'
             fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f], shift = [%1.2f %1.2f]\n\n', tilts(1), tilts(2), shifts(1)/pi, shifts(2)/pi)
-            for iShift = 1:numel(shifts);
+            for iShift = 1:numel(shifts); % here, shift refers to either a phase shift or an orientation change, depending on the values of "shifts" and "tilts"
                 for iP1 = 1:numel(target.phases)
                     for iP2 = 1:numel(target.phases)
                         p2 = target.phases(iP2) + shifts(iShift);
