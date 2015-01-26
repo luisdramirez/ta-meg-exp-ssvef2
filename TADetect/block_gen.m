@@ -46,7 +46,8 @@ cueBlockOrder = cueBlockOrder(indices);
 
 dummy = repmat([pp,pa,ap,aa],[4,1]);
 targetBlockOrder_cue1 = dummy(:)';
-targetBlockOrder = repmat(targetBlockOrder_cue1,[1,2]);
+% targetBlockOrder = repmat(targetBlockOrder_cue1,[1,2]);
+targetBlockOrder = repmat(targetBlockOrder_cue1,[1,numel(cueBlockOrder)/numel(targetBlockOrder_cue1)]);
 
 % randomize target order
 targetBlockOrder = targetBlockOrder(indices);

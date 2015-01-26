@@ -3,7 +3,7 @@ function makeTADetectStim(run)
 %% run setup
 % run = 3;
 saveStim = 1;
-saveFigs = 1;
+saveFigs = 0;
 saveOrder = 1;
 
 %% add paths
@@ -31,7 +31,7 @@ keyCodes = KbName(keyNames);
 %% timing setup
 refrate = 60; % (Hz)
 blockDur = 5 - 0.5; % (s)
-targetDur = 2/refrate; % (s)
+targetDur = 3/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.8 - 0.5; % (s) % SOA between targets
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
@@ -52,6 +52,7 @@ end
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
 attBlockNames = {'no-att','att-right'}; % att-right
+% targetBlockNames = {'no-targ','pres-pres'};
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames ,cueBlockNames );
@@ -62,7 +63,7 @@ stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
 stimContrast = 0.64;
-targetContrast = 0.84;
+targetContrast = 1;
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
