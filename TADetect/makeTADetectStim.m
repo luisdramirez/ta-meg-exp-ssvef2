@@ -1,12 +1,15 @@
-function makeTADetectStim(run)
+function makeTADetectStim1(run)
 
 %% run setup
 % run = 3;
-saveStim = 0;
-saveFigs = 0;
+saveStim = 1;
+saveFigs = 1;
+saveOrder = 1;
 
 %% add paths
+addpath(genpath('/../vistadisp'))
 addpath('../TAPilot')
+
 
 %% file i/o
 stimDir = 'stimuli';
@@ -46,23 +49,20 @@ else
     slowUnit = [1 1 2 2];
 end
 
-%% blocks setup
-blockNames = {'blank','fast-left','slow-left'};
-blockOrder = [1 2 3 2 3 1 2 3 2 3 1];
-attBlockNames = {'no-att','att-right'};
-attBlockOrder = [1 2 2 2 2 1 2 2 2 2 1];
+%% blocks setup (one run)
+blockNames = {'blank','fast-left'}; % fast-left
+attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-targetBlockOrder = [1 2 3 4 5 1 2 3 4 5 1]; % order should be unpredictable
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-cueBlockOrder = [1 2 3 4 5 1 2 3 4 5 1]; % should also be randomized and counterbalanced with target order
+[blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames ,cueBlockNames );
 nBlocks = numel(blockOrder);
 
-%% stim setup
+%% stim setup   
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
 stimContrast = 0.64;
-targetContrast = 1;
+targetContrast = 0.84;
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
@@ -515,13 +515,23 @@ stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 
+% store in order structure
+order.blockorder = blockOrder;
+order.attBlockOrder = attBlockOrder;
+order.targetBlockOrder = targetBlockOrder;
+order.cueBlockOrder = cueBlockOrder;
+
+% save block order
+if saveOrder
+    save(sprintf('%s/%s.mat', stimDir, stimFile), 'order')
+end
+
 % save stimulus
 if saveStim
-    save(sprintf('%s/%s.mat', stimDir, stimFile), 'stimulus', 'p')
+    save(sprintf('%s/%s.mat', stimDir, stimFile), 'stimulus', 'p','-append')
 end
 
 % save figs
 if saveFigs
     rd_saveAllFigs(f, {'trigplot','trigchan'}, stimFile);
 end
-
