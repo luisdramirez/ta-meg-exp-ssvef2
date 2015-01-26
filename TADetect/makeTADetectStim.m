@@ -1,4 +1,4 @@
-function makeTADetectStim1(run)
+function makeTADetectStim(run)
 
 %% run setup
 % run = 3;
@@ -16,7 +16,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetect%d', run);
 
 %% screen setup
-displayName = 'meg_lcd';
+displayName = 'Carrasco_L2'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 d = loadDisplayParams(displayName);
 pixelsPerDegree = 1/d.pixelSize;
 screenWidth = d.numPixels(1); % (px)
@@ -30,10 +30,10 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-blockDur = 5; % (s)
-targetDur = 3/refrate; % (s)
+blockDur = 5 - 0.5; % (s)
+targetDur = 2/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 0.8; % (s) % SOA between targets
+targetSOA = 0.8 - 0.5; % (s) % SOA between targets
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.4; % (s)
