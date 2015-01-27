@@ -14,7 +14,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'Carrasco_L2'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 pixelsPerDegree = 1/d.pixelSize;
 screenWidth = d.numPixels(1); % (px)
@@ -29,7 +29,7 @@ keyCodes = KbName(keyNames);
 %% timing setup
 refrate = 60; % (Hz)
 blockDur = 5 - 0.5; % (s) (- difference from .8)
-nFramesPerTarget = 2;
+nFramesPerTarget = 3;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.8 - 0.5; % (s) % SOA between targets (- difference from .8)

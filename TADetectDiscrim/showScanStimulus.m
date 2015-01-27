@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-10 10]; % relative to the base orientation
+tilts = [-1 1]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
 
