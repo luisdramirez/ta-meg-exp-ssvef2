@@ -112,11 +112,11 @@ if isfield(stimulus, 'target')
     
     switch target.type
         case 'lines'
-            fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
+            fprintf('\n[showScanStimulus] lines tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
         case 'dot'
             fprintf('\n[showScanStimulus] dot size = %1.1f degrees\n\n', dotSize)
         case 'grating'
-            fprintf('\n[showScanStimulus] tilt = [%1.1f %1.1f], shift = [%1.2f %1.2f]\n\n', tilts(1), tilts(2), shifts(1)/pi, shifts(2)/pi)
+            fprintf('\n[showScanStimulus] grating tilt = [%1.1f %1.1f], shift = [%1.2f %1.2f]\n\n', tilts(1), tilts(2), shifts(1)/pi, shifts(2)/pi)
             for iShift = 1:numel(shifts); % here, shift refers to either a phase shift or an orientation change, depending on the values of "shifts" and "tilts"
                 for iP1 = 1:numel(target.phases)
                     for iP2 = 1:numel(target.phases)
@@ -137,6 +137,20 @@ if isfield(stimulus, 'target')
                     end
                 end
             end
+        case 'cb'
+            fprintf('\n[showScanStimulus] cb tilt = [%1.1f %1.1f]\n\n', tilts(1), tilts(2))
+            Screen('BlendFunction', display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            
+            targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
+                target.spatialFreq, 0, 0, target.contrast, 0, 'bw');
+            alphaLayer = make2DGaussianCentered(size(targ0,1), size(targ0,2), 0, 0, target.size*target.pixelsPerDegree, 1); % black is transparent, white is opaque
+            targ = cat(3, targ0, alphaLayer);
+            
+            target.textures = Screen('MakeTexture', display.windowPtr, targ.*255);
+            
+            targetSizePx = size(targ0);
+            target.destRect(1:2) = target.center - targetSizePx/2;
+            target.destRect(3:4) = target.destRect(1:2) + targetSizePx;
         otherwise
             error('target.type not recognized')
     end
@@ -188,6 +202,13 @@ for frame = 1:nFrames
                         sh = target.seq(frame); % shift
                         Screen('DrawTexture', display.windowPtr, target.textures(ph(1),ph(2),sh), ...
                             stimulus.srcRect, stimulus.destRect);
+                    case 'cb'
+                        if target.seq(frame-1)==0 % update only for new targets
+                            baseOrient = round(rand)*90; % 0 or 90
+                        end
+                        rot  = baseOrient + tilts(target.seq(frame));
+                        Screen('DrawTexture', display.windowPtr, target.textures(1), ...
+                            [], target.destRect, rot);
                     otherwise
                         error('target.type not recognized');
                 end

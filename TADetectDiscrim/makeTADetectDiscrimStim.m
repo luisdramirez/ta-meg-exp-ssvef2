@@ -14,7 +14,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'Carrasco_L2'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 pixelsPerDegree = 1/d.pixelSize;
 screenWidth = d.numPixels(1); % (px)
@@ -49,7 +49,7 @@ else
 end
 
 %% target setup
-target.type = 'grating'; % 'dot','lines','grating'
+target.type = 'cb'; % 'dot','lines','grating','cb'
 
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
@@ -184,6 +184,13 @@ switch target.type
         target.backgroundColor = backgroundColor;
         target.spacer = spacer;
         target.stim = stim;
+    case 'cb'
+        target.pixelsPerDegree = pixelsPerDegree;
+        target.imSize = stimSize; % whole grating square
+        target.size = 0.5; % sigma of gaussian aperture
+        target.spatialFreq = 4;
+        target.contrast = 1;
+        target.center = targetCenter;
     otherwise
         error('target.type not recognized')
 end

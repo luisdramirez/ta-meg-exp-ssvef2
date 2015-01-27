@@ -19,7 +19,7 @@ function rd_MEG_TAPilot(run, stimfile)
 % addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
 
 %% Settings
-displayName = 'Carrasco_L2'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = false;
