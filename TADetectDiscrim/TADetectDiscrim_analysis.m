@@ -23,8 +23,8 @@ function [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(su
 
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
-% rootDir = pathToExpt;
-rootDir = pwd;
+rootDir = pathToExpt;
+% rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 % df = dir([dataDir,'*.mat']);
@@ -172,33 +172,45 @@ Pc.Detect_all_ste = Pc.Detect_all_std ./ sqrt(length(df));
 
 %% plot
 scrsz=get(0,'ScreenSize');                                 
-figure('Position', [1 scrsz(4)*1/3 scrsz(3)*1/3 scrsz(4)])
+% figure('Position', [1 scrsz(4)*1/3 scrsz(3)*1/3 scrsz(4)])
+figure
 
 hold on
-subplot(2,1,1)
+subplot(1,2,1)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
 y = errorbar([Pc.discrim_means(1:2);Pc.discrim_means(3:4)],[Pc.discrim_stes(1:2);Pc.discrim_stes(3:4)],'.');
 ylim([0 1])
-set(gca,'XTickLabel',{'','T1','','','','','T2',''});
-ylabel('Accuracy')
-legend(y,{'valid','invalid'});
-title('discrimination accuracy')
+% set(y, 'MarkerSize', 20)
+set(y(2),'Color','r')
+set(gca,'XTick',[1 2])
+set(gca,'XTickLabel',{'T1','T2'});
+% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+ylabel('accuracy')
+% legend(y,{'valid','invalid'});
+legend('valid','invalid','Location','SouthEast');
+title('discrimination')
 
-subplot(2,1,2)
+subplot(1,2,2)
 y = errorbar([Pc.detect_means(1:2);Pc.detect_means(3:4)],[Pc.detect_stes(1:2);Pc.detect_stes(3:4)],'.');
 ylim([0 1])
-set(gca,'XTickLabel',{'','T1','','','','','T2',''});
-ylabel('Accuracy')
-title('detection accuracy')
+% set(y, 'MarkerSize', 20)
+set(y(2),'Color','r')
+set(gca,'XTick',[1 2])
+set(gca,'XTickLabel',{'T1','T2'});
+% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+ylabel('accuracy')
+title('detection')
+
+turnwhite
 
 %%
-figure
-y = errorbar([Pc.Discrim_all_mean;Pc.Detect_all_mean],[Pc.Discrim_all_ste;Pc.Detect_all_ste],'.');
-ylim([0 1])
-set(gca,'XTickLabel',{'','discrimination','','','','','detection',''});
-legend(y,{'T1','T2'},'Location','NorthWest')
-ylabel('Accuracy')
-title('overall accuracy')
+% figure
+% y = errorbar([Pc.Discrim_all_mean;Pc.Detect_all_mean],[Pc.Discrim_all_ste;Pc.Detect_all_ste],'.');
+% ylim([0 1])
+% set(gca,'XTickLabel',{'','discrimination','','','','','detection',''});
+% legend(y,{'T1','T2'},'Location','NorthWest')
+% ylabel('Accuracy')
+% title('overall accuracy')
 
 end
 
