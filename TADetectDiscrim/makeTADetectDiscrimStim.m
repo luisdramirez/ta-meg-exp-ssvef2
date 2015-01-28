@@ -60,7 +60,8 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames);
 nBlocks = numel(blockOrder);
 
-%% stim setup   
+%% stim setup  
+stimType = 'checkerboard'; %'grating','checkerboard'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
@@ -104,9 +105,27 @@ for iPhase = 1:numel(phases)
         phase = phases(iPhase);
         contrast = contrasts(iContrast);
         
-        s{iPhase, iContrast} = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
-            spatialFreq, orientation, phase, contrast, ...
-            1, 'bw', 1, 1);
+        switch stimType
+            case 'grating'
+                s{iPhase, iContrast} = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
+                    spatialFreq, orientation, phase, contrast, ...
+                    1, 'bw', 1, 1);
+            case 'checkerboard'
+                c1 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
+                    spatialFreq, orientation, phase, contrast, ...
+                    1, 'bw', 1, 1);
+                c2 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
+                    spatialFreq, orientation+90, phase, contrast, ...
+                    1, 'bw', 1, 1);
+                if iPhase==1
+                    c = c1==c2;
+                elseif iPhase==2
+                    c = c1~=c2;
+                end
+                s{iPhase, iContrast} = c;
+            otherwise
+                error('stimType not recognized')
+        end
         
         stim{iPhase, iContrast} = maskWithAnnulus(s{iPhase,iContrast}, ...
             length(s{iPhase,iContrast}), ...
