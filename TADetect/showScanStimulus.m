@@ -188,7 +188,7 @@ for frame = 1:nFrames
         else
             % Use KbCheck
             %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
-            [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck;
+            [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(-1);
             if(ssKeyIsDown)
                 kc = find(ssKeyCode);
                 response.keyCode(frame) = kc(1);

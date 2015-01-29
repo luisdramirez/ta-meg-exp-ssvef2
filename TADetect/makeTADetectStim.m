@@ -52,7 +52,7 @@ end
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
 attBlockNames = {'no-att','att-right'}; % att-right
-% targetBlockNames = {'no-targ','pres-pres'};
+%targetBlockNames = {'no-targ','pres-pres'};
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames ,cueBlockNames );
@@ -63,7 +63,7 @@ stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
 stimContrast = 0.64;
-targetContrast = 1;
+targetContrast = .84;
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
