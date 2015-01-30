@@ -14,7 +14,6 @@ function [responseData, runLabels] = sl_responseData(respTime, ...
 % keyCodes = [30 31];
 % runNum = 1;
 
-
 for trialNum = 1 : trialCount
     
     % Defining search range
