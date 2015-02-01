@@ -73,7 +73,7 @@ end
 %% extract block order from responseData_all
 run = responseData_all(:,1);
 cueBlockOrder = responseData_all(:,4);
-Detectresponse_all = responseData_all(:,11);
+response_correct = responseData_all(:,11);
 response_all = responseData_all(:,10);
 targetTypeT1 = responseData_all(:,7);
 targetTypeT2 = responseData_all(:,8);
@@ -107,11 +107,15 @@ for n = 1:length(df)
          sum(ismember(targetTypeT1(valid_T1_Indx),[1,2]) );
      Pc.detect_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1) == DetectResponse_all(valid_T1_Indx) ) /...
          numel(DetectTargetType(valid_T1_Indx,1));
+     Pc.overall_valid_T1(:,n) = sum ( response_correct(valid_T1_Indx) == 1 ) / ...
+         numel( response_correct(valid_T1_Indx) );
      
      Pc.discrim_invalid_T1(:,n) = sum (targetTypeT1(invalid_T1_Indx) == response_all(invalid_T1_Indx))/ ...
          sum(ismember(targetTypeT1(invalid_T1_Indx),[1,2]) );
      Pc.detect_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1) == DetectResponse_all(invalid_T1_Indx) ) /...
          numel(DetectTargetType(invalid_T1_Indx,1));
+     Pc.overall_invalid_T1(:,n) = sum ( response_correct(invalid_T1_Indx) == 1) / ...
+         numel( response_correct(invalid_T1_Indx) );
 
     % postCue = T2; cueBlockNames is valid '2-2 or invalid '1-2'
      valid_T2_Indx = runIndx & cueBlockOrder == 5;
@@ -119,29 +123,35 @@ for n = 1:length(df)
 
      Pc.discrim_valid_T2(:,n) = sum (targetTypeT2(valid_T2_Indx) == response_all(valid_T2_Indx))/ ...
          sum(ismember(targetTypeT2(valid_T2_Indx),[1,2]) );
-      Pc.detect_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2) == DetectResponse_all(valid_T2_Indx) ) /...
+     Pc.detect_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2) == DetectResponse_all(valid_T2_Indx) ) /...
          numel(DetectTargetType(valid_T2_Indx,2));
+     Pc.overall_valid_T2(:,n) = sum( response_correct(valid_T2_Indx) == 1 ) /...
+         numel( response_correct(valid_T2_Indx) );
 
      Pc.discrim_invalid_T2(:,n) = sum( targetTypeT2(invalid_T2_Indx) == response_all(invalid_T2_Indx) )/ ...
          sum( ismember(targetTypeT2(invalid_T2_Indx),[1,2]) );
      Pc.detect_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2) == DetectResponse_all(invalid_T2_Indx) ) /...
          numel(DetectTargetType(invalid_T2_Indx,2));
-     
-    %% overall accuracy
-    cueT1 = runIndx & (valid_T1_Indx | invalid_T1_Indx);
-    cueT2 = runIndx & (valid_T2_Indx | invalid_T2_Indx);
-    
-    pc.DetectT1(:,n) = sum( DetectTargetType (cueT1,1) == ...
-        DetectResponse_all (cueT1) ) / numel(DetectTargetType (cueT1,1));
-    
-    pc.DetectT2(:,n) = sum( DetectTargetType (cueT2,2) == ...
-        DetectResponse_all (cueT2) ) / numel (DetectTargetType (cueT2,2));
+     Pc.overall_invalid_T2(:,n) = sum( response_correct(invalid_T2_Indx) == 1) /...
+         numel( response_correct(invalid_T2_Indx) );
 
-    pc.DiscrimT1(:,n) = sum( targetTypeT1 (cueT1) == ...
-        response_all(cueT1) ) / sum ( ismember(targetTypeT1(cueT1),[1,2]) );
-       
-    pc.DiscrimT2(:,n) = sum( targetTypeT2 (cueT2) == ...
-        response_all(cueT2) ) / sum( ismember(targetTypeT2(cueT2),[1,2]) );
+     
+     
+    %% overall accuracy (detect and discrim seperate)
+%     cueT1 = runIndx & (valid_T1_Indx | invalid_T1_Indx);
+%     cueT2 = runIndx & (valid_T2_Indx | invalid_T2_Indx);
+%     
+%     pc.DetectT1(:,n) = sum( DetectTargetType (cueT1,1) == ...
+%         DetectResponse_all (cueT1) ) / numel(DetectTargetType (cueT1,1));
+%     
+%     pc.DetectT2(:,n) = sum( DetectTargetType (cueT2,2) == ...
+%         DetectResponse_all (cueT2) ) / numel (DetectTargetType (cueT2,2));
+% 
+%     pc.DiscrimT1(:,n) = sum( targetTypeT1 (cueT1) == ...
+%         response_all(cueT1) ) / sum ( ismember(targetTypeT1(cueT1),[1,2]) );
+%        
+%     pc.DiscrimT2(:,n) = sum( targetTypeT2 (cueT2) == ...
+%         response_all(cueT2) ) / sum( ismember(targetTypeT2(cueT2),[1,2]) );
   
 end
 
@@ -153,22 +163,30 @@ Pc.discrim_means = [mean(Pc.discrim_valid_T1),mean(Pc.discrim_invalid_T1),mean(P
     mean(Pc.discrim_invalid_T2)];
 Pc.detect_means = [mean(Pc.detect_valid_T1),mean(Pc.detect_invalid_T1),mean(Pc.detect_valid_T2),...
     mean(Pc.detect_invalid_T2)];
-Pc.Discrim_all_mean = [mean(pc.DiscrimT1),mean(pc.DiscrimT2)];
-Pc.Detect_all_mean = [mean(pc.DetectT1),mean(pc.DetectT2)];
+Pc.overall_mean = [mean(Pc.overall_valid_T1), mean(Pc.overall_invalid_T1), mean(Pc.overall_valid_T2),...
+    mean(Pc.overall_invalid_T2) ];
+
+% Pc.Discrim_all_mean = [mean(pc.DiscrimT1),mean(pc.DiscrimT2)];
+% Pc.Detect_all_mean = [mean(pc.DetectT1),mean(pc.DetectT2)];
 
 % stds
 Pc.discrim_stds = [std(Pc.discrim_valid_T1),std(Pc.discrim_invalid_T1),std(Pc.discrim_valid_T2),...
     std(Pc.discrim_invalid_T2)];
 Pc.detect_stds = [std(Pc.detect_valid_T1),std(Pc.detect_invalid_T1),std(Pc.detect_valid_T2),...
     std(Pc.detect_invalid_T2)];
-Pc.Discrim_all_std = [std(pc.DiscrimT1),std(pc.DiscrimT2)];
-Pc.Detect_all_std = [std(pc.DetectT1),std(pc.DetectT2)];
+Pc.overall_stds = [std(Pc.overall_valid_T1), std(Pc.overall_invalid_T1), std(Pc.overall_valid_T2),...
+    std(Pc.overall_invalid_T2) ];
+
+% Pc.Discrim_all_std = [std(pc.DiscrimT1),std(pc.DiscrimT2)];
+% Pc.Detect_all_std = [std(pc.DetectT1),std(pc.DetectT2)];
 
 % stes
 Pc.discrim_stes = Pc.discrim_stds ./ sqrt (length(df));
 Pc.detect_stes = Pc.detect_stds ./ sqrt (length(df));
-Pc.Discrim_all_ste = Pc.Discrim_all_std ./ sqrt (length(df));
-Pc.Detect_all_ste = Pc.Detect_all_std ./ sqrt(length(df));
+Pc.overall_stes = Pc.overall_stds ./ sqrt( length(df) );
+
+% Pc.Discrim_all_ste = Pc.Discrim_all_std ./ sqrt (length(df));
+% Pc.Detect_all_ste = Pc.Detect_all_std ./ sqrt(length(df));
 
 %% plot
 scrsz=get(0,'ScreenSize');                                 
@@ -176,7 +194,7 @@ scrsz=get(0,'ScreenSize');
 figure
 
 hold on
-subplot(1,2,1)
+subplot(1,3,1)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
 y = errorbar([Pc.discrim_means(1:2);Pc.discrim_means(3:4)],[Pc.discrim_stes(1:2);Pc.discrim_stes(3:4)],'.');
 ylim([0 1])
@@ -190,7 +208,7 @@ ylabel('accuracy')
 legend('valid','invalid','Location','SouthEast');
 title('discrimination')
 
-subplot(1,2,2)
+subplot(1,3,2)
 y = errorbar([Pc.detect_means(1:2);Pc.detect_means(3:4)],[Pc.detect_stes(1:2);Pc.detect_stes(3:4)],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
@@ -201,7 +219,18 @@ set(gca,'XTickLabel',{'T1','T2'});
 ylabel('accuracy')
 title('detection')
 
-turnwhite
+subplot(1,3,3)
+y = errorbar([Pc.overall_mean(1:2);Pc.overall_mean(3:4)],[Pc.overall_stes(1:2);Pc.overall_stes(3:4)],'.');
+ylim([0 1])
+% set(y, 'MarkerSize', 20)
+set(y(2),'Color','r')
+set(gca,'XTick',[1 2])
+set(gca,'XTickLabel',{'T1','T2'});
+% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+ylabel('accuracy')
+title('overall')
+
+% turnwhite
 
 %%
 % figure
