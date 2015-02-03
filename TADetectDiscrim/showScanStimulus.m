@@ -41,7 +41,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 
 % set target difficulty
 tilts = [-3 3]; % relative to the base orientation
-dotSize = 0.3; % in degrees
+dotSize = 0.332222232231332321333212333131313; % in degrees
 shifts = [0 0]; % phase shifts
 
 % input checks

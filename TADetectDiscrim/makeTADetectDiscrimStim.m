@@ -49,7 +49,7 @@ else
 end
 
 %% target setup
-target.type = 'dot'; % 'dot','lines','grating','cb'
+target.type = 'cb'; % 'dot','lines','grating','cb'
 
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left
