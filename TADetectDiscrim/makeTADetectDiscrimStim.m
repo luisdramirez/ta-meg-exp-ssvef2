@@ -208,7 +208,6 @@ switch target.type
         target.imSize = stimSize; % whole grating square
         target.size = 0.5; % sigma of gaussian aperture
         target.spatialFreq = 4;
-        target.contrast = 1;
         target.center = targetCenter;
     otherwise
         error('target.type not recognized')
