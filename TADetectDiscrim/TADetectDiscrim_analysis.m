@@ -119,8 +119,17 @@ for n = 1:length(df)
     
      Pc.detect_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1) == DetectResponse_all(valid_T1_Indx) ) /...
          numel(DetectTargetType(valid_T1_Indx,1));
+
+     Pc.Hit_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1) == DiscrimResponse_all(valid_T1_Indx) ) / ...
+         sum(ismember(targetTypeT1(valid_T1_Indx),[1,2]) );
+     Pc.FA_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1)== 0 & DetectResponse_all(valid_T1_Indx) == 1) / ...
+         sum(ismember(targetTypeT1(valid_T1_Indx),[1,2]) );
+     Pc.Miss_valid_T1(:,n) = 1-Pc.Hit_valid_T1(:,n);
+     Pc.CR_valid_T1(:,n) = 1- Pc.FA_valid_T1(:,n);
+     
 %      Pc.overall_valid_T1(:,n) = sum ( response_correct(valid_T1_Indx) == 1 ) / ...
-%          numel( response_correct(valid_T1_Indx) );
+%          numel( response_correct(valid_T1_Indx) ); 
+
      Pc.overall_valid_T1(:,n) = sum ( targetTypeT1(valid_T1_Indx) == OverallResponse_all (valid_T1_Indx) ) / ...
          sum( valid_T1_Indx) ;
      
@@ -131,6 +140,14 @@ for n = 1:length(df)
      
      Pc.detect_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1) == DetectResponse_all(invalid_T1_Indx) ) /...
          numel(DetectTargetType(invalid_T1_Indx,1));
+          
+     Pc.Hit_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1) == DiscrimResponse_all(invalid_T1_Indx) ) / ...
+         sum(ismember(targetTypeT1(invalid_T1_Indx),[1,2]) ) ;
+     Pc.FA_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1)== 0 & DetectResponse_all(invalid_T1_Indx) == 1) / ...
+         sum(ismember(targetTypeT1(invalid_T1_Indx),[1,2]) );
+     Pc.Miss_invalid_T1(:,n) = 1-Pc.Hit_invalid_T1(:,n);
+     Pc.CR_invalid_T1(:,n) = 1- Pc.FA_invalid_T1(:,n);
+     
 %      Pc.overall_invalid_T1(:,n) = sum ( response_correct(invalid_T1_Indx) == 1) / ...
 %          numel( response_correct(invalid_T1_Indx) );
      Pc.overall_invalid_T1(:,n) = sum ( targetTypeT1(invalid_T1_Indx) == OverallResponse_all (invalid_T1_Indx) ) / ...
@@ -147,6 +164,14 @@ for n = 1:length(df)
      
      Pc.detect_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2) == DetectResponse_all(valid_T2_Indx) ) /...
          numel(DetectTargetType(valid_T2_Indx,2));
+    
+     Pc.Hit_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2) == DiscrimResponse_all(valid_T2_Indx) ) / ...
+         sum(ismember(targetTypeT2(valid_T2_Indx),[1,2]) ) ;
+     Pc.FA_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2)== 0 & DetectResponse_all(valid_T2_Indx) == 1) / ...
+         sum(ismember(targetTypeT2(valid_T2_Indx),[1,2]) );
+     Pc.Miss_valid_T2(:,n) = 1-Pc.Hit_valid_T2(:,n);
+     Pc.CR_valid_T2(:,n) = 1- Pc.FA_valid_T2(:,n);
+     
 %      Pc.overall_valid_T2(:,n) = sum( response_correct(valid_T2_Indx) == 1 ) /...
 %          numel( response_correct(valid_T2_Indx) );
      Pc.overall_valid_T2(:,n) = sum ( targetTypeT2(valid_T2_Indx) == OverallResponse_all (valid_T2_Indx) ) / ...
@@ -158,7 +183,15 @@ for n = 1:length(df)
          sum(DetectTargetType(invalid_T2_Indx,2) == DiscrimResponse_all(invalid_T2_Indx) );
      
      Pc.detect_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2) == DetectResponse_all(invalid_T2_Indx) ) /...
-         numel(DetectTargetType(invalid_T2_Indx,2));
+         numel(DetectTargetType(invalid_T2_Indx,2));     
+     
+     Pc.Hit_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2) == DiscrimResponse_all(invalid_T2_Indx) ) / ...
+         sum( ismember(targetTypeT2(invalid_T2_Indx),[1,2]) );
+     Pc.FA_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2)== 0 & DetectResponse_all(invalid_T2_Indx) == 1) / ...
+         sum( ismember(targetTypeT2(invalid_T2_Indx),[1,2]) );
+     Pc.Miss_invalid_T2(:,n) = 1-Pc.Hit_invalid_T2(:,n);
+     Pc.CR_invalid_T2(:,n) = 1- Pc.FA_invalid_T2(:,n);
+     
 %      Pc.overall_invalid_T2(:,n) = sum( response_correct(invalid_T2_Indx) == 1) /...
 %          numel( response_correct(invalid_T2_Indx) );
      Pc.overall_invalid_T2(:,n) = sum ( targetTypeT2(invalid_T2_Indx) == OverallResponse_all (invalid_T2_Indx) ) / ...
@@ -197,10 +230,17 @@ Pc.detect_means = [mean(Pc.detect_valid_T1),mean(Pc.detect_invalid_T1),mean(Pc.d
 Pc.overall_mean = [mean(Pc.overall_valid_T1), mean(Pc.overall_invalid_T1), mean(Pc.overall_valid_T2),...
     mean(Pc.overall_invalid_T2) ];
 
+Pc.T1_valid_means = [mean(Pc.Hit_valid_T1),mean(Pc.FA_valid_T1),mean(Pc.Miss_valid_T1),mean(Pc.CR_valid_T1)];
+Pc.T1_invalid_means = [mean(Pc.Hit_invalid_T1),mean(Pc.FA_invalid_T1),mean(Pc.Miss_invalid_T1),mean(Pc.CR_invalid_T1)];
+Pc.T2_valid_means = [mean(Pc.Hit_valid_T2),mean(Pc.FA_valid_T2),mean(Pc.Miss_valid_T2),mean(Pc.CR_valid_T2)];
+Pc.T2_invalid_means = [mean(Pc.Hit_invalid_T2),mean(Pc.FA_invalid_T2),mean(Pc.Miss_invalid_T2),mean(Pc.CR_invalid_T2)];
+
+
 % Pc.Discrim_all_mean = [mean(pc.DiscrimT1),mean(pc.DiscrimT2)];
 % Pc.Detect_all_mean = [mean(pc.DetectT1),mean(pc.DetectT2)];
 
 % stds
+
 Pc.discrim_stds = [std(Pc.discrim_valid_T1),std(Pc.discrim_invalid_T1),std(Pc.discrim_valid_T2),...
     std(Pc.discrim_invalid_T2)];
 Pc.discrim1_stds = [nanstd(Pc.discrim1_valid_T1),nanstd(Pc.discrim1_invalid_T1),nanstd(Pc.discrim1_valid_T2),...
@@ -210,6 +250,12 @@ Pc.detect_stds = [std(Pc.detect_valid_T1),std(Pc.detect_invalid_T1),std(Pc.detec
 Pc.overall_stds = [std(Pc.overall_valid_T1), std(Pc.overall_invalid_T1), std(Pc.overall_valid_T2),...
     std(Pc.overall_invalid_T2) ];
 
+Pc.T1_valid_stds = [std(Pc.Hit_valid_T1),std(Pc.FA_valid_T1),std(Pc.Miss_valid_T1),std(Pc.CR_valid_T1)];
+Pc.T1_invalid_stds = [std(Pc.Hit_invalid_T1),std(Pc.FA_invalid_T1),std(Pc.Miss_invalid_T1),std(Pc.CR_invalid_T1)];
+Pc.T2_valid_stds = [std(Pc.Hit_valid_T2),std(Pc.FA_valid_T2),std(Pc.Miss_valid_T2),std(Pc.CR_valid_T2)];
+Pc.T2_invalid_stds = [std(Pc.Hit_invalid_T2),std(Pc.FA_invalid_T2),std(Pc.Miss_invalid_T2),std(Pc.CR_invalid_T2)];
+
+
 % Pc.Discrim_all_std = [std(pc.DiscrimT1),std(pc.DiscrimT2)];
 % Pc.Detect_all_std = [std(pc.DetectT1),std(pc.DetectT2)];
 
@@ -218,6 +264,11 @@ Pc.discrim_stes = Pc.discrim_stds ./ sqrt (length(df));
 Pc.discrim1_stes = Pc.discrim1_stds ./ sqrt (length(df));
 Pc.detect_stes = Pc.detect_stds ./ sqrt (length(df));
 Pc.overall_stes = Pc.overall_stds ./ sqrt( length(df) );
+
+Pc.T1_valid_stes = Pc.T1_valid_stds ./ sqrt(length(df));
+Pc.T1_invalid_stes = Pc.T1_invalid_stds ./ sqrt (length(df));
+Pc.T2_valid_stes = Pc.T2_valid_stds ./ sqrt(length(df));
+Pc.T2_invalid_stes = Pc.T2_invalid_stds ./ sqrt(length(df));
 
 % Pc.Discrim_all_ste = Pc.Discrim_all_std ./ sqrt (length(df));
 % Pc.Detect_all_ste = Pc.Detect_all_std ./ sqrt(length(df));
@@ -276,7 +327,24 @@ set(gca,'XTickLabel',{'T1','T2'});
 ylabel('accuracy')
 title('overall')
 
-% turnwhite
+figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+subplot(1,2,1)
+barwitherr ([Pc.T1_valid_stes' Pc.T1_invalid_stes'],[1 2 3 4],[Pc.T1_valid_means' Pc.T1_invalid_means'])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
+colormap(barmap);
+title('T1 detection')
+set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
+
+subplot(1,2,2)
+barwitherr ([Pc.T2_valid_stes' Pc.T2_invalid_stes'],[1 2 3 4],[Pc.T2_valid_means' Pc.T2_invalid_means'])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
+colormap(barmap);
+title('T2 detection')
+set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
+
+turnwhite
 
 %%
 % figure
