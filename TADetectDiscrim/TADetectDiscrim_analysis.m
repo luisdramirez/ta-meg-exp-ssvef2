@@ -77,6 +77,7 @@ response_correct = responseData_all(:,11);
 response_all = responseData_all(:,10);
 targetTypeT1 = responseData_all(:,7);
 targetTypeT2 = responseData_all(:,8);
+targetCondition = responseData_all(:,6);
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
@@ -217,6 +218,71 @@ for n = 1:length(df)
   
 end
 
+%% pp pa ap aa
+cueBlockOrder_Indx = [2 4 5 3]; % cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+
+Discrim_all = []; % rows: pp,pa,ap,aa; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-9
+Discrim1_all = [];
+Detect_all = [];
+Overall_all = [];
+
+for n = 1:length(df) 
+    runIndx = run == n;
+    for k = 1:length(cueBlockOrder_Indx)
+        dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
+        for i = 2:5; % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
+            condition_Indx =  dd & targetCondition == i ;
+              if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+                 interval = 1;
+                 targetType = targetTypeT1;
+             else interval = 2;
+                 targetType = targetTypeT2;
+              end
+              % total correct / total present
+             Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                 sum(ismember(targetType(condition_Indx),[1,2]) );
+             % total correct / total correctly detected
+             Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+             Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                 numel(DetectTargetType(condition_Indx,interval));
+             Overall_all(i-1,k,n) = sum ( targetTypeT1(condition_Indx) == OverallResponse_all (condition_Indx) ) / ...
+                 sum( condition_Indx);
+             
+         end
+     end
+end
+ 
+%% calculate means and stes (pp pa ap aa)
+Discrim_means = nanmean(Discrim_all,3); % rows:  pp,pa,ap,aa; columns: target type
+Discrim1_means = nanmean(Discrim1_all,3);
+Detect_means = nanmean(Detect_all,3);
+Overall_means = nanmean(Overall_all,3);
+
+Discrim_stes = std(Discrim_all,0,3)./sqrt(length(df));
+Discrim1_stes = std(Discrim1_all,0,3)./sqrt(length(df));
+Detect_stes = std(Detect_all,0,3)./sqrt(length(df));
+Overall_stes = std(Overall_all,0,3) ./ sqrt(length(df));
+
+T1_Discrim_means = Discrim_means(1:2,1:2); % rows: pp,pa; columns: valid, invalid; 
+T1_Discrim_stes = Discrim_stes(1:2,1:2);
+T2_Discrim_means = [Discrim_means(1,3:4) ; Discrim_means(3,3:4)]; % rows: pp,ap columns: valid, invalid;
+T2_Discrim_stes = [Discrim_stes(1,3:4) ; Discrim_stes(3,3:4)];
+
+T1_Discrim1_means = Discrim1_means(1:2,1:2); % rows: pp,pa; columns: valid, invalid;
+T1_Discrim1_stes = Discrim1_stes(1:2,1:2);
+T2_Discrim1_means = [Discrim1_means(1,3:4) ; Discrim1_means(3,3:4)];% rows: pp,ap columns: valid, invalid;
+T2_Discrim1_stes = [Discrim1_stes(1,3:4) ; Discrim1_stes(3,3:4)];
+
+T1_Detect_means = Detect_means(:,1:2);
+T1_Detect_stes = Detect_stes(:,1:2);
+T2_Detect_means = Detect_means(:,3:4);
+T2_Detect_stes = Detect_stes(:,3:4);
+
+T1_Overall_means = Overall_means(:,1:2);
+T1_Overall_stes = Overall_stes(:,1:2);
+T2_Overall_means = Overall_means(:,3:4);
+T2_Overall_stes = Overall_stes(:,3:4);
 
 
 %% calculate means and stes
@@ -327,6 +393,7 @@ set(gca,'XTickLabel',{'T1','T2'});
 ylabel('accuracy')
 title('overall')
 
+%% plot (hit, fa, miss, cr)
 figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
 barwitherr ([Pc.T1_valid_stes' Pc.T1_invalid_stes'],[1 2 3 4],[Pc.T1_valid_means' Pc.T1_invalid_means'])
@@ -344,7 +411,89 @@ colormap(barmap);
 title('T2 detection')
 set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
 
-turnwhite
+%%
+figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
+subplot(1,2,1)
+ylim([0 1])
+barwitherr ([T1_Discrim_stes(:,1) T1_Discrim_stes(:,2)],[1 2],[T1_Discrim_means(:,1) T1_Discrim_means(:,2)])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
+colormap(barmap);
+title('T1 Discrim (total correct/total present)')
+set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
+
+subplot(1,2,2)
+barwitherr ([T2_Discrim_stes(:,1) T2_Discrim_stes(:,2)],[1 2],[T2_Discrim_means(:,1) T2_Discrim_means(:,2)])
+legend('valid','invalid')
+ylim([0 1])
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
+colormap(barmap);
+title('T2 Discrim (total correct/total present)')
+set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
+
+
+figure('Position', [1 scrsz(1) scrsz(3)*3/4 scrsz(4)/2])
+subplot(1,2,1)
+
+barwitherr ([T1_Discrim1_stes(:,1) T1_Discrim1_stes(:,2)],[1 2],[T1_Discrim1_means(:,1) T1_Discrim1_means(:,2)])
+legend('valid','invalid')
+ylim([0 1])
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
+colormap(barmap);
+title('T1 Discrim (total correct/total detected)')
+set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
+
+subplot(1,2,2)
+barwitherr ([T2_Discrim1_stes(:,1) T2_Discrim1_stes(:,2)],[1 2],[T2_Discrim1_means(:,1) T2_Discrim1_means(:,2)])
+legend('valid','invalid')
+ylim([0 1])
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
+colormap(barmap);
+title('T2 Discrim (total correct/total detected)')
+set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
+
+
+%%
+figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+subplot(1,2,1)
+barwitherr ([T1_Detect_stes(:,1) T1_Detect_stes(:,2)],[1 2 3 4],[T1_Detect_means(:,1) T1_Detect_means(:,2)])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
+colormap(barmap);
+title('T1 detection')
+set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+
+subplot(1,2,2)
+barwitherr ([T2_Detect_stes(:,1) T2_Detect_stes(:,2)],[1 2 3 4],[T2_Detect_means(:,1) T2_Detect_means(:,2)])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
+colormap(barmap);
+title('T2 detection')
+set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+
+
+
+
+%%
+
+figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+subplot(1,2,1)
+barwitherr ([T1_Overall_stes(:,1) T1_Overall_stes(:,2)],[1 2 3 4],[T1_Overall_means(:,1) T1_Overall_means(:,2)])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
+colormap(barmap);
+title('T1 overall')
+set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+
+subplot(1,2,2)
+barwitherr ([T2_Overall_stes(:,1) T2_Overall_stes(:,2)],[1 2 3 4],[T2_Overall_means(:,1) T2_Overall_means(:,2)])
+legend('valid','invalid')
+barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
+colormap(barmap);
+title('T2 overall')
+set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+
+turnallwhite
 
 %%
 % figure
