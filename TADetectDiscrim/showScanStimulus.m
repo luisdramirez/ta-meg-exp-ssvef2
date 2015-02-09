@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-.5 .5]; % relative to the base orientation
+tilts = [-1 1]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
 patchContrast = 0.5; % for cb target
@@ -143,7 +143,7 @@ if isfield(stimulus, 'target')
                 end
             end
         case 'cb'
-            fprintf('\n[showScanStimulus] cb tilt = [%1.1f %1.1f], contrast = %1.2f\n\n', tilts(1), tilts(2), contrast)
+            fprintf('\n[showScanStimulus] cb tilt = [%1.1f %1.1f], contrast = %1.2f\n\n', tilts(1), tilts(2), patchContrast)
             target.tilts = tilts; % store settings
             target.contrast = patchContrast;
             Screen('BlendFunction', display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
