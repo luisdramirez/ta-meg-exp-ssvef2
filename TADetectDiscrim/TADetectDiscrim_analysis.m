@@ -397,6 +397,7 @@ title('overall')
 figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
 barwitherr ([Pc.T1_valid_stes' Pc.T1_invalid_stes'],[1 2 3 4],[Pc.T1_valid_means' Pc.T1_invalid_means'])
+ylim([0 1])
 legend('valid','invalid')
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
 colormap(barmap);
@@ -405,6 +406,7 @@ set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
 
 subplot(1,2,2)
 barwitherr ([Pc.T2_valid_stes' Pc.T2_invalid_stes'],[1 2 3 4],[Pc.T2_valid_means' Pc.T2_invalid_means'])
+ylim([0 1])
 legend('valid','invalid')
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
 colormap(barmap);
@@ -458,6 +460,7 @@ figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
 barwitherr ([T1_Detect_stes(:,1) T1_Detect_stes(:,2)],[1 2 3 4],[T1_Detect_means(:,1) T1_Detect_means(:,2)])
 legend('valid','invalid')
+ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
 colormap(barmap);
 title('T1 detection')
@@ -466,6 +469,7 @@ set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
 subplot(1,2,2)
 barwitherr ([T2_Detect_stes(:,1) T2_Detect_stes(:,2)],[1 2 3 4],[T2_Detect_means(:,1) T2_Detect_means(:,2)])
 legend('valid','invalid')
+ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
 colormap(barmap);
 title('T2 detection')
@@ -480,6 +484,7 @@ figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
 barwitherr ([T1_Overall_stes(:,1) T1_Overall_stes(:,2)],[1 2 3 4],[T1_Overall_means(:,1) T1_Overall_means(:,2)])
 legend('valid','invalid')
+ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
 colormap(barmap);
 title('T1 overall')
@@ -488,6 +493,7 @@ set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
 subplot(1,2,2)
 barwitherr ([T2_Overall_stes(:,1) T2_Overall_stes(:,2)],[1 2 3 4],[T2_Overall_means(:,1) T2_Overall_means(:,2)])
 legend('valid','invalid')
+ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
 colormap(barmap);
 title('T2 overall')
