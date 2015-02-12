@@ -1,4 +1,4 @@
-function [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date)
+function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date)
 
 % [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, [date])
 % 
@@ -73,11 +73,11 @@ end
 %% extract block order from responseData_all
 run = responseData_all(:,1);
 cueBlockOrder = responseData_all(:,4);
-response_correct = responseData_all(:,11);
-response_all = responseData_all(:,10);
+targetCondition = responseData_all(:,6);
 targetTypeT1 = responseData_all(:,7);
 targetTypeT2 = responseData_all(:,8);
-targetCondition = responseData_all(:,6);
+response_all = responseData_all(:,10);
+response_correct = responseData_all(:,11);
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
@@ -102,242 +102,63 @@ OverallResponse_all ( OverallResponse_all == 3) = 0;
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 % cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 
-for n = 1:length(df)
-    
-    runIndx = run == n;
-    
-    % postCue = T1; cueBlockNames is valid '1-1' or invalid '2-1'
-    
-    valid_T1_Indx = runIndx & cueBlockOrder == 2;   
-    invalid_T1_Indx = runIndx & cueBlockOrder == 4;
-    
-    % total correct / total present
-     Pc.discrim_valid_T1(:,n) = sum (targetTypeT1(valid_T1_Indx) == response_all(valid_T1_Indx))/ ...
-         sum(ismember(targetTypeT1(valid_T1_Indx),[1,2]) );
-    % total correct / total correctly detected
-     Pc.discrim1_valid_T1(:,n) = sum (targetTypeT1(valid_T1_Indx) == response_all(valid_T1_Indx))/ ...
-         sum (DetectTargetType(valid_T1_Indx,1) == DiscrimResponse_all(valid_T1_Indx) );
-    
-     Pc.detect_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1) == DetectResponse_all(valid_T1_Indx) ) /...
-         numel(DetectTargetType(valid_T1_Indx,1));
-
-     Pc.Hit_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1) == DiscrimResponse_all(valid_T1_Indx) ) / ...
-         sum(ismember(targetTypeT1(valid_T1_Indx),[1,2]) );
-     Pc.FA_valid_T1(:,n) = sum (DetectTargetType(valid_T1_Indx,1)== 0 & DetectResponse_all(valid_T1_Indx) == 1) / ...
-         sum(ismember(targetTypeT1(valid_T1_Indx),[1,2]) );
-     Pc.Miss_valid_T1(:,n) = 1-Pc.Hit_valid_T1(:,n);
-     Pc.CR_valid_T1(:,n) = 1- Pc.FA_valid_T1(:,n);
-     
-%      Pc.overall_valid_T1(:,n) = sum ( response_correct(valid_T1_Indx) == 1 ) / ...
-%          numel( response_correct(valid_T1_Indx) ); 
-
-     Pc.overall_valid_T1(:,n) = sum ( targetTypeT1(valid_T1_Indx) == OverallResponse_all (valid_T1_Indx) ) / ...
-         sum( valid_T1_Indx) ;
-     
-     Pc.discrim_invalid_T1(:,n) = sum (targetTypeT1(invalid_T1_Indx) == response_all(invalid_T1_Indx))/ ...
-         sum(ismember(targetTypeT1(invalid_T1_Indx),[1,2]) );
-     Pc.discrim1_invalid_T1(:,n) = sum (targetTypeT1(invalid_T1_Indx) == response_all(invalid_T1_Indx))/ ...
-         sum (DetectTargetType(invalid_T1_Indx,1) == DiscrimResponse_all(invalid_T1_Indx) );
-     
-     Pc.detect_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1) == DetectResponse_all(invalid_T1_Indx) ) /...
-         numel(DetectTargetType(invalid_T1_Indx,1));
-          
-     Pc.Hit_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1) == DiscrimResponse_all(invalid_T1_Indx) ) / ...
-         sum(ismember(targetTypeT1(invalid_T1_Indx),[1,2]) ) ;
-     Pc.FA_invalid_T1(:,n) = sum (DetectTargetType(invalid_T1_Indx,1)== 0 & DetectResponse_all(invalid_T1_Indx) == 1) / ...
-         sum(ismember(targetTypeT1(invalid_T1_Indx),[1,2]) );
-     Pc.Miss_invalid_T1(:,n) = 1-Pc.Hit_invalid_T1(:,n);
-     Pc.CR_invalid_T1(:,n) = 1- Pc.FA_invalid_T1(:,n);
-     
-%      Pc.overall_invalid_T1(:,n) = sum ( response_correct(invalid_T1_Indx) == 1) / ...
-%          numel( response_correct(invalid_T1_Indx) );
-     Pc.overall_invalid_T1(:,n) = sum ( targetTypeT1(invalid_T1_Indx) == OverallResponse_all (invalid_T1_Indx) ) / ...
-         sum( invalid_T1_Indx) ;
-
-    % postCue = T2; cueBlockNames is valid '2-2 or invalid '1-2'
-     valid_T2_Indx = runIndx & cueBlockOrder == 5;
-     invalid_T2_Indx = runIndx & cueBlockOrder == 3;
-
-     Pc.discrim_valid_T2(:,n) = sum (targetTypeT2(valid_T2_Indx) == response_all(valid_T2_Indx))/ ...
-         sum(ismember(targetTypeT2(valid_T2_Indx),[1,2]) );
-     Pc.discrim1_valid_T2(:,n) = sum (targetTypeT2(valid_T2_Indx) == response_all(valid_T2_Indx))/ ...
-         sum(DetectTargetType(valid_T2_Indx,2) == DiscrimResponse_all(valid_T2_Indx) );
-     
-     Pc.detect_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2) == DetectResponse_all(valid_T2_Indx) ) /...
-         numel(DetectTargetType(valid_T2_Indx,2));
-    
-     Pc.Hit_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2) == DiscrimResponse_all(valid_T2_Indx) ) / ...
-         sum(ismember(targetTypeT2(valid_T2_Indx),[1,2]) ) ;
-     Pc.FA_valid_T2(:,n) = sum (DetectTargetType(valid_T2_Indx,2)== 0 & DetectResponse_all(valid_T2_Indx) == 1) / ...
-         sum(ismember(targetTypeT2(valid_T2_Indx),[1,2]) );
-     Pc.Miss_valid_T2(:,n) = 1-Pc.Hit_valid_T2(:,n);
-     Pc.CR_valid_T2(:,n) = 1- Pc.FA_valid_T2(:,n);
-     
-%      Pc.overall_valid_T2(:,n) = sum( response_correct(valid_T2_Indx) == 1 ) /...
-%          numel( response_correct(valid_T2_Indx) );
-     Pc.overall_valid_T2(:,n) = sum ( targetTypeT2(valid_T2_Indx) == OverallResponse_all (valid_T2_Indx) ) / ...
-         sum( valid_T2_Indx) ;
-
-     Pc.discrim_invalid_T2(:,n) = sum( targetTypeT2(invalid_T2_Indx) == response_all(invalid_T2_Indx) )/ ...
-         sum( ismember(targetTypeT2(invalid_T2_Indx),[1,2]) );
-     Pc.discrim1_invalid_T2(:,n) = sum (targetTypeT2(invalid_T2_Indx) == response_all(invalid_T2_Indx))/ ...
-         sum(DetectTargetType(invalid_T2_Indx,2) == DiscrimResponse_all(invalid_T2_Indx) );
-     
-     Pc.detect_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2) == DetectResponse_all(invalid_T2_Indx) ) /...
-         numel(DetectTargetType(invalid_T2_Indx,2));     
-     
-     Pc.Hit_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2) == DiscrimResponse_all(invalid_T2_Indx) ) / ...
-         sum( ismember(targetTypeT2(invalid_T2_Indx),[1,2]) );
-     Pc.FA_invalid_T2(:,n) = sum (DetectTargetType(invalid_T2_Indx,2)== 0 & DetectResponse_all(invalid_T2_Indx) == 1) / ...
-         sum( ismember(targetTypeT2(invalid_T2_Indx),[1,2]) );
-     Pc.Miss_invalid_T2(:,n) = 1-Pc.Hit_invalid_T2(:,n);
-     Pc.CR_invalid_T2(:,n) = 1- Pc.FA_invalid_T2(:,n);
-     
-%      Pc.overall_invalid_T2(:,n) = sum( response_correct(invalid_T2_Indx) == 1) /...
-%          numel( response_correct(invalid_T2_Indx) );
-     Pc.overall_invalid_T2(:,n) = sum ( targetTypeT2(invalid_T2_Indx) == OverallResponse_all (invalid_T2_Indx) ) / ...
-         sum( invalid_T2_Indx) ;
-
-     
-     
-    %% overall accuracy (detect and discrim seperate)
-%     cueT1 = runIndx & (valid_T1_Indx | invalid_T1_Indx);
-%     cueT2 = runIndx & (valid_T2_Indx | invalid_T2_Indx);
-%     
-%     pc.DetectT1(:,n) = sum( DetectTargetType (cueT1,1) == ...
-%         DetectResponse_all (cueT1) ) / numel(DetectTargetType (cueT1,1));
-%     
-%     pc.DetectT2(:,n) = sum( DetectTargetType (cueT2,2) == ...
-%         DetectResponse_all (cueT2) ) / numel (DetectTargetType (cueT2,2));
-% 
-%     pc.DiscrimT1(:,n) = sum( targetTypeT1 (cueT1) == ...
-%         response_all(cueT1) ) / sum ( ismember(targetTypeT1(cueT1),[1,2]) );
-%        
-%     pc.DiscrimT2(:,n) = sum( targetTypeT2 (cueT2) == ...
-%         response_all(cueT2) ) / sum( ismember(targetTypeT2(cueT2),[1,2]) );
-  
-end
-
-%% pp pa ap aa
-cueBlockOrder_Indx = [2 4 5 3]; % cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-
-Discrim_all = []; % rows: pp,pa,ap,aa; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-9
-Discrim1_all = [];
-Detect_all = [];
-Overall_all = [];
+cueBlockOrder_Indx = [2 4 5 3]; 
+accuracy =[]; % rows: '1-1','2-1','2-2','1-2'; columns: runs 1-10
+accuracy.missedTrials = zeros(1,length(df)); % columns: runs 1-10
 
 for n = 1:length(df) 
     runIndx = run == n;
-    for k = 1:length(cueBlockOrder_Indx)
-        dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
-        for i = 2:5; % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-            condition_Indx =  dd & targetCondition == i ;
-              if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
+       condition_Indx = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
+            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
                  interval = 1;
                  targetType = targetTypeT1;
-             else interval = 2;
+            else interval = 2;
                  targetType = targetTypeT2;
-              end
+            end
               % total correct / total present
-             Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+            accuracy.Discrim_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
                  sum(ismember(targetType(condition_Indx),[1,2]) );
              % total correct / total correctly detected
-             Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+            accuracy.Discrim1_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
                  sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
-             Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+            accuracy.Detect_all(k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
                  numel(DetectTargetType(condition_Indx,interval));
-             Overall_all(i-1,k,n) = sum ( targetTypeT1(condition_Indx) == OverallResponse_all (condition_Indx) ) / ...
-                 sum( condition_Indx);
-             
-         end
-     end
+            accuracy.Overall_all(k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                 numel( response_correct(condition_Indx) ); 
+            accuracy.Hit_all(k,n) = sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) ) / ...
+                 sum(ismember(targetType(condition_Indx),[1,2]) );
+            accuracy.FA_all(k,n) = sum (DetectTargetType(condition_Indx,interval)== 0 & DetectResponse_all(condition_Indx) == 1) / ...
+                 sum(ismember(targetType(condition_Indx),[1,2]) );
+            accuracy.Miss_all(k,n) = 1 - accuracy.Hit_all(k,n);
+            accuracy.CR_all(k,n) = 1 -  accuracy.FA_all(k,n);
+            accuracy.missedTrials(n) = accuracy.missedTrials(n) + sum(isnan(response_all(condition_Indx)) );
+    end
 end
- 
-%% calculate means and stes (pp pa ap aa)
-Discrim_means = nanmean(Discrim_all,3); % rows:  pp,pa,ap,aa; columns: target type
-Discrim1_means = nanmean(Discrim1_all,3);
-Detect_means = nanmean(Detect_all,3);
-Overall_means = nanmean(Overall_all,3);
-
-Discrim_stes = std(Discrim_all,0,3)./sqrt(length(df));
-Discrim1_stes = std(Discrim1_all,0,3)./sqrt(length(df));
-Detect_stes = std(Detect_all,0,3)./sqrt(length(df));
-Overall_stes = std(Overall_all,0,3) ./ sqrt(length(df));
-
-T1_Discrim_means = Discrim_means(1:2,1:2); % rows: pp,pa; columns: valid, invalid; 
-T1_Discrim_stes = Discrim_stes(1:2,1:2);
-T2_Discrim_means = [Discrim_means(1,3:4) ; Discrim_means(3,3:4)]; % rows: pp,ap columns: valid, invalid;
-T2_Discrim_stes = [Discrim_stes(1,3:4) ; Discrim_stes(3,3:4)];
-
-T1_Discrim1_means = Discrim1_means(1:2,1:2); % rows: pp,pa; columns: valid, invalid;
-T1_Discrim1_stes = Discrim1_stes(1:2,1:2);
-T2_Discrim1_means = [Discrim1_means(1,3:4) ; Discrim1_means(3,3:4)];% rows: pp,ap columns: valid, invalid;
-T2_Discrim1_stes = [Discrim1_stes(1,3:4) ; Discrim1_stes(3,3:4)];
-
-T1_Detect_means = Detect_means(:,1:2);
-T1_Detect_stes = Detect_stes(:,1:2);
-T2_Detect_means = Detect_means(:,3:4);
-T2_Detect_stes = Detect_stes(:,3:4);
-
-T1_Overall_means = Overall_means(:,1:2);
-T1_Overall_stes = Overall_stes(:,1:2);
-T2_Overall_means = Overall_means(:,3:4);
-T2_Overall_stes = Overall_stes(:,3:4);
 
 
-%% calculate means and stes
-% means
-Pc.discrim_means = [mean(Pc.discrim_valid_T1),mean(Pc.discrim_invalid_T1),mean(Pc.discrim_valid_T2),...
-    mean(Pc.discrim_invalid_T2)];
-Pc.discrim1_means = [nanmean(Pc.discrim1_valid_T1),nanmean(Pc.discrim1_invalid_T1),nanmean(Pc.discrim1_valid_T2),...
-    nanmean(Pc.discrim1_invalid_T2)];
-Pc.detect_means = [mean(Pc.detect_valid_T1),mean(Pc.detect_invalid_T1),mean(Pc.detect_valid_T2),...
-    mean(Pc.detect_invalid_T2)];
-Pc.overall_mean = [mean(Pc.overall_valid_T1), mean(Pc.overall_invalid_T1), mean(Pc.overall_valid_T2),...
-    mean(Pc.overall_invalid_T2) ];
-
-Pc.T1_valid_means = [mean(Pc.Hit_valid_T1),mean(Pc.FA_valid_T1),mean(Pc.Miss_valid_T1),mean(Pc.CR_valid_T1)];
-Pc.T1_invalid_means = [mean(Pc.Hit_invalid_T1),mean(Pc.FA_invalid_T1),mean(Pc.Miss_invalid_T1),mean(Pc.CR_invalid_T1)];
-Pc.T2_valid_means = [mean(Pc.Hit_valid_T2),mean(Pc.FA_valid_T2),mean(Pc.Miss_valid_T2),mean(Pc.CR_valid_T2)];
-Pc.T2_invalid_means = [mean(Pc.Hit_invalid_T2),mean(Pc.FA_invalid_T2),mean(Pc.Miss_invalid_T2),mean(Pc.CR_invalid_T2)];
-
-
-% Pc.Discrim_all_mean = [mean(pc.DiscrimT1),mean(pc.DiscrimT2)];
-% Pc.Detect_all_mean = [mean(pc.DetectT1),mean(pc.DetectT2)];
-
-% stds
-
-Pc.discrim_stds = [std(Pc.discrim_valid_T1),std(Pc.discrim_invalid_T1),std(Pc.discrim_valid_T2),...
-    std(Pc.discrim_invalid_T2)];
-Pc.discrim1_stds = [nanstd(Pc.discrim1_valid_T1),nanstd(Pc.discrim1_invalid_T1),nanstd(Pc.discrim1_valid_T2),...
-    nanstd(Pc.discrim1_invalid_T2)];
-Pc.detect_stds = [std(Pc.detect_valid_T1),std(Pc.detect_invalid_T1),std(Pc.detect_valid_T2),...
-    std(Pc.detect_invalid_T2)];
-Pc.overall_stds = [std(Pc.overall_valid_T1), std(Pc.overall_invalid_T1), std(Pc.overall_valid_T2),...
-    std(Pc.overall_invalid_T2) ];
-
-Pc.T1_valid_stds = [std(Pc.Hit_valid_T1),std(Pc.FA_valid_T1),std(Pc.Miss_valid_T1),std(Pc.CR_valid_T1)];
-Pc.T1_invalid_stds = [std(Pc.Hit_invalid_T1),std(Pc.FA_invalid_T1),std(Pc.Miss_invalid_T1),std(Pc.CR_invalid_T1)];
-Pc.T2_valid_stds = [std(Pc.Hit_valid_T2),std(Pc.FA_valid_T2),std(Pc.Miss_valid_T2),std(Pc.CR_valid_T2)];
-Pc.T2_invalid_stds = [std(Pc.Hit_invalid_T2),std(Pc.FA_invalid_T2),std(Pc.Miss_invalid_T2),std(Pc.CR_invalid_T2)];
+%% calculate means and stes 
+accuracy.Discrim_means = nanmean(accuracy.Discrim_all,2); % rows: '1-1','2-1','2-2','1-2'
+accuracy.Discrim1_means = nanmean(accuracy.Discrim1_all,2);
+accuracy.Detect_means = nanmean(accuracy.Detect_all,2);
+accuracy.Overall_means = nanmean(accuracy.Overall_all,2);
+accuracy.Hit_means = nanmean(accuracy.Hit_all,2);
+accuracy.FA_means = nanmean(accuracy.FA_all,2);
+accuracy.Miss_means = nanmean(accuracy.Miss_all,2);
+accuracy.CR_means = nanmean(accuracy.CR_all,2);
+all_means = [accuracy.Hit_means,accuracy.FA_means,accuracy.Miss_means,accuracy.CR_means ]; % rows: '1-1','2-1','2-2','1-2'
+                                                                                           % columns: Hit,FA, Miss, CR                                                                                          
+accuracy.Discrim_stes = nanstd(accuracy.Discrim_all,0,2)./sqrt(length(df));
+accuracy.Discrim1_stes = nanstd(accuracy.Discrim1_all,0,2)./sqrt(length(df));
+accuracy.Detect_stes = nanstd(accuracy.Detect_all,0,2)./sqrt(length(df));
+accuracy.Overall_stes = nanstd(accuracy.Overall_all,0,2) ./ sqrt(length(df));
+accuracy.Hit_stes = nanstd(accuracy.Hit_all,0,2) ./ sqrt(length(df));
+accuracy.FA_stes = nanstd(accuracy.FA_all,0,2)./ sqrt(length(df));
+accuracy.Miss_stes = nanstd(accuracy.Miss_all,0,2)./ sqrt(length(df));
+accuracy.CR_stes = nanstd(accuracy.CR_all,0,2)./ sqrt(length(df));
+all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_stes];
 
 
-% Pc.Discrim_all_std = [std(pc.DiscrimT1),std(pc.DiscrimT2)];
-% Pc.Detect_all_std = [std(pc.DetectT1),std(pc.DetectT2)];
-
-% stes
-Pc.discrim_stes = Pc.discrim_stds ./ sqrt (length(df));
-Pc.discrim1_stes = Pc.discrim1_stds ./ sqrt (length(df));
-Pc.detect_stes = Pc.detect_stds ./ sqrt (length(df));
-Pc.overall_stes = Pc.overall_stds ./ sqrt( length(df) );
-
-Pc.T1_valid_stes = Pc.T1_valid_stds ./ sqrt(length(df));
-Pc.T1_invalid_stes = Pc.T1_invalid_stds ./ sqrt (length(df));
-Pc.T2_valid_stes = Pc.T2_valid_stds ./ sqrt(length(df));
-Pc.T2_invalid_stes = Pc.T2_invalid_stds ./ sqrt(length(df));
-
-% Pc.Discrim_all_ste = Pc.Discrim_all_std ./ sqrt (length(df));
-% Pc.Detect_all_ste = Pc.Detect_all_std ./ sqrt(length(df));
 
 %% plot
 scrsz=get(0,'ScreenSize');                                 
@@ -346,7 +167,7 @@ scrsz=get(0,'ScreenSize');
 hold on
 subplot(1,4,1)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
-y = errorbar([Pc.discrim_means(1:2);Pc.discrim_means(3:4)],[Pc.discrim_stes(1:2);Pc.discrim_stes(3:4)],'.');
+y = errorbar([ (accuracy.Discrim_means (1:2)') ; (accuracy.Discrim_means (3:4)')],[(accuracy.Discrim_stes(1:2)');(accuracy.Discrim_stes(3:4)')],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
 set(y(2),'Color','r')
@@ -360,7 +181,7 @@ title('discrimination(total correct/total present)')
 
 subplot(1,4,2)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
-y = errorbar([Pc.discrim1_means(1:2);Pc.discrim1_means(3:4)],[Pc.discrim1_stes(1:2);Pc.discrim1_stes(3:4)],'.');
+y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
 set(y(2),'Color','r')
@@ -372,7 +193,7 @@ ylabel('accuracy')
 title('discrimination(total correct/total detected)')
 
 subplot(1,4,3)
-y = errorbar([Pc.detect_means(1:2);Pc.detect_means(3:4)],[Pc.detect_stes(1:2);Pc.detect_stes(3:4)],'.');
+y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
 set(y(2),'Color','r')
@@ -383,7 +204,7 @@ ylabel('accuracy')
 title('detection')
 
 subplot(1,4,4)
-y = errorbar([Pc.overall_mean(1:2);Pc.overall_mean(3:4)],[Pc.overall_stes(1:2);Pc.overall_stes(3:4)],'.');
+y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
 set(y(2),'Color','r')
@@ -393,10 +214,11 @@ set(gca,'XTickLabel',{'T1','T2'});
 ylabel('accuracy')
 title('overall')
 
+
 %% plot (hit, fa, miss, cr)
 figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
-barwitherr ([Pc.T1_valid_stes' Pc.T1_invalid_stes'],[1 2 3 4],[Pc.T1_valid_means' Pc.T1_invalid_means'])
+barwitherr ([all_stes(1,:)' all_stes(2,:)'],[1 2 3 4],[all_means(1,:)' all_means(2,:)'])
 ylim([0 1])
 legend('valid','invalid')
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
@@ -405,7 +227,7 @@ title('T1 detection')
 set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
 
 subplot(1,2,2)
-barwitherr ([Pc.T2_valid_stes' Pc.T2_invalid_stes'],[1 2 3 4],[Pc.T2_valid_means' Pc.T2_invalid_means'])
+barwitherr ([all_stes(3,:)' all_stes(4,:)'],[1 2 3 4],[all_means(3,:)' all_means(4,:)'])
 ylim([0 1])
 legend('valid','invalid')
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
@@ -413,11 +235,75 @@ colormap(barmap);
 title('T2 detection')
 set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
 
-%%
+
+%% pp pa ap aa
+accuracy2 = []; % rows: pp,pa,ap,aa; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-10
+
+for n = 1:length(df) 
+    runIndx = run == n;
+    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
+        dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
+        for i = 2:5; % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
+            condition_Indx =  dd & targetCondition == i ;
+            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+                 interval = 1;
+                 targetType = targetTypeT1;
+            else interval = 2;
+                 targetType = targetTypeT2;
+            end
+              % total correct / total present
+             accuracy2.Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                 sum(ismember(targetType(condition_Indx),[1,2]) );
+             % total correct / total correctly detected
+             accuracy2.Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+             accuracy2.Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                 numel(DetectTargetType(condition_Indx,interval));
+             accuracy2.Overall_all(i-1,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                 numel( response_correct(condition_Indx) );
+             
+         end
+     end
+end
+
+
+ 
+%% calculate means and stes (pp pa ap aa)
+accuracy2.Discrim_means = nanmean(accuracy2.Discrim_all,3); % rows:  pp,pa,ap,aa; columns: target type
+accuracy2.Discrim1_means = nanmean(accuracy2.Discrim1_all,3);
+accuracy2.Detect_means = nanmean(accuracy2.Detect_all,3);
+accuracy2.Overall_means = nanmean(accuracy2.Overall_all,3);
+
+accuracy2.Discrim_stes = nanstd(accuracy2.Discrim_all,0,3)./sqrt(length(df));
+accuracy2.Discrim1_stes = nanstd(accuracy2.Discrim1_all,0,3)./sqrt(length(df));
+accuracy2.Detect_stes = nanstd(accuracy2.Detect_all,0,3)./sqrt(length(df));
+accuracy2.Overall_stes = nanstd(accuracy2.Overall_all,0,3) ./ sqrt(length(df));
+
+accuracy2.T1_Discrim_means = accuracy2.Discrim_means(1:2,1:2); % rows: pp,pa; columns: T1 valid, invalid; 
+accuracy2.T1_Discrim_stes = accuracy2.Discrim_stes(1:2,1:2);
+accuracy2.T2_Discrim_means = [accuracy2.Discrim_means(1,3:4) ; accuracy2.Discrim_means(3,3:4)]; % rows: pp,ap columns: T2 valid, invalid;
+accuracy2.T2_Discrim_stes = [accuracy2.Discrim_stes(1,3:4) ; accuracy2.Discrim_stes(3,3:4)];
+
+accuracy2.T1_Discrim1_means = accuracy2.Discrim1_means(1:2,1:2); % rows: pp,pa; columns:  T1 valid, invalid;
+accuracy2.T1_Discrim1_stes = accuracy2.Discrim1_stes(1:2,1:2);
+accuracy2.T2_Discrim1_means = [accuracy2.Discrim1_means(1,3:4) ; accuracy2.Discrim1_means(3,3:4)];% rows: pp,ap columns: T2 valid, invalid;
+accuracy2.T2_Discrim1_stes = [accuracy2.Discrim1_stes(1,3:4) ; accuracy2.Discrim1_stes(3,3:4)];
+
+accuracy2.T1_Detect_means = accuracy2.Detect_means(:,1:2);
+accuracy2.T1_Detect_stes = accuracy2.Detect_stes(:,1:2);
+accuracy2.T2_Detect_means = accuracy2.Detect_means(:,3:4);
+accuracy2.T2_Detect_stes = accuracy2.Detect_stes(:,3:4);
+
+accuracy2.T1_Overall_means = accuracy2.Overall_means(:,1:2);
+accuracy2.T1_Overall_stes = accuracy2.Overall_stes(:,1:2);
+accuracy2.T2_Overall_means = accuracy2.Overall_means(:,3:4);
+accuracy2.T2_Overall_stes = accuracy2.Overall_stes(:,3:4);
+
+%% plot discrimination pp pa/pp ap for T1 and T2
 figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
 ylim([0 1])
-barwitherr ([T1_Discrim_stes(:,1) T1_Discrim_stes(:,2)],[1 2],[T1_Discrim_means(:,1) T1_Discrim_means(:,2)])
+barwitherr ([accuracy2.T1_Discrim_stes(:,1) accuracy2.T1_Discrim_stes(:,2)],[1 2],[accuracy2.T1_Discrim_means(:,1) accuracy2.T1_Discrim_means(:,2)])
 legend('valid','invalid')
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
 colormap(barmap);
@@ -425,7 +311,7 @@ title('T1 Discrim (total correct/total present)')
 set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
 
 subplot(1,2,2)
-barwitherr ([T2_Discrim_stes(:,1) T2_Discrim_stes(:,2)],[1 2],[T2_Discrim_means(:,1) T2_Discrim_means(:,2)])
+barwitherr ([accuracy2.T2_Discrim_stes(:,1) accuracy2.T2_Discrim_stes(:,2)],[1 2],[accuracy2.T2_Discrim_means(:,1) accuracy2.T2_Discrim_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
@@ -437,7 +323,7 @@ set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
 figure('Position', [1 scrsz(1) scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
 
-barwitherr ([T1_Discrim1_stes(:,1) T1_Discrim1_stes(:,2)],[1 2],[T1_Discrim1_means(:,1) T1_Discrim1_means(:,2)])
+barwitherr ([accuracy2.T1_Discrim1_stes(:,1) accuracy2.T1_Discrim1_stes(:,2)],[1 2],[accuracy2.T1_Discrim1_means(:,1) accuracy2.T1_Discrim1_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
@@ -446,7 +332,7 @@ title('T1 Discrim (total correct/total detected)')
 set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
 
 subplot(1,2,2)
-barwitherr ([T2_Discrim1_stes(:,1) T2_Discrim1_stes(:,2)],[1 2],[T2_Discrim1_means(:,1) T2_Discrim1_means(:,2)])
+barwitherr ([accuracy2.T2_Discrim1_stes(:,1) accuracy2.T2_Discrim1_stes(:,2)],[1 2],[accuracy2.T2_Discrim1_means(:,1) accuracy2.T2_Discrim1_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
@@ -455,10 +341,10 @@ title('T2 Discrim (total correct/total detected)')
 set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
 
 
-%%
+%% plot detection for pp ap ap aa
 figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
-barwitherr ([T1_Detect_stes(:,1) T1_Detect_stes(:,2)],[1 2 3 4],[T1_Detect_means(:,1) T1_Detect_means(:,2)])
+barwitherr ([accuracy2.T1_Detect_stes(:,1) accuracy2.T1_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T1_Detect_means(:,1) accuracy2.T1_Detect_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
@@ -467,7 +353,7 @@ title('T1 detection')
 set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
 
 subplot(1,2,2)
-barwitherr ([T2_Detect_stes(:,1) T2_Detect_stes(:,2)],[1 2 3 4],[T2_Detect_means(:,1) T2_Detect_means(:,2)])
+barwitherr ([accuracy2.T2_Detect_stes(:,1) accuracy2.T2_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T2_Detect_means(:,1) accuracy2.T2_Detect_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
@@ -478,11 +364,11 @@ set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
 
 
 
-%%
+%% plot overall accuracy for pp pa ap aa
 
 figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
 subplot(1,2,1)
-barwitherr ([T1_Overall_stes(:,1) T1_Overall_stes(:,2)],[1 2 3 4],[T1_Overall_means(:,1) T1_Overall_means(:,2)])
+barwitherr ([accuracy2.T1_Overall_stes(:,1) accuracy2.T1_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T1_Overall_means(:,1) accuracy2.T1_Overall_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
@@ -491,7 +377,7 @@ title('T1 overall')
 set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
 
 subplot(1,2,2)
-barwitherr ([T2_Overall_stes(:,1) T2_Overall_stes(:,2)],[1 2 3 4],[T2_Overall_means(:,1) T2_Overall_means(:,2)])
+barwitherr ([accuracy2.T2_Overall_stes(:,1) accuracy2.T2_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T2_Overall_means(:,1) accuracy2.T2_Overall_means(:,2)])
 legend('valid','invalid')
 ylim([0 1])
 barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
