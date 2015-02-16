@@ -1,5 +1,5 @@
 function [responseData, runLabels] = sl_responseDiscrimData(respTime, ...
-    trialCount, respSecs,refreshRate, blockLength, keyCodes, response, ...
+    trialCount,respSecs,refreshRate, blockLength, keyCodes, response, ...
     order,runNum)
 
 % use like this: 
@@ -31,6 +31,7 @@ for trialNum = 1 : trialCount
         % If no response, make these variables blank
         rData.keyCode(trialNum,:) = NaN;
         rData.RT(trialNum,:) = NaN;
+  %     rData.RTold(trialNum,:) = NaN;
         rData.response(trialNum,:) = NaN;
         rData.correct(trialNum,:) = NaN;
         % Since nothing was found just skip over to the next trial
@@ -47,6 +48,7 @@ for trialNum = 1 : trialCount
    
     % Stores key code found in data matrix
     rData.RT(trialNum,:) = (fidx - blockLength * (trialNum - 1) - respTime)/refreshRate;
+  % rData.RTold(trialNum,:) = response.secs(fidx) - ((blockLength * (trialNum - 1) + respTime)/refreshRate); 
     rData.keyCode(trialNum,:) = keyVal; 
     rData.correct(trialNum,:) = RespVal;
     
