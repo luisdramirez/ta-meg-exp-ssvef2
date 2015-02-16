@@ -1,5 +1,5 @@
 function [responseData, runLabels] = sl_responseDiscrimData(respTime, ...
-    trialCount, respSecs,feedbackDur,refreshRate, blockLength, keyCodes, response, ...
+    trialCount, respSecs,refreshRate, blockLength, keyCodes, response, ...
     order,runNum)
 
 % use like this: 
@@ -16,10 +16,9 @@ function [responseData, runLabels] = sl_responseDiscrimData(respTime, ...
 
 
 for trialNum = 1 : trialCount
-    
     % Defining search range
-    begSearchIdx = (blockLength * (trialNum - 1) + respTime) + 1;
-    endSearchIdx = begSearchIdx + ((respSecs + feedbackDur) * refreshRate - 1);
+    begSearchIdx = blockLength * (trialNum - 1) + respTime + 1 ;
+    endSearchIdx = begSearchIdx + (respSecs) * refreshRate - 1 ;
     
     % Find the index for ALL non-zero elements (key-codes) within search
     % range
@@ -47,7 +46,7 @@ for trialNum = 1 : trialCount
     sprintf('Trial %d: KeyCode %d found at Idx = %d', trialNum, keyVal, fidx);
    
     % Stores key code found in data matrix
-    rData.RT(trialNum,:) = response.secs(fidx) - ((blockLength * (trialNum - 1) + respTime)/refreshRate);
+    rData.RT(trialNum,:) = (fidx - blockLength * (trialNum - 1) - respTime)/refreshRate;
     rData.keyCode(trialNum,:) = keyVal; 
     rData.correct(trialNum,:) = RespVal;
     
