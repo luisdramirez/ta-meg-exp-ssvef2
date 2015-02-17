@@ -31,7 +31,7 @@ for trialNum = 1 : trialCount
         % If no response, make these variables blank
         rData.keyCode(trialNum,:) = NaN;
         rData.RT(trialNum,:) = NaN;
-       rData.RTold(trialNum,:) = NaN;
+   %o    rData.RTold(trialNum,:) = NaN;
         rData.response(trialNum,:) = NaN;
         rData.correct(trialNum,:) = NaN;
         % Since nothing was found just skip over to the next trial
