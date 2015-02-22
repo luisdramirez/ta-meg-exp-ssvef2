@@ -40,10 +40,10 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-0.8 0.8]; % relative to the base orientation
+tilts = [-5 5]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
-patchContrast = 0.5; % for cb target
+patchContrast = 1; % for cb target
 
 % input checks
 if nargin < 2,
