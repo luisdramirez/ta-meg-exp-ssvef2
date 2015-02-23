@@ -132,6 +132,21 @@ for n = 1:length(df)
                  sum(ismember(targetType(condition_Indx),[1,2]) );
             accuracy.Miss_all(k,n) = 1 - accuracy.Hit_all(k,n);
             accuracy.CR_all(k,n) = 1 -  accuracy.FA_all(k,n);
+            
+            accuracy.Hit_alltemp(k,n) = accuracy.Hit_all(k,n);
+            accuracy.FA_alltemp(k,n) = accuracy.FA_all(k,n);
+            if accuracy.Hit_alltemp(k,n) == 1
+                accuracy.Hit_alltemp(k,n) = .99; % avoid Inf for dprime 
+            elseif accuracy.Hit_alltemp(k,n) == 0
+                accuracy.Hit_alltemp(k,n) = .01;
+            end
+            if accuracy.FA_alltemp(k,n) == 1
+                accuracy.FA_alltemp(k,n) = .99;
+            elseif accuracy.FA_alltemp(k,n) == 0
+                accuracy.FA_alltemp(k,n) = .01;
+            end
+            accuracy.dprime(k,n) = norminv(accuracy.Hit_alltemp(k,n)) - norminv(accuracy.FA_alltemp(k,n));
+            
             accuracy.missedTrials(n) = accuracy.missedTrials(n) + sum(isnan(response_all(condition_Indx)) );
     end
 end
@@ -146,6 +161,7 @@ accuracy.Hit_means = nanmean(accuracy.Hit_all,2);
 accuracy.FA_means = nanmean(accuracy.FA_all,2);
 accuracy.Miss_means = nanmean(accuracy.Miss_all,2);
 accuracy.CR_means = nanmean(accuracy.CR_all,2);
+accuracy.dprime_means = nanmean(accuracy.dprime,2);
 all_means = [accuracy.Hit_means,accuracy.FA_means,accuracy.Miss_means,accuracy.CR_means ]; % rows: '1-1','2-1','2-2','1-2'
                                                                                            % columns: Hit,FA, Miss, CR                                                                                          
 accuracy.Discrim_stes = nanstd(accuracy.Discrim_all,0,2)./sqrt(length(df));
@@ -156,16 +172,17 @@ accuracy.Hit_stes = nanstd(accuracy.Hit_all,0,2) ./ sqrt(length(df));
 accuracy.FA_stes = nanstd(accuracy.FA_all,0,2)./ sqrt(length(df));
 accuracy.Miss_stes = nanstd(accuracy.Miss_all,0,2)./ sqrt(length(df));
 accuracy.CR_stes = nanstd(accuracy.CR_all,0,2)./ sqrt(length(df));
+accuracy.dprime_stes = nanstd(accuracy.dprime,0,2) ./ sqrt(length(df));
 all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_stes];
 
 
 
 %% plot
 scrsz=get(0,'ScreenSize');                                 
- figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
+ figure('Position', [1 scrsz(4) scrsz(3) scrsz(4)/2])
 
 hold on
-subplot(1,4,1)
+subplot(1,5,1)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
 y = errorbar([ (accuracy.Discrim_means (1:2)') ; (accuracy.Discrim_means (3:4)')],[(accuracy.Discrim_stes(1:2)');(accuracy.Discrim_stes(3:4)')],'.');
 ylim([0 1])
@@ -179,7 +196,7 @@ ylabel('accuracy')
 legend('valid','invalid','Location','SouthEast');
 title('discrimination(total correct/total present)')
 
-subplot(1,4,2)
+subplot(1,5,2)
 % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
 y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
 ylim([0 1])
@@ -192,7 +209,7 @@ ylabel('accuracy')
 % legend(y,{'valid','invalid'});
 title('discrimination(total correct/total detected)')
 
-subplot(1,4,3)
+subplot(1,5,3)
 y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
@@ -203,7 +220,16 @@ set(gca,'XTickLabel',{'T1','T2'});
 ylabel('accuracy')
 title('detection')
 
-subplot(1,4,4)
+subplot(1,5,4)
+y = errorbar([ (accuracy.dprime_means(1:2)');(accuracy.dprime_means(3:4)') ],[(accuracy.dprime_stes(1:2)'); (accuracy.dprime_stes(3:4)')],'.');
+ylim([0 5])
+set(y(2),'Color','r')
+set(gca,'XTick',[1 2])
+set(gca,'XTickLabel',{'T1','T2'});
+ylabel('d''')
+title('detection')
+
+subplot(1,5,5)
 y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
 ylim([0 1])
 % set(y, 'MarkerSize', 20)
