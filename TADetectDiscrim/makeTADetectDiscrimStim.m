@@ -28,11 +28,11 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-blockDur = 5; % (s) (- difference from .8)
+blockDur = 5 - 0.15; % (s) (- difference from .8)
 nFramesPerTarget = 3;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 0.8; % (s) % SOA between targets (- difference from .8)
+targetSOA = 0.8 - 0.15; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.4; % (s)

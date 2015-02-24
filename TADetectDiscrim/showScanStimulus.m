@@ -44,6 +44,7 @@ tilts = [-5 5]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
 patchContrast = 1; % for cb target
+% patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
 
 % input checks
 if nargin < 2,
@@ -146,6 +147,7 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] cb tilt = [%1.1f %1.1f], contrast = %1.2f\n\n', tilts(1), tilts(2), patchContrast)
             target.tilts = tilts; % store settings
             target.contrast = patchContrast;
+%             target.size = patchSize;
             Screen('BlendFunction', display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             
             targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
