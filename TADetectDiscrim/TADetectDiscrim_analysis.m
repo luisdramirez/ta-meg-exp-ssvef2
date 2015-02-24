@@ -1,4 +1,4 @@
-function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date)
+function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel)
 
 % [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, [date])
 % 
@@ -23,14 +23,18 @@ function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDis
 
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
-% rootDir = pathToExpt;
-rootDir = pwd;
+rootDir = pathToExpt;
+% rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 % df = dir([dataDir,'*.mat']);
 
 if ~exist('date','var')
     date = [];
+end
+
+if ~exist('plotLevel','var')
+    plotLevel = 3; % 1 plot everything --> 3 plot minimal
 end
 
 for iRun = 1:numel(runs)
@@ -178,89 +182,127 @@ all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_st
 
 
 %% plot
-scrsz=get(0,'ScreenSize');                                 
- figure('Position', [1 scrsz(4) scrsz(3) scrsz(4)/2])
-
-hold on
-subplot(1,5,1)
-% y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
-y = errorbar([ (accuracy.Discrim_means (1:2)') ; (accuracy.Discrim_means (3:4)')],[(accuracy.Discrim_stes(1:2)');(accuracy.Discrim_stes(3:4)')],'.');
-ylim([0 1])
-% set(y, 'MarkerSize', 20)
-set(y(2),'Color','r')
-set(gca,'XTick',[1 2])
-set(gca,'XTickLabel',{'T1','T2'});
-% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
-ylabel('accuracy')
-% legend(y,{'valid','invalid'});
-legend('valid','invalid','Location','SouthEast');
-title('discrimination(total correct/total present)')
-
-subplot(1,5,2)
-% y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
-y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
-ylim([0 1])
-% set(y, 'MarkerSize', 20)
-set(y(2),'Color','r')
-set(gca,'XTick',[1 2])
-set(gca,'XTickLabel',{'T1','T2'});
-% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
-ylabel('accuracy')
-% legend(y,{'valid','invalid'});
-title('discrimination(total correct/total detected)')
-
-subplot(1,5,3)
-y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
-ylim([0 1])
-% set(y, 'MarkerSize', 20)
-set(y(2),'Color','r')
-set(gca,'XTick',[1 2])
-set(gca,'XTickLabel',{'T1','T2'});
-% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
-ylabel('accuracy')
-title('detection')
-
-subplot(1,5,4)
-y = errorbar([ (accuracy.dprime_means(1:2)');(accuracy.dprime_means(3:4)') ],[(accuracy.dprime_stes(1:2)'); (accuracy.dprime_stes(3:4)')],'.');
-ylim([0 5])
-set(y(2),'Color','r')
-set(gca,'XTick',[1 2])
-set(gca,'XTickLabel',{'T1','T2'});
-ylabel('d''')
-title('detection')
-
-subplot(1,5,5)
-y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
-ylim([0 1])
-% set(y, 'MarkerSize', 20)
-set(y(2),'Color','r')
-set(gca,'XTick',[1 2])
-set(gca,'XTickLabel',{'T1','T2'});
-% set(gca,'XTickLabel',{'','T1','','','','','T2',''});
-ylabel('accuracy')
-title('overall')
+switch plotLevel
+    case 1
+        scrsz=get(0,'ScreenSize');
+        figure('Position', [1 scrsz(4) scrsz(3) scrsz(4)/2])
+        
+        hold on
+        subplot(1,5,1)
+        % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
+        y = errorbar([ (accuracy.Discrim_means (1:2)') ; (accuracy.Discrim_means (3:4)')],[(accuracy.Discrim_stes(1:2)');(accuracy.Discrim_stes(3:4)')],'.');
+        ylim([0 1])
+        % set(y, 'MarkerSize', 20)
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+        ylabel('accuracy')
+        % legend(y,{'valid','invalid'});
+        legend('valid','invalid','Location','SouthEast');
+        title('discrimination(total correct/total present)')
+        
+        subplot(1,5,2)
+        % y = bar([Pc.means(1:2);Pc.means(3:4)],0.5);
+        y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
+        ylim([0 1])
+        % set(y, 'MarkerSize', 20)
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+        ylabel('accuracy')
+        % legend(y,{'valid','invalid'});
+        title('discrimination(total correct/total detected)')
+        
+        subplot(1,5,3)
+        y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
+        ylim([0 1])
+        % set(y, 'MarkerSize', 20)
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+        ylabel('accuracy')
+        title('detection')
+        
+        subplot(1,5,4)
+        y = errorbar([ (accuracy.dprime_means(1:2)');(accuracy.dprime_means(3:4)') ],[(accuracy.dprime_stes(1:2)'); (accuracy.dprime_stes(3:4)')],'.');
+        ylim([0 5])
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        ylabel('d''')
+        title('detection')
+        
+        subplot(1,5,5)
+        y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
+        ylim([0 1])
+        % set(y, 'MarkerSize', 20)
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+        ylabel('accuracy')
+        title('overall')
+        
+    case {2,3}
+        scrsz=get(0,'ScreenSize');
+        figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2])
+        
+        subplot(1,3,1)
+        y = errorbar([ (accuracy.dprime_means(1:2)');(accuracy.dprime_means(3:4)') ],[(accuracy.dprime_stes(1:2)'); (accuracy.dprime_stes(3:4)')],'.');
+        ylim([0 5])
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        ylabel('d''')
+        legend('valid','invalid','Location','SouthEast');
+        title('detection')
+        
+        subplot(1,3,2)
+        y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
+        ylim([0 1])
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        ylabel('accuracy')
+        title('discrimination(total correct/total detected)')
+        
+        subplot(1,3,3)
+        y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
+        ylim([0 1])
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        ylabel('accuracy')
+        title('overall')
+    otherwise
+        error('plotLevel not recognized')
+end
 
 
 %% plot (hit, fa, miss, cr)
-figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
-subplot(1,2,1)
-barwitherr ([all_stes(1,:)' all_stes(2,:)'],[1 2 3 4],[all_means(1,:)' all_means(2,:)'])
-ylim([0 1])
-legend('valid','invalid')
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
-colormap(barmap);
-title('T1 detection')
-set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
-
-subplot(1,2,2)
-barwitherr ([all_stes(3,:)' all_stes(4,:)'],[1 2 3 4],[all_means(3,:)' all_means(4,:)'])
-ylim([0 1])
-legend('valid','invalid')
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
-colormap(barmap);
-title('T2 detection')
-set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
-
+if plotLevel==1
+    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    barwitherr ([all_stes(1,:)' all_stes(2,:)'],[1 2 3 4],[all_means(1,:)' all_means(2,:)'])
+    ylim([0 1])
+    legend('valid','invalid','Location','best')
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 detection')
+    set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
+    
+    subplot(1,2,2)
+    barwitherr ([all_stes(3,:)' all_stes(4,:)'],[1 2 3 4],[all_means(3,:)' all_means(4,:)'])
+    ylim([0 1])
+    legend('valid','invalid','Location','best')
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 detection')
+    set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'Hit','FA','Miss','CR' });
+end
 
 %% pp pa ap aa
 accuracy2 = []; % rows: pp,pa,ap,aa; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-10
@@ -326,91 +368,94 @@ accuracy2.T2_Overall_means = accuracy2.Overall_means(:,3:4);
 accuracy2.T2_Overall_stes = accuracy2.Overall_stes(:,3:4);
 
 %% plot discrimination pp pa/pp ap for T1 and T2
-figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
-subplot(1,2,1)
-ylim([0 1])
-barwitherr ([accuracy2.T1_Discrim_stes(:,1) accuracy2.T1_Discrim_stes(:,2)],[1 2],[accuracy2.T1_Discrim_means(:,1) accuracy2.T1_Discrim_means(:,2)])
-legend('valid','invalid')
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
-colormap(barmap);
-title('T1 Discrim (total correct/total present)')
-set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
+if plotLevel==1
+    figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    ylim([0 1])
+    barwitherr ([accuracy2.T1_Discrim_stes(:,1) accuracy2.T1_Discrim_stes(:,2)],[1 2],[accuracy2.T1_Discrim_means(:,1) accuracy2.T1_Discrim_means(:,2)])
+    legend('valid','invalid','Location','best')
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 Discrim (total correct/total present)')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy2.T2_Discrim_stes(:,1) accuracy2.T2_Discrim_stes(:,2)],[1 2],[accuracy2.T2_Discrim_means(:,1) accuracy2.T2_Discrim_means(:,2)])
+    legend('valid','invalid','Location','best')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 Discrim (total correct/total present)')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
+end
 
-subplot(1,2,2)
-barwitherr ([accuracy2.T2_Discrim_stes(:,1) accuracy2.T2_Discrim_stes(:,2)],[1 2],[accuracy2.T2_Discrim_means(:,1) accuracy2.T2_Discrim_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
-colormap(barmap);
-title('T2 Discrim (total correct/total present)')
-set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
-
-
-figure('Position', [1 scrsz(1) scrsz(3)*3/4 scrsz(4)/2])
-subplot(1,2,1)
-
-barwitherr ([accuracy2.T1_Discrim1_stes(:,1) accuracy2.T1_Discrim1_stes(:,2)],[1 2],[accuracy2.T1_Discrim1_means(:,1) accuracy2.T1_Discrim1_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
-colormap(barmap);
-title('T1 Discrim (total correct/total detected)')
-set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
-
-subplot(1,2,2)
-barwitherr ([accuracy2.T2_Discrim1_stes(:,1) accuracy2.T2_Discrim1_stes(:,2)],[1 2],[accuracy2.T2_Discrim1_means(:,1) accuracy2.T2_Discrim1_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
-colormap(barmap);
-title('T2 Discrim (total correct/total detected)')
-set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
-
+if plotLevel < 3
+    figure('Position', [1 scrsz(1) scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    
+    barwitherr ([accuracy2.T1_Discrim1_stes(:,1) accuracy2.T1_Discrim1_stes(:,2)],[1 2],[accuracy2.T1_Discrim1_means(:,1) accuracy2.T1_Discrim1_means(:,2)])
+    legend('valid','invalid','Location','best')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 Discrim (total correct/total detected)')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'pp','pa' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy2.T2_Discrim1_stes(:,1) accuracy2.T2_Discrim1_stes(:,2)],[1 2],[accuracy2.T2_Discrim1_means(:,1) accuracy2.T2_Discrim1_means(:,2)])
+    legend('valid','invalid','Location','best')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 Discrim (total correct/total detected)')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'pp','ap' });
+end
 
 %% plot detection for pp ap ap aa
-figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
-subplot(1,2,1)
-barwitherr ([accuracy2.T1_Detect_stes(:,1) accuracy2.T1_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T1_Detect_means(:,1) accuracy2.T1_Detect_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
-colormap(barmap);
-title('T1 detection')
-set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
-
-subplot(1,2,2)
-barwitherr ([accuracy2.T2_Detect_stes(:,1) accuracy2.T2_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T2_Detect_means(:,1) accuracy2.T2_Detect_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
-colormap(barmap);
-title('T2 detection')
-set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
-
-
-
+if plotLevel < 3
+    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    barwitherr ([accuracy2.T1_Detect_stes(:,1) accuracy2.T1_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T1_Detect_means(:,1) accuracy2.T1_Detect_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 detection')
+    set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy2.T2_Detect_stes(:,1) accuracy2.T2_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T2_Detect_means(:,1) accuracy2.T2_Detect_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 detection')
+    set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+end
 
 %% plot overall accuracy for pp pa ap aa
+if plotLevel==1
+    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    barwitherr ([accuracy2.T1_Overall_stes(:,1) accuracy2.T1_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T1_Overall_means(:,1) accuracy2.T1_Overall_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 overall')
+    set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy2.T2_Overall_stes(:,1) accuracy2.T2_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T2_Overall_means(:,1) accuracy2.T2_Overall_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 overall')
+    set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
+end
 
-figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
-subplot(1,2,1)
-barwitherr ([accuracy2.T1_Overall_stes(:,1) accuracy2.T1_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T1_Overall_means(:,1) accuracy2.T1_Overall_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1] 
-colormap(barmap);
-title('T1 overall')
-set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
-
-subplot(1,2,2)
-barwitherr ([accuracy2.T2_Overall_stes(:,1) accuracy2.T2_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T2_Overall_means(:,1) accuracy2.T2_Overall_means(:,2)])
-legend('valid','invalid')
-ylim([0 1])
-barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; 
-colormap(barmap);
-title('T2 overall')
-set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
-
+%% turn figs white
 turnallwhite
 
 %%
