@@ -23,8 +23,8 @@ function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDis
 
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
-rootDir = pathToExpt;
-% rootDir = pwd;
+% rootDir = pathToExpt;
+rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 % df = dir([dataDir,'*.mat']);
