@@ -251,13 +251,14 @@ switch plotLevel
         figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2])
         
         subplot(1,3,1)
-        y = errorbar([ (accuracy.dprime_means(1:2)');(accuracy.dprime_means(3:4)') ],[(accuracy.dprime_stes(1:2)'); (accuracy.dprime_stes(3:4)')],'.');
-        ylim([0 5])
+        y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
+        ylim([0 1])
+        % set(y, 'MarkerSize', 20)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});
-        ylabel('d''')
-        legend('valid','invalid','Location','SouthEast');
+        % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
+        ylabel('accuracy')
         title('detection')
         
         subplot(1,3,2)
