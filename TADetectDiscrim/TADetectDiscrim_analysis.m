@@ -82,6 +82,7 @@ targetTypeT1 = responseData_all(:,7);
 targetTypeT2 = responseData_all(:,8);
 response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
+targetAxis = responseData_all(:,13);
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
@@ -368,6 +369,7 @@ accuracy2.T1_Overall_stes = accuracy2.Overall_stes(:,1:2);
 accuracy2.T2_Overall_means = accuracy2.Overall_means(:,3:4);
 accuracy2.T2_Overall_stes = accuracy2.Overall_stes(:,3:4);
 
+
 %% plot discrimination pp pa/pp ap for T1 and T2
 if plotLevel==1
     figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
@@ -455,6 +457,115 @@ if plotLevel==1
     title('T2 overall')
     set(gca, 'XTick',[1 2 3 4],'XTickLabel',{'pp','pa','ap','aa' });
 end
+
+%% target axis: vertical, horizontal
+accuracy3 = []; % rows: target axis [0,90] ; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-10
+targetAxis_Indx = [0,90]; 
+
+for n = 1:length(df) 
+    runIndx = run == n;
+    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
+        dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
+        for i = 1:2; % targetAxis = [0,90];
+            condition_Indx =  dd & targetAxis == targetAxis_Indx(i) ;
+            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+                 interval = 1;
+                 targetType = targetTypeT1;
+            else interval = 2;
+                 targetType = targetTypeT2;
+            end
+              % total correct / total present
+             accuracy3.Discrim_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                 sum(ismember(targetType(condition_Indx),[1,2]) );
+             % total correct / total correctly detected
+             accuracy3.Discrim1_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+             accuracy3.Detect_all(i,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                 numel(DetectTargetType(condition_Indx,interval));
+             accuracy3.Overall_all(i,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                 numel( response_correct(condition_Indx) );
+             
+         end
+     end
+end
+
+%% calculate means and stes (vertical horizontal)
+
+accuracy3.Discrim_means = nanmean(accuracy3.Discrim_all,3); % rows: [0 90]; columns: '1-1','2-1','2-2','1-2'
+accuracy3.Discrim1_means = nanmean(accuracy3.Discrim1_all,3);
+accuracy3.Detect_means = nanmean(accuracy3.Detect_all,3);
+accuracy3.Overall_means = nanmean(accuracy3.Overall_all,3);
+
+accuracy3.Discrim_stes = nanstd(accuracy3.Discrim_all,0,3)./sqrt(length(df));
+accuracy3.Discrim1_stes = nanstd(accuracy3.Discrim1_all,0,3)./sqrt(length(df));
+accuracy3.Detect_stes = nanstd(accuracy3.Detect_all,0,3)./sqrt(length(df));
+accuracy3.Overall_stes = nanstd(accuracy3.Overall_all,0,3) ./ sqrt(length(df));
+
+%% plot discrimination for vertical and horizontal 
+if plotLevel==1
+    scrsz=get(0,'ScreenSize');
+    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    barwitherr ([accuracy3.Discrim1_stes(:,1) accuracy3.Discrim1_stes(:,2)],[1 2],[accuracy3.Discrim1_means(:,1) accuracy3.Discrim1_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 Discrim (total correct/total detected)')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy3.Discrim1_stes(:,3) accuracy3.Discrim1_stes(:,4)],[1 2],[accuracy3.Discrim1_means(:,3) accuracy3.Discrim1_means(:,4)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 Discrim (total correct/total detected)')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+
+   %% plot detection for vertical and horizontal
+    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    barwitherr ([accuracy3.Detect_stes(:,1) accuracy3.Detect_stes(:,2)],[1 2],[accuracy3.Detect_means(:,1) accuracy3.Detect_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 Detection')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy3.Detect_stes(:,3) accuracy3.Detect_stes(:,4)],[1 2],[accuracy3.Detect_means(:,3) accuracy3.Detect_means(:,4)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 Detection')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+    
+    %% plot overall accuracy for vertical and horizontal
+    
+    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    subplot(1,2,1)
+    barwitherr ([accuracy3.Overall_stes(:,1) accuracy3.Overall_stes(:,2)],[1 2],[accuracy3.Overall_means(:,1) accuracy3.Overall_means(:,2)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
+    colormap(barmap);
+    title('T1 Overall')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+    
+    subplot(1,2,2)
+    barwitherr ([accuracy3.Overall_stes(:,3) accuracy3.Overall_stes(:,4)],[1 2],[accuracy3.Overall_means(:,3) accuracy3.Overall_means(:,4)])
+    legend('valid','invalid')
+    ylim([0 1])
+    barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
+    colormap(barmap);
+    title('T2 Overall')
+    set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+
+end
+    
 
 %% turn figs white
 turnallwhite
