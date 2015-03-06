@@ -1,5 +1,5 @@
 function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel)
-
+close all;
 % [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, [date])
 % 
 % subject is the subject ID, e.g. 'sl'
@@ -27,7 +27,14 @@ rootDir = pathToExpt;
 %rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
+figDir = sprintf('%s/data/%s/%s',rootDir,subject,'figures');
+
 % df = dir([dataDir,'*.mat']);
+if numel(runs)>1
+analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s',subject,date,num2str(runs(1)),'_',num2str(runs(end)));
+else
+analysisFile = sprintf('%s_%s_taDetectDiscrim_%s',subject,date,num2str(runs));
+end
 
 if ~exist('date','var')
     date = [];
@@ -186,7 +193,7 @@ all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_st
 switch plotLevel
     case 1
         scrsz=get(0,'ScreenSize');
-        figure('Position', [1 scrsz(4) scrsz(3) scrsz(4)/2])
+        f(1) = figure('Position', [1 scrsz(4) scrsz(3) scrsz(4)/2]);
         
         hold on
         subplot(1,5,1)
@@ -236,6 +243,8 @@ switch plotLevel
         ylabel('d''')
         title('detection')
         
+        turnallwhite
+        
         subplot(1,5,5)
         y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
         ylim([0 1])
@@ -249,7 +258,7 @@ switch plotLevel
         
     case {2,3}
         scrsz=get(0,'ScreenSize');
-        figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2])
+        f(1) = figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2]);
         
         subplot(1,3,1)
         y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
@@ -286,11 +295,11 @@ end
 
 %% plot (hit, fa, miss, cr)
 if plotLevel==1
-    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    f(2) = figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([all_stes(1,:)' all_stes(2,:)'],[1 2 3 4],[all_means(1,:)' all_means(2,:)'])
     ylim([0 1])
-    legend('valid','invalid','Location','best')
+    legend('valid','invalid','Location','NorthEast')
     barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
     colormap(barmap);
     title('T1 detection')
@@ -299,7 +308,7 @@ if plotLevel==1
     subplot(1,2,2)
     barwitherr ([all_stes(3,:)' all_stes(4,:)'],[1 2 3 4],[all_means(3,:)' all_means(4,:)'])
     ylim([0 1])
-    legend('valid','invalid','Location','best')
+    legend('valid','invalid','Location','NorthEast')
     barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
     colormap(barmap);
     title('T2 detection')
@@ -372,7 +381,7 @@ accuracy2.T2_Overall_stes = accuracy2.Overall_stes(:,3:4);
 
 %% plot discrimination pp pa/pp ap for T1 and T2
 if plotLevel==1
-    figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2])
+    f(3) = figure('Position', [1 scrsz(4) scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     ylim([0 1])
     barwitherr ([accuracy2.T1_Discrim_stes(:,1) accuracy2.T1_Discrim_stes(:,2)],[1 2],[accuracy2.T1_Discrim_means(:,1) accuracy2.T1_Discrim_means(:,2)])
@@ -393,11 +402,11 @@ if plotLevel==1
 end
 
 if plotLevel < 3
-    figure('Position', [1 scrsz(1) scrsz(3)*3/4 scrsz(4)/2])
+    f(4) = figure('Position', [1 scrsz(1) scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     
     barwitherr ([accuracy2.T1_Discrim1_stes(:,1) accuracy2.T1_Discrim1_stes(:,2)],[1 2],[accuracy2.T1_Discrim1_means(:,1) accuracy2.T1_Discrim1_means(:,2)])
-    legend('valid','invalid','Location','best')
+    legend('valid','invalid','Location','NorthEast')
     ylim([0 1])
     barmap=[0.7 0.7 0.7; 0.05 .45 0.1]; %[0.7 0.7 0.7] is grey, [ 0.05 .45 0.1]
     colormap(barmap);
@@ -406,7 +415,7 @@ if plotLevel < 3
     
     subplot(1,2,2)
     barwitherr ([accuracy2.T2_Discrim1_stes(:,1) accuracy2.T2_Discrim1_stes(:,2)],[1 2],[accuracy2.T2_Discrim1_means(:,1) accuracy2.T2_Discrim1_means(:,2)])
-    legend('valid','invalid','Location','best')
+    legend('valid','invalid','Location','NorthEast')
     ylim([0 1])
     barmap=[0.7 0.7 0.7; 0.05 .45 0.1];
     colormap(barmap);
@@ -416,7 +425,7 @@ end
 
 %% plot detection for pp ap ap aa
 if plotLevel < 3
-    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    f(5) = figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy2.T1_Detect_stes(:,1) accuracy2.T1_Detect_stes(:,2)],[1 2 3 4],[accuracy2.T1_Detect_means(:,1) accuracy2.T1_Detect_means(:,2)])
     legend('valid','invalid')
@@ -438,7 +447,7 @@ end
 
 %% plot overall accuracy for pp pa ap aa
 if plotLevel==1
-    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    f(6) = figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy2.T1_Overall_stes(:,1) accuracy2.T1_Overall_stes(:,2)],[1 2 3 4],[accuracy2.T1_Overall_means(:,1) accuracy2.T1_Overall_means(:,2)])
     legend('valid','invalid')
@@ -502,9 +511,8 @@ accuracy3.Detect_stes = nanstd(accuracy3.Detect_all,0,3)./sqrt(length(df));
 accuracy3.Overall_stes = nanstd(accuracy3.Overall_all,0,3) ./ sqrt(length(df));
 
 %% plot discrimination for vertical and horizontal 
-if plotLevel==1
-    scrsz=get(0,'ScreenSize');
-    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+if plotLevel == 1
+    f(7) = figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy3.Discrim1_stes(:,1) accuracy3.Discrim1_stes(:,2)],[1 2],[accuracy3.Discrim1_means(:,1) accuracy3.Discrim1_means(:,2)])
     legend('valid','invalid')
@@ -522,9 +530,11 @@ if plotLevel==1
     colormap(barmap);
     title('T2 Discrim (total correct/total detected)')
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
+end
 
    %% plot detection for vertical and horizontal
-    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+   if plotLevel == 1 
+  f(8) =  figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy3.Detect_stes(:,1) accuracy3.Detect_stes(:,2)],[1 2],[accuracy3.Detect_means(:,1) accuracy3.Detect_means(:,2)])
     legend('valid','invalid')
@@ -542,10 +552,10 @@ if plotLevel==1
     colormap(barmap);
     title('T2 Detection')
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
-    
+   end
     %% plot overall accuracy for vertical and horizontal
-    
-    figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2])
+    if plotLevel == 1
+   f(9) =  figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy3.Overall_stes(:,1) accuracy3.Overall_stes(:,2)],[1 2],[accuracy3.Overall_means(:,1) accuracy3.Overall_means(:,2)])
     legend('valid','invalid')
@@ -563,12 +573,34 @@ if plotLevel==1
     colormap(barmap);
     title('T2 Overall')
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
-
-end
-    
-
+    end
 %% turn figs white
-turnallwhite
+turnallwhite  
+
+%% Save analysis files and figures
+
+saveFile = 1;
+saveFigs = 1;
+
+% save analysis
+if saveFile
+    save(sprintf('%s/%s.mat', dataDir, analysisFile), 'accuracy',...
+        'accuracy2','responseData_all','responseData_labels')
+end
+
+% save figs
+if saveFigs
+    if plotLevel == 1;
+    rd_saveAllFigs(f, {'all','Detect1','Discrim1','Discrim2',...
+        'Detect2','overall','DiscrimAxis','DetectAxis','OverallAxis'},...
+        analysisFile,figDir);     
+    elseif plotLevel == 2;
+    rd_saveAllFigs([], {'minAll','Discrim2','Detect2'},analysisFile,figDir);     
+    elseif plotLevel == 3;
+    rd_saveAllFigs(f, {'minAll'},analysisFile,figDir);    
+    end
+end
+
 
 %%
 % figure
