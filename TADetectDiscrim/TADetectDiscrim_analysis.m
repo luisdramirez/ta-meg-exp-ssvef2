@@ -27,7 +27,8 @@ rootDir = pathToExpt;
 %rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
-figDir = sprintf('%s/data/%s/%s',rootDir,subject,'figures');
+analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
+figDir = sprintf('%s/figures/%s',rootDir,subject);
 
 % df = dir([dataDir,'*.mat']);
 if numel(runs)>1
@@ -584,7 +585,7 @@ saveFigs = 1;
 
 % save analysis
 if saveFile
-    save(sprintf('%s/%s.mat', dataDir, analysisFile), 'accuracy',...
+    save(sprintf('%s/%s.mat', analysisDir, analysisFile), 'accuracy',...
         'accuracy2','responseData_all','responseData_labels')
 end
 
