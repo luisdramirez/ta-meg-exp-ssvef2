@@ -15,7 +15,7 @@ end
 for n = 1:nSubj;
     subject = subjects{n};
     date = dates{n};
-    dir = sprintf('%s/data/%s', rootDir, subject);
+    dir = sprintf('%s/analysis/%s', rootDir, subject);
     if numel(runs)>1
         analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s%s',subject,date,num2str(runs(1)),'_',num2str(runs(end)));
         else
