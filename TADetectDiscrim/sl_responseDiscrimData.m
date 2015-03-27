@@ -69,22 +69,32 @@ emptyIndex = cellfun(@isempty,mycellarray);
 mycellarray(emptyIndex) = {[NaN,NaN]}; 
 targetPresented = [cell2mat(mycellarray);[NaN,NaN]];
 
-%% extract target axis order and pad with NaN
+%% extract target axis order
 p = response.target.baseOrients;
-q = NaN; n = 4;
-N = numel(p);
-M = mod(N, n);
-p_pad = [p(:); zeros((n - M) * (M > 0), 1)];
-targetAxis =  [reshape(p_pad, n, []); repmat(q(:), 1, numel(p_pad) / n)];
-targetAxis = targetAxis (1:N + numel(q) * fix(N / n));
-targetAxis = [NaN,targetAxis]';
+temp = targetPresented ;
+temp (temp == 0) = NaN;
+[row ,col] = find (temp == 1 | temp  ==2 ) ;
+[row_sorted,idx] = sort(row);
+col_sorted = col(idx,:);
+axis = temp ;
+for i = 1:length(row_sorted)
+    axis (row_sorted(i),col_sorted(i)) = p(i);
+end
+
+% q = NaN; n = 4;
+% N = numel(p);
+% M = mod(N, n);
+% p_pad = [p(:); zeros((n - M) * (M > 0), 1)];
+% targetAxis =  [reshape(p_pad, n, []); repmat(q(:), 1, numel(p_pad) / n)];
+% targetAxis = targetAxis (1:N + numel(q) * fix(N / n));
+% targetAxis = [NaN,targetAxis]';
 %% Create final output matrix
 
 runLabels = {'run number', 'trial number','fast side','cue condition','attended side',... 
-    'target condition','target type T1','target type T2','key code', 'response', 'correct', 'RT','targetAxis'};
+    'target condition','target type T1','target type T2','key code', 'response', 'correct', 'RT','targetsAxis'};
 responseData = horzcat(repmat(runNum,trialCount,1),(1:trialCount)', order.blockOrder', ...
     order.cueBlockOrder',order.attBlockOrder',order.targetBlockOrder', ...
-    targetPresented,rData.keyCode, rData.response,rData.correct,rData.RT,targetAxis);
+    targetPresented,rData.keyCode, rData.response,rData.correct,rData.RT,axis);
 
 end
 

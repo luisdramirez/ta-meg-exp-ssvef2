@@ -90,7 +90,7 @@ targetTypeT1 = responseData_all(:,7);
 targetTypeT2 = responseData_all(:,8);
 response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
-targetAxis = responseData_all(:,13);
+targetAxis = responseData_all(:,13:14);
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
@@ -476,14 +476,14 @@ for n = 1:length(df)
     runIndx = run == n;
     for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
         dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
-        for i = 1:2; % targetAxis = [0,90];
-            condition_Indx =  dd & targetAxis == targetAxis_Indx(i) ;
-            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
-                 interval = 1;
+           if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+                 interval = 1; TargetAxis = targetAxis(:,1);
                  targetType = targetTypeT1;
-            else interval = 2;
+            else interval = 2; TargetAxis = targetAxis(:,2);
                  targetType = targetTypeT2;
             end
+        for i = 1:2; % targetAxis = [0,90];
+            condition_Indx =  dd & TargetAxis == targetAxis_Indx(i) ;    
               % total correct / total present
              accuracy3.Discrim_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
                  sum(ismember(targetType(condition_Indx),[1,2]) );
@@ -498,6 +498,7 @@ for n = 1:length(df)
          end
      end
 end
+
 
 %% calculate means and stes (vertical horizontal)
 
