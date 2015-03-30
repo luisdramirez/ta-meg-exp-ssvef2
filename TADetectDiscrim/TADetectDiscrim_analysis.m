@@ -1,11 +1,25 @@
-function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel)
-close all;
-% [Pc,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, [date])
-% 
+function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel,saveFile,saveFigs)
+
 % subject is the subject ID, e.g. 'sl'
 % runs is the run numbers to analyze, e.g. 1:10
 % date (optional) is a string with the date of the experiment, e.g. '20141219'
 %   if date is not given, will look for runs from all dates.
+
+if nargin < 3 || ~exist('date','var')
+    date = [];
+end
+
+if nargin < 4 || ~exist('plotLevel','var')
+    plotLevel = 3; % 1 plot everything --> 3 plot minimal
+end
+
+if nargin < 5 || isempty(saveFile)
+    saveFile = 0;
+end
+
+if nargin < 6 || isempty(saveFigs)
+    saveFigs = 0;
+end
 
 %% exp setup (now read from stim file, below)
 % trialCount = 41;  
@@ -35,14 +49,6 @@ if numel(runs)>1
 analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s',subject,date,num2str(runs(1)),'_',num2str(runs(end)));
 else
 analysisFile = sprintf('%s_%s_taDetectDiscrim_%s',subject,date,num2str(runs));
-end
-
-if ~exist('date','var')
-    date = [];
-end
-
-if ~exist('plotLevel','var')
-    plotLevel = 3; % 1 plot everything --> 3 plot minimal
 end
 
 for iRun = 1:numel(runs)
@@ -576,26 +582,142 @@ end
     title('T2 Overall')
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
     end
+    
+%% 2 targets: 2 axes x 2 orientations
+accuracy4 = [];    % rows: runs = 1:10; columns: axis = [0 90]; pages: cueBlockOrder_Indx = [2 4 5 3]; 4thD: ori = [1 2];
+sameOri = targetTypeT1 == targetTypeT2;
+sameAxis = targetAxis (:,1) == targetAxis(:,2);
+ori = [sameOri,~sameOri];
+axis = [sameAxis,~sameAxis];
+
+for n = 1:length(df)
+    for o = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'};
+        if cueBlockOrder_Indx(o) == 2 || cueBlockOrder_Indx(o) == 4;
+            interval = 1;
+            targetType = targetTypeT1;
+        else interval = 2;
+            targetType = targetTypeT2;
+        end
+        for m = 1:2 % [sameOri, diffOri]
+            for i = 1:2 % [sameAxis,diffAxis]
+                condition_Indx  = run == n & cueBlockOrder == cueBlockOrder_Indx(o) & targetCondition == 2 & ...
+                    ori(:,m) & axis(:,i);
+                % total correct / total present
+                accuracy4.Discrim_all(n,o,m,i) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                    sum(ismember(targetType(condition_Indx),[1,2]) );
+                % total correct / total correctly detected
+                accuracy4.Discrim1_all(n,o,m,i) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                    sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+                accuracy4.Detect_all(n,o,m,i) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                    numel(DetectTargetType(condition_Indx,interval));
+                accuracy4.Overall_all(n,o,m,i) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                    numel( response_correct(condition_Indx) );
+            end
+        end
+    end
+end
+
+
+
+% rows: cueBlockOrder = ['1-1','2-1','2-2','1-2']
+% columns: orientation {same diff}
+% pages: axis {same diff}
+accuracy4.Discrim_means = squeeze (nanmean(accuracy4.Discrim_all,1));
+accuracy4.Discrim1_means = squeeze (nanmean(accuracy4.Discrim1_all,1));
+accuracy4.Detect_means = squeeze (nanmean(accuracy4.Detect_all,1));
+accuracy4.Overall_means = squeeze (nanmean(accuracy4.Overall_all,1));
+
+accuracy4.Discrim_stes = squeeze (nanstd(accuracy4.Discrim_all,0,1)./sqrt(length(df)));
+accuracy4.Discrim1_stes = squeeze (nanstd(accuracy4.Discrim1_all,0,1)./sqrt(length(df)));
+accuracy4.Detect_stes = squeeze (nanstd(accuracy4.Detect_all,0,1)./sqrt(length(df)));
+accuracy4.Overall_stes = squeeze (nanstd(accuracy4.Overall_all,0,1) ./ sqrt(length(df)));
+
+%% plot: 2 axes x 2 orientation
+names = {'SOSA','SODA','DOSA','DODA'};
+
+if plotLevel == 1
+    for i = 1:2 % orientation {same diff}
+        for k = 1:2 % axis {same diff}
+            if i==1
+                f(9+k)= figure;
+            else
+                f(9+k+2)= figure;
+            end
+            
+            subplot(1,3,1)
+            y = errorbar([ (accuracy4.Discrim1_means (1:2,i,k)') ;...
+                (accuracy4.Discrim1_means (3:4,i,k)')],...
+                [(accuracy4.Discrim1_stes(1:2,i,k)');...
+                (accuracy4.Discrim1_stes(3:4,i,k)')],'.');
+            ylim([0 1])
+            set(y(2),'Color','r')
+            set(gca,'XTick',[1 2])
+            set(gca,'XTickLabel',{'T1','T2'});
+            ylabel('accuracy')
+            legend('valid','invalid','Location','SouthEast');
+            if i == 1
+                title([names{k},' - discrimination'])
+            else
+                title ([names{k+2},' - discrimination'])
+            end
+            
+            subplot (1,3,2)
+            y = errorbar([ (accuracy4.Detect_means (1:2,i,k)') ;...
+                (accuracy4.Detect_means (3:4,i,k)')],...
+                [(accuracy4.Detect_stes(1:2,i,k)');...
+                (accuracy4.Detect_stes(3:4,i,k)')],'.');
+            ylim([0 1])
+            set(y(2),'Color','r')
+            set(gca,'XTick',[1 2])
+            set(gca,'XTickLabel',{'T1','T2'});
+            ylabel('accuracy')
+            legend('valid','invalid','Location','SouthEast');
+            if i == 1
+                title([names{k},' - detection'])
+            else
+                title ([names{k+2},' - detection'])
+            end
+            
+            subplot(1,3,3)
+            y = errorbar([ (accuracy4.Overall_means (1:2,i,k)') ;...
+                (accuracy4.Overall_means (3:4,i,k)')],...
+                [(accuracy4.Overall_stes(1:2,i,k)');...
+                (accuracy4.Overall_stes(3:4,i,k)')],'.');
+            ylim([0 1])
+            set(y(2),'Color','r')
+            set(gca,'XTick',[1 2])
+            set(gca,'XTickLabel',{'T1','T2'});
+            ylabel('accuracy')
+            legend('valid','invalid','Location','SouthEast');
+            if i == 1
+                title([names{k},' - overall'])
+            else
+                title ([names{k+2},' - overall'])
+            end
+            
+            turnallwhite
+            
+        end
+    end
+end
+
 %% turn figs white
 turnallwhite  
 
 %% Save analysis files and figures
 
-saveFile = 1;
-saveFigs = 1;
-
 % save analysis
 if saveFile
     save(sprintf('%s/%s.mat', analysisDir, analysisFile), 'accuracy',...
-        'accuracy2','responseData_all','responseData_labels')
+        'accuracy2','accuracy3','accuracy4','responseData_all',...
+        'responseData_labels')
 end
 
 % save figs
 if saveFigs
     if plotLevel == 1;
     rd_saveAllFigs(f, {'all','Detect1','Discrim1','Discrim2',...
-        'Detect2','overall','DiscrimAxis','DetectAxis','OverallAxis'},...
-        analysisFile,figDir);     
+        'Detect2','overall','DiscrimAxis','DetectAxis','OverallAxis','SOSA','SODA','DOSA','DODA'},analysisFile,figDir);     
     elseif plotLevel == 2;
     rd_saveAllFigs([], {'minAll','Discrim2','Detect2'},analysisFile,figDir);     
     elseif plotLevel == 3;
