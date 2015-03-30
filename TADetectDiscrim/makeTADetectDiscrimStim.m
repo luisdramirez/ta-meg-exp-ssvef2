@@ -61,7 +61,7 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'grating'; %'grating','checkerboard'
+stimType = 'checkerboard'; %'grating','checkerboard'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
