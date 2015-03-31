@@ -214,7 +214,7 @@ switch plotLevel
         % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
         ylabel('accuracy')
         % legend(y,{'valid','invalid'});
-        legend('valid','invalid','Location','SouthEast');
+        legend('valid','invalid','Location','NorthEast');
         title('discrimination(total correct/total present)')
         
         subplot(1,5,2)
@@ -249,8 +249,6 @@ switch plotLevel
         set(gca,'XTickLabel',{'T1','T2'});
         ylabel('d''')
         title('detection')
-        
-        turnallwhite
         
         subplot(1,5,5)
         y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
