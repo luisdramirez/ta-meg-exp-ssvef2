@@ -7,11 +7,15 @@ if mod(w, 2)
     w = w - 1 ; 
     fprintf('make2DGaussianCentered: adjusting width, w, to be even ...\n')
     widthAdjusted = 1;
+else
+    widthAdjusted = 0;
 end
 if mod(h, 2)
     h = h - 1 ; 
     fprintf('make2DGaussianCentered: adjusting height, h, to be even ...\n')
     heightAdjusted = 1;
+else
+    heightAdjusted = 0;
 end
 
 [x y] = meshgrid(-w/2+1:w/2, -h/2+1:h/2);
