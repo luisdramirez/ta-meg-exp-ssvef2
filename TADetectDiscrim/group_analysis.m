@@ -18,7 +18,7 @@ for n = 1:nSubj;
     dir = sprintf('%s/analysis/%s', rootDir, subject);
     if numel(runs)>1
         analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s%s',subject,date,num2str(runs(1)),'_',num2str(runs(end)));
-        else
+    else
         analysisFile = sprintf('%s_%s_taDetectDiscrim_%s%s',subject,date,num2str(runs)');
     end
     analysis = load (sprintf('%s/%s.mat', dir, analysisFile));
@@ -52,7 +52,7 @@ OverallResponse_all ( OverallResponse_all == 3) = 0;
 
 
 
-%% For each run calculate detection and discrimination accuracy for: 
+%% For each run calculate detection and discrimination accuracy for:
 % postcue T1 valid & invalid; postcue T2 valid & invalid; overall accuracy
 
 % blockNames = {'blank','fast-left'}; % fast-left
@@ -60,57 +60,57 @@ OverallResponse_all ( OverallResponse_all == 3) = 0;
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 % cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 
-cueBlockOrder_Indx = [2 4 5 3]; 
+cueBlockOrder_Indx = [2 4 5 3];
 accuracy =[]; % rows: '1-1','2-1','2-2','1-2'; columns: runs 1-10
 accuracy.missedTrials = zeros(1,length(runs)); % columns: runs 1-10
 
-for n = 1:length(runs) 
+for n = 1:length(runs)
     runIndx = run == n;
-    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
-       condition_Indx = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
-            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
-                 interval = 1;
-                 targetType = targetTypeT1;
-            else interval = 2;
-                 targetType = targetTypeT2;
-            end
-              % total correct / total present
-            accuracy.Discrim_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum(ismember(targetType(condition_Indx),[1,2]) );
-             % total correct / total correctly detected
-            accuracy.Discrim1_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
-            accuracy.Detect_all(k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
-                 numel(DetectTargetType(condition_Indx,interval));
-            accuracy.Overall_all(k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
-                 numel( response_correct(condition_Indx) ); 
-            accuracy.Hit_all(k,n) = sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) ) / ...
-                 sum(ismember(targetType(condition_Indx),[1,2]) );
-            accuracy.FA_all(k,n) = sum (DetectTargetType(condition_Indx,interval)== 0 & DetectResponse_all(condition_Indx) == 1) / ...
-                 sum(ismember(targetType(condition_Indx),[1,2]) );
-            accuracy.Miss_all(k,n) = 1 - accuracy.Hit_all(k,n);
-            accuracy.CR_all(k,n) = 1 -  accuracy.FA_all(k,n);
-            
-            accuracy.Hit_alltemp(k,n) = accuracy.Hit_all(k,n);
-            accuracy.FA_alltemp(k,n) = accuracy.FA_all(k,n);
-            if accuracy.Hit_alltemp(k,n) == 1
-                accuracy.Hit_alltemp(k,n) = .99; % avoid Inf for dprime 
-            elseif accuracy.Hit_alltemp(k,n) == 0
-                accuracy.Hit_alltemp(k,n) = .01;
-            end
-            if accuracy.FA_alltemp(k,n) == 1
-                accuracy.FA_alltemp(k,n) = .99;
-            elseif accuracy.FA_alltemp(k,n) == 0
-                accuracy.FA_alltemp(k,n) = .01;
-            end
-            accuracy.dprime(k,n) = norminv(accuracy.Hit_alltemp(k,n)) - norminv(accuracy.FA_alltemp(k,n));
-            
-            accuracy.missedTrials(n) = accuracy.missedTrials(n) + sum(isnan(response_all(condition_Indx)) );
+    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'};
+        condition_Indx = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
+        if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+            interval = 1;
+            targetType = targetTypeT1;
+        else interval = 2;
+            targetType = targetTypeT2;
+        end
+        % total correct / total present
+        accuracy.Discrim_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+            sum(ismember(targetType(condition_Indx),[1,2]) );
+        % total correct / total correctly detected
+        accuracy.Discrim1_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+            sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+        accuracy.Detect_all(k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+            numel(DetectTargetType(condition_Indx,interval));
+        accuracy.Overall_all(k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+            numel( response_correct(condition_Indx) );
+        accuracy.Hit_all(k,n) = sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) ) / ...
+            sum(ismember(targetType(condition_Indx),[1,2]) );
+        accuracy.FA_all(k,n) = sum (DetectTargetType(condition_Indx,interval)== 0 & DetectResponse_all(condition_Indx) == 1) / ...
+            sum(ismember(targetType(condition_Indx),[1,2]) );
+        accuracy.Miss_all(k,n) = 1 - accuracy.Hit_all(k,n);
+        accuracy.CR_all(k,n) = 1 -  accuracy.FA_all(k,n);
+        
+        accuracy.Hit_alltemp(k,n) = accuracy.Hit_all(k,n);
+        accuracy.FA_alltemp(k,n) = accuracy.FA_all(k,n);
+        if accuracy.Hit_alltemp(k,n) == 1
+            accuracy.Hit_alltemp(k,n) = .99; % avoid Inf for dprime
+        elseif accuracy.Hit_alltemp(k,n) == 0
+            accuracy.Hit_alltemp(k,n) = .01;
+        end
+        if accuracy.FA_alltemp(k,n) == 1
+            accuracy.FA_alltemp(k,n) = .99;
+        elseif accuracy.FA_alltemp(k,n) == 0
+            accuracy.FA_alltemp(k,n) = .01;
+        end
+        accuracy.dprime(k,n) = norminv(accuracy.Hit_alltemp(k,n)) - norminv(accuracy.FA_alltemp(k,n));
+        
+        accuracy.missedTrials(n) = accuracy.missedTrials(n) + sum(isnan(response_all(condition_Indx)) );
     end
 end
 
 
-%% calculate means and stes 
+%% calculate means and stes
 accuracy.Discrim_means = nanmean(accuracy.Discrim_all,2); % rows: '1-1','2-1','2-2','1-2'
 accuracy.Discrim1_means = nanmean(accuracy.Discrim1_all,2);
 accuracy.Detect_means = nanmean(accuracy.Detect_all,2);
@@ -121,7 +121,7 @@ accuracy.Miss_means = nanmean(accuracy.Miss_all,2);
 accuracy.CR_means = nanmean(accuracy.CR_all,2);
 accuracy.dprime_means = nanmean(accuracy.dprime,2);
 all_means = [accuracy.Hit_means,accuracy.FA_means,accuracy.Miss_means,accuracy.CR_means ]; % rows: '1-1','2-1','2-2','1-2'
-                                                                                           % columns: Hit,FA, Miss, CR                                                                                          
+% columns: Hit,FA, Miss, CR
 accuracy.Discrim_stes = nanstd(accuracy.Discrim_all,0,2)./sqrt(length(runs));
 accuracy.Discrim1_stes = nanstd(accuracy.Discrim1_all,0,2)./sqrt(length(runs));
 accuracy.Detect_stes = nanstd(accuracy.Detect_all,0,2)./sqrt(length(runs));
@@ -262,35 +262,35 @@ end
 %% pp pa ap aa
 accuracy2 = []; % rows: pp,pa,ap,aa; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-10
 
-for n = 1:length(runs) 
+for n = 1:length(runs)
     runIndx = run == n;
-    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
+    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'};
         dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
         for i = 2:5; % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
             condition_Indx =  dd & targetCondition == i ;
             if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
-                 interval = 1;
-                 targetType = targetTypeT1;
+                interval = 1;
+                targetType = targetTypeT1;
             else interval = 2;
-                 targetType = targetTypeT2;
+                targetType = targetTypeT2;
             end
-              % total correct / total present
-             accuracy2.Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum(ismember(targetType(condition_Indx),[1,2]) );
-             % total correct / total correctly detected
-             accuracy2.Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
-             accuracy2.Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
-                 numel(DetectTargetType(condition_Indx,interval));
-             accuracy2.Overall_all(i-1,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
-                 numel( response_correct(condition_Indx) );
-             
-         end
-     end
+            % total correct / total present
+            accuracy2.Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                sum(ismember(targetType(condition_Indx),[1,2]) );
+            % total correct / total correctly detected
+            accuracy2.Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+            accuracy2.Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                numel(DetectTargetType(condition_Indx,interval));
+            accuracy2.Overall_all(i-1,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                numel( response_correct(condition_Indx) );
+            
+        end
+    end
 end
 
 
- 
+
 %% calculate means and stes (pp pa ap aa)
 accuracy2.Discrim_means = nanmean(accuracy2.Discrim_all,3); % rows:  pp,pa,ap,aa; columns: target type
 accuracy2.Discrim1_means = nanmean(accuracy2.Discrim1_all,3);
@@ -302,7 +302,7 @@ accuracy2.Discrim1_stes = nanstd(accuracy2.Discrim1_all,0,3)./sqrt(length(runs))
 accuracy2.Detect_stes = nanstd(accuracy2.Detect_all,0,3)./sqrt(length(runs));
 accuracy2.Overall_stes = nanstd(accuracy2.Overall_all,0,3) ./ sqrt(length(runs));
 
-accuracy2.T1_Discrim_means = accuracy2.Discrim_means(1:2,1:2); % rows: pp,pa; columns: T1 valid, invalid; 
+accuracy2.T1_Discrim_means = accuracy2.Discrim_means(1:2,1:2); % rows: pp,pa; columns: T1 valid, invalid;
 accuracy2.T1_Discrim_stes = accuracy2.Discrim_stes(1:2,1:2);
 accuracy2.T2_Discrim_means = [accuracy2.Discrim_means(1,3:4) ; accuracy2.Discrim_means(3,3:4)]; % rows: pp,ap columns: T2 valid, invalid;
 accuracy2.T2_Discrim_stes = [accuracy2.Discrim_stes(1,3:4) ; accuracy2.Discrim_stes(3,3:4)];
@@ -413,33 +413,33 @@ end
 
 %% target axis: vertical, horizontal
 accuracy3 = []; % rows: target axis [0,90] ; columns: '1-1','2-1','2-2','1-2'; pages: runs 1-10
-targetAxis_Indx = [0,90]; 
+targetAxis_Indx = [0,90];
 
-for n = 1:length(runs) 
+for n = 1:length(runs)
     runIndx = run == n;
-    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
+    for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'};
         dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
-           if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
-                 interval = 1; TargetAxis = targetAxis(:,1);
-                 targetType = targetTypeT1;
-            else interval = 2; TargetAxis = targetAxis(:,2);
-                 targetType = targetTypeT2;
-            end
+        if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+            interval = 1; TargetAxis = targetAxis(:,1);
+            targetType = targetTypeT1;
+        else interval = 2; TargetAxis = targetAxis(:,2);
+            targetType = targetTypeT2;
+        end
         for i = 1:2; % targetAxis = [0,90];
-            condition_Indx =  dd & TargetAxis == targetAxis_Indx(i) ;    
-              % total correct / total present
-             accuracy3.Discrim_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum(ismember(targetType(condition_Indx),[1,2]) );
-             % total correct / total correctly detected
-             accuracy3.Discrim1_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
-             accuracy3.Detect_all(i,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
-                 numel(DetectTargetType(condition_Indx,interval));
-             accuracy3.Overall_all(i,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
-                 numel( response_correct(condition_Indx) );
-             
-         end
-     end
+            condition_Indx =  dd & TargetAxis == targetAxis_Indx(i) ;
+            % total correct / total present
+            accuracy3.Discrim_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                sum(ismember(targetType(condition_Indx),[1,2]) );
+            % total correct / total correctly detected
+            accuracy3.Discrim1_all(i,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+            accuracy3.Detect_all(i,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                numel(DetectTargetType(condition_Indx,interval));
+            accuracy3.Overall_all(i,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                numel( response_correct(condition_Indx) );
+            
+        end
+    end
 end
 
 %% calculate means and stes (vertical horizontal)
@@ -454,7 +454,7 @@ accuracy3.Discrim1_stes = nanstd(accuracy3.Discrim1_all,0,3)./sqrt(length(runs))
 accuracy3.Detect_stes = nanstd(accuracy3.Detect_all,0,3)./sqrt(length(runs));
 accuracy3.Overall_stes = nanstd(accuracy3.Overall_all,0,3) ./ sqrt(length(runs));
 
-%% plot discrimination for vertical and horizontal 
+%% plot discrimination for vertical and horizontal
 if plotLevel == 1
     f(7) = figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
@@ -476,9 +476,9 @@ if plotLevel == 1
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
 end
 
-   %% plot detection for vertical and horizontal
-   if plotLevel == 1 
-  f(8) =  figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
+%% plot detection for vertical and horizontal
+if plotLevel == 1
+    f(8) =  figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy3.Detect_stes(:,1) accuracy3.Detect_stes(:,2)],[1 2],[accuracy3.Detect_means(:,1) accuracy3.Detect_means(:,2)])
     legend('valid','invalid')
@@ -496,10 +496,10 @@ end
     colormap(barmap);
     title('T2 Detection')
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
-   end
-    %% plot overall accuracy for vertical and horizontal
-    if plotLevel == 1
-   f(9) =  figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
+end
+%% plot overall accuracy for vertical and horizontal
+if plotLevel == 1
+    f(9) =  figure('Position', [1 1 scrsz(3)*3/4 scrsz(4)/2]);
     subplot(1,2,1)
     barwitherr ([accuracy3.Overall_stes(:,1) accuracy3.Overall_stes(:,2)],[1 2],[accuracy3.Overall_means(:,1) accuracy3.Overall_means(:,2)])
     legend('valid','invalid')
@@ -517,8 +517,8 @@ end
     colormap(barmap);
     title('T2 Overall')
     set(gca, 'XTick',[1 2],'XTickLabel',{'0','90' });
-    end
-    
+end
+
 %% 2 targets: 2 axes x 2 orientations
 accuracy4 = [];    % rows: runs = 1:10; columns: axis = [0 90]; pages: cueBlockOrder_Indx = [2 4 5 3]; 4thD: ori = [1 2];
 sameOri = targetTypeT1 == targetTypeT2;
@@ -637,7 +637,7 @@ if plotLevel == 1
     end
 end
 %% turn figs white
-turnallwhite  
+turnallwhite
 
 %% Save analysis files and figures
 
@@ -649,17 +649,17 @@ turnallwhite
 %     save(sprintf('%s/%s.mat', dataDir, analysisFile), 'accuracy',...
 %         'accuracy2','responseData_group','responseData_labels')
 % end
-% 
+%
 % % save figs
 % if saveFigs
 %     if plotLevel == 1;
 %     rd_saveAllFigs(f, {'all','Detect1','Discrim1','Discrim2',...
 %         'Detect2','overall','DiscrimAxis','DetectAxis','OverallAxis'},...
-%         analysisFile,figDir);     
+%         analysisFile,figDir);
 %     elseif plotLevel == 2;
-%     rd_saveAllFigs([], {'minAll','Discrim2','Detect2'},analysisFile,figDir);     
+%     rd_saveAllFigs([], {'minAll','Discrim2','Detect2'},analysisFile,figDir);
 %     elseif plotLevel == 3;
-%     rd_saveAllFigs(f, {'minAll'},analysisFile,figDir);    
+%     rd_saveAllFigs(f, {'minAll'},analysisFile,figDir);
 %     end
 % end
 
@@ -677,4 +677,3 @@ end
 
 
 
-    
