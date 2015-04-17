@@ -40,10 +40,10 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [- 3 3]; % relative to the base orientation
+tilts = [-3 3]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
-patchContrast = 1; % for cb target
+patchContrast = .5; % for cb target
 % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
 
 % input checks
