@@ -417,10 +417,10 @@ for iFrame = 1:numel(seqtiming)
     % determine spatial attention cue
     switch attBlockName
         case 'no-att'
-            if time-blockStartTimes(blockIdx) < respDur - 0.00001
-                % give a response window at the beginning of blank blocks
-                fixSeq(iFrame,1) = 2;
-            elseif blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime - 0.00001)
+%             if time-blockStartTimes(blockIdx) < respDur - 0.00001
+%                 % give a response window at the beginning of blank blocks
+%                 fixSeq(iFrame,1) = 2;
+            if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime - 0.00001)
                 % cue the next attention block right before it starts
                 switch attBlockNames{attBlockOrder(blockIdx+1)}
                     case 'att-left'
