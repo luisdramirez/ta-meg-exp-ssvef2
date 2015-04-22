@@ -28,16 +28,16 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-blockDur = 4.4; % (s)
 nFramesPerTarget = 3;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
-respDur = 1; % (s)
+respDur = 1.2; % (s)
 feedbackDur = 0.3;
 cueDur = 0.1;
+blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
 jitter = 1; % add jittered interval between trials
 if refrate==75
     % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
