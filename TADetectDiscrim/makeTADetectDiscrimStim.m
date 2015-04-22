@@ -14,7 +14,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'Carrasco_L2'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 pixelsPerDegree = 1/d.pixelSize;
 screenWidth = d.numPixels(1); % (px)
@@ -38,6 +38,7 @@ attCueLeadTime = 0.5; % (s)
 respDur = 1.4; % (s)
 feedbackDur = 0.3;
 cueDur = 0.1;
+jitter = 1; % add jittered interval between trials
 if refrate==75
     % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
     fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
@@ -97,7 +98,7 @@ p = v2struct(...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
     cueBlockNames, cueBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
-    contrasts, blurRadius, backgroundColor, phases, triggerOption);
+    contrasts, blurRadius, backgroundColor, phases, triggerOption, jitter);
 
 %% Make the stimuli
 for iPhase = 1:numel(phases)
@@ -206,7 +207,7 @@ switch target.type
     case 'cb'
         target.pixelsPerDegree = pixelsPerDegree;
         target.imSize = stimSize; % whole grating square
-        target.size = 1; % 0.5 % sigma of gaussian aperture
+        target.size = 1.5; % 0.5 % sigma of gaussian aperture
         target.spatialFreq = 4;
         target.center = targetCenter;
     otherwise
@@ -214,9 +215,19 @@ switch target.type
 end
 
 %% Determine the stimulus times
-runDur = blockDur*nBlocks;
-blockStartTimes = 0:blockDur:runDur-blockDur;
-nFramesPerBlock = blockDur*refrate;
+if jitter
+    iti = 0:0.2:1.2;
+    itiSeq = shuffle(repmat(iti,1,ceil(nBlocks/numel(iti))));
+    itiSeq = itiSeq(1:nBlocks);
+    runDur = blockDur*nBlocks + sum(itiSeq);
+    blockStartTimes = (0:blockDur:blockDur*nBlocks-blockDur) + cumsum([0 itiSeq(1:end-1)]);
+    nFramesPerBlock = (blockDur + max(itiSeq))*refrate; % number of frames in the longest block
+else
+    itiSeq = zeros(1,nBlocks);
+    runDur = blockDur*nBlocks;
+    blockStartTimes = 0:blockDur:runDur-blockDur;
+    nFramesPerBlock = blockDur*refrate;
+end
 
 % fixed target times (T1 and T2) on the attended (right-side) stimulus
 targetStartTimes = [];
@@ -421,14 +432,16 @@ for iFrame = 1:numel(seqtiming)
                 fixSeq(iFrame,1) = 1;
             end
         case 'att-left'
-            if blockStartTimes(blockIdx+1)-time < feedbackDur - 0.00001
+            if blockStartTimes(blockIdx+1)-time < feedbackDur + itiSeq(blockIdx) - 0.00001 && ...
+                blockStartTimes(blockIdx+1)-time > itiSeq(blockIdx) - 0.00001
                 % display feedback at the end of the block
                 fixSeq(iFrame,1) = 8; % blue
              else
                 fixSeq(iFrame,1) = 4;
             end
         case 'att-right'
-            if blockStartTimes(blockIdx+1)-time < feedbackDur - 0.00001
+            if blockStartTimes(blockIdx+1)-time < feedbackDur + itiSeq(blockIdx) - 0.00001 && ...
+                blockStartTimes(blockIdx+1)-time > itiSeq(blockIdx) - 0.00001
                 % display feedback at the end of the block
                 fixSeq(iFrame,1) = 8; % blue
             else
@@ -442,7 +455,7 @@ for iFrame = 1:numel(seqtiming)
     cueBlock = cueBlockNames{cueBlockOrder(blockIdx)};
     if ~strcmp(cueBlock, 'no-cue') && ...
             time-blockStartTimes(blockIdx) > targetLeadTime + targetSOA + cueTargetSOA && ...
-            blockStartTimes(blockIdx+1)-time > feedbackDur
+            blockStartTimes(blockIdx+1)-time > feedbackDur + itiSeq(blockIdx) - 0.00001
         % which target is post-cued?
         responseCue = str2double(cueBlock(end));
         switch targetBlockNames{targetBlockOrder(blockIdx)}
@@ -609,6 +622,7 @@ stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 stimulus.target = target;
 stimulus.respDur = respDur;
+stimulus.itiSeq = itiSeq; % storage only
 
 % store in order structure
 order.blockOrder = blockOrder;
