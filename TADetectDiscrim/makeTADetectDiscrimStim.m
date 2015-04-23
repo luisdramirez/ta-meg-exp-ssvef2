@@ -496,28 +496,42 @@ for iFrame = 1:numel(seqtiming)
         case 'conditionID'
             % determine trigger - condition ID
             if newBlock % only give condition trigger at the first frame of the block
-                switch blockName
-                    case 'blank'
+%                 switch blockName
+%                     case 'blank'
+%                         trig = 7;
+%                     case 'fast-left'
+%                         if strcmp(attBlockName,'att-left')
+%                             trig = NaN; % never happens, so don't use up the trigger
+%                         elseif strcmp(attBlockName,'att-right')
+%                             trig = 1;
+%                         end
+%                     case 'slow-left'
+%                         if strcmp(attBlockName,'att-left')
+%                             trig = NaN; % never happens, so don't use up the trigger
+%                         elseif strcmp(attBlockName,'att-right')
+%                             trig = 2;
+%                         end
+%                     otherwise
+%                         error('blockName not recognized')
+%                 end
+                switch cueBlock
+                    case 'no-cue' % blank
                         trig = 7;
-                    case 'fast-left'
-                        if strcmp(attBlockName,'att-left')
-                            trig = NaN; % never happens, so don't use up the trigger
-                        elseif strcmp(attBlockName,'att-right')
-                            trig = 1;
-                        end
-                    case 'slow-left'
-                        if strcmp(attBlockName,'att-left')
-                            trig = NaN; % never happens, so don't use up the trigger
-                        elseif strcmp(attBlockName,'att-right')
-                            trig = 2;
-                        end
+                    case '1-1'
+                        trig = 1;
+                    case '1-2'
+                        trig = 2;
+                    case '2-1'
+                        trig = 3;
+                    case '2-2'
+                        trig = 4;
                     otherwise
-                        error('blockName not recognized')
+                        error('cueBlock not recognized')
                 end
             elseif targetOnSeq(iFrame)~=0
                 % triger for target side, only on first target frame
                 if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
-                    trig = 5; % target on left
+                    trig = NaN; % target on left % never happens, so don't use up the trigger
                 elseif targetOnSeq(iFrame)==2 && targetOnSeq(iFrame-1)==0
                     trig = 6; % target on right
                 else
@@ -526,9 +540,9 @@ for iFrame = 1:numel(seqtiming)
             elseif targetAbsOnSeq(iFrame)~=0
                 % triger for target side, only on first target frame
                 if targetAbsOnSeq(iFrame)==1 && targetAbsOnSeq(iFrame-1)==0
-                    trig = 3; % target on left
+                    trig = NaN; % target on left % never happens, so don't use up the trigger
                 elseif targetAbsOnSeq(iFrame)==2 && targetAbsOnSeq(iFrame-1)==0
-                    trig = 4; % target on right
+                    trig = 5; % target on right
                 else
                     trig = NaN;
                 end
