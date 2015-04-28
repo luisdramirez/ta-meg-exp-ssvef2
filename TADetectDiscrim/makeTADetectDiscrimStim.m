@@ -14,7 +14,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'Carrasco_L2'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 pixelsPerDegree = 1/d.pixelSize;
 screenWidth = d.numPixels(1); % (px)

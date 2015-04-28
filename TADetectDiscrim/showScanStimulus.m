@@ -45,6 +45,7 @@ dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
 patchContrast = .5; % for cb target
 % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
+soundAmp = 0.10;
 
 % input checks
 if nargin < 2,
@@ -256,7 +257,7 @@ for frame = 1:nFrames
         % Play a sound if requested
         if isfield(stimulus, 'soundSeq')
             if stimulus.soundSeq(frame)~=0
-                playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:))
+                playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:)*soundAmp)
             end
         end
         
@@ -295,8 +296,14 @@ for frame = 1:nFrames
                     quitProg = 1;
                     break; % out of while loop
                 end;
+                if(response.correct(frame)~=0), %%% TO ADD OTHERWISE OVERWRITE THE response.correct VARIABLE
+                    break; % out of while loop
+                end;
             else
                 response.correct(frame) = 0;
+                if(response.correct(frame)==0), %%% TO ADD OTHERWISE OVERWRITE THE response.correct VARIABLE
+                    break; % out of while loop
+                end;
             end
         else
             % Use KbCheck
