@@ -28,16 +28,17 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-blockDur = 5 - 0.15; % (s) (- difference from .8)
 nFramesPerTarget = 3;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 0.8 - 0.15; % (s) % SOA between targets (- difference from .8)
+targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
-respDur = 1.4; % (s)
+respDur = 1.2; % (s)
 feedbackDur = 0.3;
 cueDur = 0.1;
+blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
+jitter = 1; % add jittered interval between trials
 if refrate==75
     % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
     fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
@@ -97,7 +98,7 @@ p = v2struct(...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
     cueBlockNames, cueBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
-    contrasts, blurRadius, backgroundColor, phases, triggerOption);
+    contrasts, blurRadius, backgroundColor, phases, triggerOption, jitter);
 
 %% Make the stimuli
 for iPhase = 1:numel(phases)
@@ -206,7 +207,7 @@ switch target.type
     case 'cb'
         target.pixelsPerDegree = pixelsPerDegree;
         target.imSize = stimSize; % whole grating square
-        target.size = 1; % 0.5 % sigma of gaussian aperture
+        target.size = 1.5; % 0.5 % sigma of gaussian aperture
         target.spatialFreq = 4;
         target.center = targetCenter;
     otherwise
@@ -214,9 +215,19 @@ switch target.type
 end
 
 %% Determine the stimulus times
-runDur = blockDur*nBlocks;
-blockStartTimes = 0:blockDur:runDur-blockDur;
-nFramesPerBlock = blockDur*refrate;
+if jitter
+    iti = 0:0.2:1; % recall there is always 0.5 s before cue
+    itiSeq = shuffle(repmat(iti,1,ceil(nBlocks/numel(iti))));
+    itiSeq = itiSeq(1:nBlocks);
+    runDur = blockDur*nBlocks + sum(itiSeq);
+    blockStartTimes = (0:blockDur:blockDur*nBlocks-blockDur) + cumsum([0 itiSeq(1:end-1)]);
+    nFramesPerBlock = (blockDur + max(itiSeq))*refrate; % number of frames in the longest block
+else
+    itiSeq = zeros(1,nBlocks);
+    runDur = blockDur*nBlocks;
+    blockStartTimes = 0:blockDur:runDur-blockDur;
+    nFramesPerBlock = blockDur*refrate;
+end
 
 % fixed target times (T1 and T2) on the attended (right-side) stimulus
 targetStartTimes = [];
@@ -406,10 +417,10 @@ for iFrame = 1:numel(seqtiming)
     % determine spatial attention cue
     switch attBlockName
         case 'no-att'
-            if time-blockStartTimes(blockIdx) < respDur - 0.00001
-                % give a response window at the beginning of blank blocks
-                fixSeq(iFrame,1) = 2;
-            elseif blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime - 0.00001)
+%             if time-blockStartTimes(blockIdx) < respDur - 0.00001
+%                 % give a response window at the beginning of blank blocks
+%                 fixSeq(iFrame,1) = 2;
+            if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < attCueLeadTime - 0.00001)
                 % cue the next attention block right before it starts
                 switch attBlockNames{attBlockOrder(blockIdx+1)}
                     case 'att-left'
@@ -421,14 +432,16 @@ for iFrame = 1:numel(seqtiming)
                 fixSeq(iFrame,1) = 1;
             end
         case 'att-left'
-            if blockStartTimes(blockIdx+1)-time < feedbackDur - 0.00001
+            if blockStartTimes(blockIdx+1)-time < feedbackDur + itiSeq(blockIdx) - 0.00001 && ...
+                blockStartTimes(blockIdx+1)-time > itiSeq(blockIdx) - 0.00001
                 % display feedback at the end of the block
                 fixSeq(iFrame,1) = 8; % blue
              else
                 fixSeq(iFrame,1) = 4;
             end
         case 'att-right'
-            if blockStartTimes(blockIdx+1)-time < feedbackDur - 0.00001
+            if blockStartTimes(blockIdx+1)-time < feedbackDur + itiSeq(blockIdx) - 0.00001 && ...
+                blockStartTimes(blockIdx+1)-time > itiSeq(blockIdx) - 0.00001
                 % display feedback at the end of the block
                 fixSeq(iFrame,1) = 8; % blue
             else
@@ -442,7 +455,7 @@ for iFrame = 1:numel(seqtiming)
     cueBlock = cueBlockNames{cueBlockOrder(blockIdx)};
     if ~strcmp(cueBlock, 'no-cue') && ...
             time-blockStartTimes(blockIdx) > targetLeadTime + targetSOA + cueTargetSOA && ...
-            blockStartTimes(blockIdx+1)-time > feedbackDur
+            blockStartTimes(blockIdx+1)-time > feedbackDur + itiSeq(blockIdx) - 0.00001
         % which target is post-cued?
         responseCue = str2double(cueBlock(end));
         switch targetBlockNames{targetBlockOrder(blockIdx)}
@@ -483,28 +496,42 @@ for iFrame = 1:numel(seqtiming)
         case 'conditionID'
             % determine trigger - condition ID
             if newBlock % only give condition trigger at the first frame of the block
-                switch blockName
-                    case 'blank'
+%                 switch blockName
+%                     case 'blank'
+%                         trig = 7;
+%                     case 'fast-left'
+%                         if strcmp(attBlockName,'att-left')
+%                             trig = NaN; % never happens, so don't use up the trigger
+%                         elseif strcmp(attBlockName,'att-right')
+%                             trig = 1;
+%                         end
+%                     case 'slow-left'
+%                         if strcmp(attBlockName,'att-left')
+%                             trig = NaN; % never happens, so don't use up the trigger
+%                         elseif strcmp(attBlockName,'att-right')
+%                             trig = 2;
+%                         end
+%                     otherwise
+%                         error('blockName not recognized')
+%                 end
+                switch cueBlock
+                    case 'no-cue' % blank
                         trig = 7;
-                    case 'fast-left'
-                        if strcmp(attBlockName,'att-left')
-                            trig = NaN; % never happens, so don't use up the trigger
-                        elseif strcmp(attBlockName,'att-right')
-                            trig = 1;
-                        end
-                    case 'slow-left'
-                        if strcmp(attBlockName,'att-left')
-                            trig = NaN; % never happens, so don't use up the trigger
-                        elseif strcmp(attBlockName,'att-right')
-                            trig = 2;
-                        end
+                    case '1-1'
+                        trig = 1;
+                    case '1-2'
+                        trig = 2;
+                    case '2-1'
+                        trig = 3;
+                    case '2-2'
+                        trig = 4;
                     otherwise
-                        error('blockName not recognized')
+                        error('cueBlock not recognized')
                 end
             elseif targetOnSeq(iFrame)~=0
                 % triger for target side, only on first target frame
                 if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
-                    trig = 5; % target on left
+                    trig = NaN; % target on left % never happens, so don't use up the trigger
                 elseif targetOnSeq(iFrame)==2 && targetOnSeq(iFrame-1)==0
                     trig = 6; % target on right
                 else
@@ -513,9 +540,9 @@ for iFrame = 1:numel(seqtiming)
             elseif targetAbsOnSeq(iFrame)~=0
                 % triger for target side, only on first target frame
                 if targetAbsOnSeq(iFrame)==1 && targetAbsOnSeq(iFrame-1)==0
-                    trig = 3; % target on left
+                    trig = NaN; % target on left % never happens, so don't use up the trigger
                 elseif targetAbsOnSeq(iFrame)==2 && targetAbsOnSeq(iFrame-1)==0
-                    trig = 4; % target on right
+                    trig = 5; % target on right
                 else
                     trig = NaN;
                 end
@@ -609,6 +636,7 @@ stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 stimulus.target = target;
 stimulus.respDur = respDur;
+stimulus.itiSeq = itiSeq; % storage only
 
 % store in order structure
 order.blockOrder = blockOrder;

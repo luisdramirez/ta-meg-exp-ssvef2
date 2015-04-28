@@ -38,7 +38,7 @@ end
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
 rootDir = pathToExpt;
-%rootDir = pwd;
+% rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
@@ -82,9 +82,15 @@ for n = 1:length(df);
     dd = load(sprintf('%s/%s',dataDir,name));
     expNum = regexp(name,'_taDetectDiscrim(\d*).mat','tokens');
     stim = load(sprintf('%s/taDetectDiscrim%s.mat', stimDir, expNum{1}{1}));
+    if isfield(stim.stimulus,'itiSeq')
+        itiSeq = stim.stimulus.itiSeq;
+    else
+        itiSeq = [];
+    end
+    
     [temp, responseData_labels] = sl_responseDiscrimData(respTime,trialCount,...
         respSecs,refreshRate, blockLength, keyCodes, dd.response, ...
-        stim.order,n);
+        stim.order, n, itiSeq);
     responseData_all = [responseData_all; temp];  
 end
 

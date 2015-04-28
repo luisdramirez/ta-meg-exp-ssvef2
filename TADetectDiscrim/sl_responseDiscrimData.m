@@ -1,6 +1,6 @@
 function [responseData, runLabels] = sl_responseDiscrimData(respTime, ...
     trialCount,respSecs,refreshRate, blockLength, keyCodes, response, ...
-    order,runNum)
+    order, runNum, itiSeq)
 
 % use like this: 
 % load('taDetect7','order');        % load block order from stimFile
@@ -14,10 +14,18 @@ function [responseData, runLabels] = sl_responseDiscrimData(respTime, ...
 % keyCodes = [30 31 32];
 % runNum = 1;
 
+if nargin < 10 || isempty(itiSeq)
+    itiSeq = zeros(1,trialCount);
+end
+
+blockLengths = itiSeq*refreshRate + blockLength;
+blockStarts = [0 cumsum(blockLengths)];
 
 for trialNum = 1 : trialCount
     % Defining search range
-    begSearchIdx = blockLength * (trialNum - 1) + respTime + 1 ;
+    blockStart = blockStarts(trialNum);
+    begSearchIdx = blockStart + respTime + 1;
+%     begSearchIdx = blockLength * (trialNum - 1) + respTime + 1 ;
     endSearchIdx = begSearchIdx + (respSecs) * refreshRate - 1 ;
     
     % Find the index for ALL non-zero elements (key-codes) within search
