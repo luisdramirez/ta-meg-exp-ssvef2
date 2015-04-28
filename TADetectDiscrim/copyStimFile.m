@@ -13,6 +13,8 @@ switch location
         vistaDir = '~/Desktop/Rachel/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
     case 'laptop'
         vistaDir = '/Users/rachel/Software/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
+    case 'MEG'
+        vistaDir = '/Users/megadmin/Desktop/Experiments/Rachel/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
     otherwise
         error('location not recognized')
 end
