@@ -5,11 +5,11 @@ function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDis
 % date (optional) is a string with the date of the experiment, e.g. '20141219'
 %   if date is not given, will look for runs from all dates.
 
-if nargin < 3 || ~exist('date','var')
+if nargin < 3 || isempty(date)
     date = [];
 end
 
-if nargin < 4 || ~exist('plotLevel','var')
+if nargin < 4 || isempty(plotLevel)
     plotLevel = 3; % 1 plot everything --> 3 plot minimal
 end
 
