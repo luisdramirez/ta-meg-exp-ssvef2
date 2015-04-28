@@ -37,7 +37,7 @@ end
 
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
-rootDir = pathToExpt;
+rootDir = pathToMEGExpt;
 % rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
@@ -53,7 +53,7 @@ end
 
 for iRun = 1:numel(runs)
     run = runs(iRun);
-    d = dir(sprintf('%s/%s*%d.mat', dataDir, date, run));
+    d = dir(sprintf('%s/%s*taDetectDiscrim%d.mat', dataDir, date, run));
     if numel(d)~=1
         error('More or fewer than one matching data file: %s/*%d.mat', dataDir, run)
     else
