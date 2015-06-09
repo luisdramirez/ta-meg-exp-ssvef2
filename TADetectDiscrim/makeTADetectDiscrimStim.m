@@ -58,7 +58,7 @@ end
 target.type = 'cb'; % 'dot','lines','grating','cb'
 
 %% blocks setup (one run)
-blockNames = {'blank','fast-left'}; % fast-left
+blockNames = {'blank','slow-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 % targetBlockNames = {'no-targ','pres-pres'};
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};

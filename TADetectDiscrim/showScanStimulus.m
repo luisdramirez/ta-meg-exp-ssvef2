@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-3 3]; % relative to the base orientation
+tilts = [-3.8 3.8]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
 patchContrast = .5; % for cb target
@@ -366,6 +366,7 @@ for frame = 1:nFrames
 end;
 
 % store target data inside response, so it gets passed out
+target.soundAmp = soundAmp;
 response.target = target;
 
 % clean up KbQueue
