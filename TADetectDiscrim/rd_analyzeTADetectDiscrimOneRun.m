@@ -1,7 +1,7 @@
 function [accuracy, accuracy2] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel)
 
 dataFile = dir(sprintf('%s/*taDetectDiscrim%d.mat', dataDir, run));
-dd = load(sprintf('%s/%s', dataDir, dataFile.name));
+dd = load(sprintf('%s/%s', dataDir, dataFile(end).name));
 stim = load(sprintf('%s/taDetectDiscrim%d.mat', stimDir, run));
 
 trialCount = length(stim.p.blockOrder);  
@@ -196,7 +196,8 @@ switch plotLevel
         
     case {2,3}
         scrsz=get(0,'ScreenSize');
-        f(1) = figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2]);
+%         f(1) = figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2]);
+        f(1) = figure('Position', [1 600 800 400]);
         
         subplot(1,3,1)
         y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
@@ -207,6 +208,7 @@ switch plotLevel
         set(gca,'XTickLabel',{'T1','T2'});
         % set(gca,'XTickLabel',{'','T1','','','','','T2',''});
         ylabel('accuracy')
+        legend('valid','invalid','Location','SouthEast');
         title('detection')
         
         subplot(1,3,2)

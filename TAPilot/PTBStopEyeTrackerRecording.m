@@ -54,7 +54,8 @@ disp(['Got status ' num2str(status) ' for command for receive file.']);
 if status < 0
     error('Eyetracker file not received.');
 end
-if ~exist(sprintf('%s/%s.edf', eyeDir, PTBEyeTrackerFileName), 'file')
+if ~exist(sprintf('%s/%s.edf', eyeDir, PTBEyeTrackerFileName), 'file') && ...
+    ~exist(sprintf('%s/%s', eyeDir, PTBEyeTrackerFileName), 'file')
     error('Eyetracker file not found.');
 end
 

@@ -2,10 +2,17 @@ function staircaseAdjustment(contrast, tilt, detect, discrim)
 %
 % function staircaseAdjustment(contrast, tilt, detect, discrim)
 
-updateTilt = 0; % only update tilt if contrast is in a good range
+%% report current values
+fprintf('original contrast: %.2f\n', contrast)
+fprintf('original tilt: %1.1f\n\n', tilt)
+
+fprintf('detection: %d%%\n', round(detect*100))
+fprintf('discrimination: %d%%\n\n', round(discrim*100))
 
 %% adjust contrast
-c = round(logspace(-1,0,20)*100)/100;
+updateTilt = 0; % only update tilt if contrast is in a good range
+
+c = round(logspace(-1,0,10)*100)/100;
 [val, cIdx] = min(abs(c-contrast)); % find c closest to contrast
 if detect > 0.90
     if cIdx > 1
@@ -66,6 +73,6 @@ save('staircase.mat', 'contrast', 'tilt')
 
 %% show new values
 fprintf('new contrast: %.2f\n', contrast)
-fprintf('new tilt: %1.1f\n', tilt)
+fprintf('new tilt: %1.1f\n\n', tilt)
 
 

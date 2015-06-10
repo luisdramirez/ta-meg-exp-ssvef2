@@ -23,7 +23,7 @@ displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = true;
-eyeFile = sprintf('TA%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
+eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 
 %% Configurations

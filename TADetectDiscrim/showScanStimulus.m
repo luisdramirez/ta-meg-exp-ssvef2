@@ -40,19 +40,21 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % staircase? (adjustment between runs)
-staircase = 1;
+staircase = 0; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
     s = load('staircase.mat');
     tilts = [-s.tilt s.tilt];
     patchContrast = s.contrast;
-    fprintf('\nStaircase update: contrast = %.2f, tilt = %1.1f\n\n', patchContrast, tilts(2))
+    fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = %.2f\ntilt = %1.1f\n\n\n\n', patchContrast, tilts(2))
 else
-    tilts = [-6 6]; % relative to the base orientation
+    % MANUAL SETTINGS
+    tilts = [-6 6]; % starting settings: [-6 6] [relative to the base orientation]
+    patchContrast = 1; % starting settings: 1 [for cb target (range is 0-1)]
+    
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
-    patchContrast = 1; % for cb target (range is 0-1)
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
 end
 soundAmp = 1; % 0.10 for MEG
@@ -121,7 +123,6 @@ end
 % set up target if desired
 if isfield(stimulus, 'target')
     target = stimulus.target;
-    dotSizePx = dotSize*target.pixelsPerDegree;
     
     switch target.type
         case 'lines'
@@ -130,6 +131,7 @@ if isfield(stimulus, 'target')
         case 'dot'
             fprintf('\n[showScanStimulus] dot size = %1.1f degrees\n\n', dotSize)
             target.dotSize = dotSize; % store settings
+            dotSizePx = dotSize*target.pixelsPerDegree;
         case 'grating'
             fprintf('\n[showScanStimulus] grating tilt = [%1.1f %1.1f], shift = [%1.2f %1.2f]\n\n', tilts(1), tilts(2), shifts(1)/pi, shifts(2)/pi)
             target.tilts = tilts; % store settings
