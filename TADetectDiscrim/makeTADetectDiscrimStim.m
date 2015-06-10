@@ -6,7 +6,7 @@ saveStim = 1;
 saveFigs = 0;
 
 %% add paths
-addpath(genpath('../../vistadisp'))
+addpath(genpath('../../../vistadisp'))
 addpath('../TAPilot')
 
 %% file i/o
@@ -14,7 +14,7 @@ stimDir = 'stimuli';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;

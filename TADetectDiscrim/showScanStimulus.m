@@ -40,12 +40,12 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % set target difficulty
-tilts = [-3 3]; % relative to the base orientation
+tilts = [-5 5]; % relative to the base orientation
 dotSize = 0.3; % in degrees
 shifts = [0 0]; % phase shifts
-patchContrast = .5; % for cb target
+patchContrast = 1; % for cb target (range is 0-1)
 % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
-soundAmp = 0.10;
+soundAmp = 1; % 0.10 for MEG
 
 % input checks
 if nargin < 2,

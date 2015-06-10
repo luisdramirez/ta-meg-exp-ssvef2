@@ -19,9 +19,9 @@ function rd_MEG_TAPilot(run, stimfile)
 % addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
 
 %% Settings
-displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
+displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
-useKbQueue = 1;
+useKbQueue = 0;
 use_eyetracker = true;
 eyeFile = sprintf('TA%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
