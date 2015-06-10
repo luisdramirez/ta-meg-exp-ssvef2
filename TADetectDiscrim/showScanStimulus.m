@@ -39,12 +39,22 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
+% staircase? (adjustment between runs)
+staircase = 1;
+
 % set target difficulty
-tilts = [-5 5]; % relative to the base orientation
-dotSize = 0.3; % in degrees
-shifts = [0 0]; % phase shifts
-patchContrast = 1; % for cb target (range is 0-1)
-% patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
+if staircase && exist('staircase.mat','file')
+    s = load('staircase.mat');
+    tilts = [-s.tilt s.tilt];
+    patchContrast = s.contrast;
+    fprintf('\nStaircase update: contrast = %.2f, tilt = %1.1f\n\n', patchContrast, tilts(2))
+else
+    tilts = [-6 6]; % relative to the base orientation
+    dotSize = 0.3; % in degrees
+    shifts = [0 0]; % phase shifts
+    patchContrast = 1; % for cb target (range is 0-1)
+    % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
+end
 soundAmp = 1; % 0.10 for MEG
 
 % input checks
@@ -366,6 +376,7 @@ for frame = 1:nFrames
 end;
 
 % store target data inside response, so it gets passed out
+target.soundAmp = soundAmp;
 response.target = target;
 
 % clean up KbQueue

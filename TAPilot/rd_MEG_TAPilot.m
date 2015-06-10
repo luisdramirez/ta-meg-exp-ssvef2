@@ -151,6 +151,24 @@ end
 newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, run);
 movefile(fileName, newFileName)
 
+%% Extra analyses if requested
+if strcmp(stimfile, 'taDetectDiscrim')
+    %% Analyze data from this run
+    dataDir = '~/Desktop';
+    stimDir = 'stimuli';
+    plotLevel = 3; % 3 = fewest plots
+    acc = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
+    
+    %% Adjust difficulty via run-by-run staircase
+    % only use valid trials, since there's more data
+    % shoot for 80% valid, mean across T1 and T2
+    validIdx = [1 3];
+    validDetect = mean(acc.Detect_means(validIdx));
+    validDiscrim = mean(acc.Discrim1_means(validIdx));
+    staircaseAdjustment(response.target.contrast, response.target.tilts(2), ...
+        validDetect, validDiscrim);
+end
+
 %% Stop Eyetracker when done with experiment
 if use_eyetracker
     PTBStopEyeTrackerRecording(eyeDir); % <----------- (can take a while)

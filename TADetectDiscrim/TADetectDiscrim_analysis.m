@@ -37,8 +37,8 @@ end
 
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
-rootDir = pathToMEGExpt;
-% rootDir = pwd;
+% rootDir = pathToMEGExpt;
+rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
