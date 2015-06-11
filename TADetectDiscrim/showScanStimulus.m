@@ -364,7 +364,7 @@ for frame = 1:nFrames
     % cue
     if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0
         PTBSendTrigger(stimulus.trigSeq(frame), 0);
-        fprintf('Trigger sent, %s\n, %s', datestr(now), stimulus.trigSeq(frame)); drawnow
+        fprintf('Trigger sent, %s\n%d', datestr(now), stimulus.trigSeq(frame)); drawnow
         response.trig(frame) = stimulus.trigSeq(frame);
     end
     
