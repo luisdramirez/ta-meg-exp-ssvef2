@@ -1,12 +1,12 @@
-function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel,saveFile,saveFigs)
+function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, dates, plotLevel,saveFile,saveFigs)
 
 % subject is the subject ID, e.g. 'sl'
 % runs is the run numbers to analyze, e.g. 1:10
 % date (optional) is a string with the date of the experiment, e.g. '20141219'
 %   if date is not given, will look for runs from all dates.
 
-if nargin < 3 || isempty(date)
-    date = [];
+if nargin < 3 || isempty(dates)
+    dates = {[]};
 end
 
 if nargin < 4 || isempty(plotLevel)
@@ -19,6 +19,12 @@ end
 
 if nargin < 6 || isempty(saveFigs)
     saveFigs = 0;
+end
+
+if ischar(dates)
+    dateStr = dates;
+    clear dates
+    dates{1} = dateStr;
 end
 
 %% exp setup (now read from stim file, below)
@@ -38,26 +44,38 @@ end
 %% combine responseData for all runs 
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
-rootDir = pwd;
+rootDir = pathToExpt;
+% rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
 figDir = sprintf('%s/figures/%s',rootDir,subject);
 
+if numel(dates)==1
+    dateStr = dates{1};
+else
+    dateStr = sprintf('%s-%s', dates{1}, dates{end});
+end
 % df = dir([dataDir,'*.mat']);
 if numel(runs)>1
-analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s',subject,date,num2str(runs(1)),'_',num2str(runs(end)));
+    analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s',subject,dateStr,num2str(runs(1)),'_',num2str(runs(end)));
 else
-analysisFile = sprintf('%s_%s_taDetectDiscrim_%s',subject,date,num2str(runs));
+    analysisFile = sprintf('%s_%s_taDetectDiscrim_%s',subject,dateStr,num2str(runs));
 end
 
-for iRun = 1:numel(runs)
-    run = runs(iRun);
-    d = dir(sprintf('%s/%s*taDetectDiscrim%d.mat', dataDir, date, run));
-    if numel(d)~=1
-        error('More or fewer than one matching data file: %s/*%d.mat', dataDir, run)
-    else
-        df(iRun) = d;
+counter = 1;
+for iDate = 1:numel(dates)
+    date = dates{iDate};
+    for iRun = 1:numel(runs)
+        run = runs(iRun);
+        d = dir(sprintf('%s/%s*taDetectDiscrim%d.mat', dataDir, date, run));
+        if numel(d)~=1
+            error('More or fewer than one matching data file: %s/*%d.mat', dataDir, run)
+        else
+%             df(iRun) = d;
+            df(counter) = d;
+            counter = counter + 1;
+        end
     end
 end
 
