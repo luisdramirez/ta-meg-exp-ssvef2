@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % staircase? (adjustment between runs)
-staircase = 0; % set to 0 for first run of the day
+staircase = 1; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -50,8 +50,8 @@ if staircase && exist('staircase.mat','file')
     fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = %.2f\ntilt = %1.1f\n\n\n\n', patchContrast, tilts(2))
 else
     % MANUAL SETTINGS
-    tilts = [-6 6]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = 1; % starting settings: 1 [for cb target (range is 0-1)]
+    tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
+    patchContrast = .77; % starting settings: 1 [for cb target (range is 0-1)]
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
