@@ -51,6 +51,13 @@ stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
 figDir = sprintf('%s/figures/%s',rootDir,subject);
 
+if ~exist(analysisDir,'dir')
+    mkdir(analysisDir);
+end
+if ~exist(figDir,'dir')
+    mkdir(figDir)
+end
+
 if numel(dates)==1
     dateStr = dates{1};
 else
@@ -58,7 +65,7 @@ else
 end
 % df = dir([dataDir,'*.mat']);
 if numel(runs)>1
-    analysisFile = sprintf('%s%s_taDetectDiscrim_%s%s%s',subject,dateStr,num2str(runs(1)),'_',num2str(runs(end)));
+    analysisFile = sprintf('%s_%s_taDetectDiscrim_%s%s%s',subject,dateStr,num2str(runs(1)),'-',num2str(runs(end)));
 else
     analysisFile = sprintf('%s_%s_taDetectDiscrim_%s',subject,dateStr,num2str(runs));
 end
