@@ -2,9 +2,15 @@ function exptspath = pathToCarrascoExpts
 
 if exist('/Volumes/purplab','dir')
     purpdir = 'purplab';
-elseif exist('/Volumes/purplab-1','dir')
+end
+if exist('/Volumes/purplab-1','dir')
     purpdir = 'purplab-1';
-else
+end
+if exist('/Volumes/purplab-2','dir')
+    purpdir = 'purplab-2';
+end
+
+if ~exist('purpdir','var')
     error('cannot find purplab')
 end
 
