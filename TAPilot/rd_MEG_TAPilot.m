@@ -1,6 +1,8 @@
 function rd_MEG_TAPilot(run, stimfile)
 % rd_MEG_TAPilot(run, stimfile)
-%
+% rd_MEG_TAPilot(2, 'taDetectDiscrim')
+
+
 % MEG SSVEP left/right flicker rate x attention expt
 % with exo targets
 % ------
@@ -16,19 +18,19 @@ function rd_MEG_TAPilot(run, stimfile)
 % RD, July 2014
 
 %% Add paths
-% addpath(genpath('/Users/megadmin/Desktop/Experiments/Rachel/vistadisp'));
+addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp'));
 
 %% Settings
 displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 0;
-use_eyetracker = true;
+use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 
 %% Configurations
 % initialize stim tracker for MEG
-PTBInitStimTracker;
+%PTBInitStimTracker;
 global PTBTriggerLength 
 PTBTriggerLength = 0.001;
 
@@ -41,7 +43,7 @@ Screen('Preference', 'SkipSyncTests', skipSyncTests);
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
-    error('Frame rate not set correctly')
+%     error('Frame rate not set correctly')
 end
 
 % You have to open a screen first (to get a window pointer), to start
@@ -155,7 +157,7 @@ movefile(fileName, newFileName)
 if strcmp(stimfile, 'taDetectDiscrim')
     %% Analyze data from this run
     dataDir = '~/Desktop';
-    stimDir = 'stimuli';
+    stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
     plotLevel = 3; % 3 = fewest plots
     acc = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
     

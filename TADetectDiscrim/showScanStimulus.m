@@ -174,6 +174,8 @@ if isfield(stimulus, 'target')
             target.destRect(1:2) = target.center - targetSizePx/2;
             target.destRect(3:4) = target.destRect(1:2) + targetSizePx;
             target.baseOrients = []; % initialize
+        case 'contrast'
+%             
         otherwise
             error('target.type not recognized')
     end

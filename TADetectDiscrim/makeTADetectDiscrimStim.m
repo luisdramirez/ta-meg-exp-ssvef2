@@ -1,16 +1,19 @@
-function makeTADetectDiscrimStim(run)
+% function makeTADetectDiscrimStim(run)
 
 %% run setup
-% run = 3;
+run = 3;
 saveStim = 1;
 saveFigs = 0;
 
 %% add paths
-addpath(genpath('../../vistadisp'))
-addpath('../TAPilot')
+% addpath(genpath('../../vistadisp'))
+% addpath('../TAPilot')
+addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp')) 
+addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp/TAPilot')
 
 %% file i/o
-stimDir = 'stimuli';
+% stimDir = 'stimuli';
+stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
@@ -55,7 +58,7 @@ else
 end
 
 %% target setup
-target.type = 'cb'; % 'dot','lines','grating','cb'
+target.type = 'contrast'; % 'dot','lines','grating','cb','contrast'
 
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left, slow-left
@@ -135,7 +138,7 @@ for iPhase = 1:numel(phases)
         
         stim{iPhase, iContrast} = maskWithAnnulus(s{iPhase,iContrast}, ...
             length(s{iPhase,iContrast}), ...
-            0, blurRadius, backgroundColor);
+            0, blurRadius, backgroundColor); %stimulus image generated here
     end
 end
 
@@ -150,11 +153,15 @@ for iP1 = 1:numel(phases)
         for iP2 = 1:numel(phases)
             for iC2 = 1:numel(contrasts)
                 
-                stimMatrix{iP1,iC1,iP2,iC2} = ...
-                    [stim{iP1,iC1} spacer stim{iP2,iC2}];
+%                 stimMatrix{iP1,iC1,iP2,iC2} = ...
+%                     [stim{iP1,iC1} spacer stim{iP2,iC2}];
+                stimMatrix{iP2,iC2} = ... %iP1,iC1,
+                    [stim{iP2,iC2}]; %stim{iP1,iC1} 
                 
-                stimIDs(iP1,iC1,iP2,iC2) = ...
-                    iP1*1000 + iC1*100 + iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right]
+%                 stimIDs(iP1,iC1,iP2,iC2) = ...
+%                     iP1*1000 + iC1*100 + iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right]
+                stimIDs(iP2,iC2) = ... %iP1,iC1,
+                    iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right] iP1*1000 + iC1*100 +
             end
         end
     end
@@ -165,7 +172,7 @@ for iIm = 1:numel(stimMatrix)
     images(:,:,iIm) = stimMatrix{iIm};
     imageIDs(iIm,1) = stimIDs(iIm);
 end
-imageIDHeaders = {'left-phase', 'left-contrast', 'right-phase', 'right-contrast'};
+imageIDHeaders = {'right-phase', 'right-contrast'}; %'left-phase', 'left-contrast', 
 
 % add blank stimulus
 images(:,:,end+1) = ones(size(images(:,:,1)))*backgroundColor;
@@ -212,9 +219,11 @@ switch target.type
     case 'cb'
         target.pixelsPerDegree = pixelsPerDegree;
         target.imSize = stimSize; % whole grating square
+        target.stimSize = stimSize/4;
         target.size = 1.5; % 0.5 % sigma of gaussian aperture
         target.spatialFreq = 4;
         target.center = targetCenter;
+    case 'contrast'      
     otherwise
         error('target.type not recognized')
 end
@@ -222,7 +231,7 @@ end
 %% Determine the stimulus times
 if jitter
     iti = 0:0.2:1; % recall there is always 0.5 s before cue
-    itiSeq = shuffle(repmat(iti,1,ceil(nBlocks/numel(iti))));
+    itiSeq = Shuffle(repmat(iti,1,ceil(nBlocks/numel(iti))));
     itiSeq = itiSeq(1:nBlocks);
     runDur = blockDur*nBlocks + sum(itiSeq);
     blockStartTimes = (0:blockDur:blockDur*nBlocks-blockDur) + cumsum([0 itiSeq(1:end-1)]);
@@ -411,7 +420,7 @@ for iFrame = 1:numel(seqtiming)
             error('blockName not recognized')
     end
     phaseSeqIdx = phaseSeqIdx + 1;
-    imageID = 1000*p1 + 100*c1 + 10*p2 + c2;
+    imageID = 10*p2 + c2; %(1000*p1 + 100*c1 + ) removed from front
     
     seq(iFrame,1) = find(imageIDs==imageID);
     
@@ -622,7 +631,7 @@ set(f(2),'Position',[0 0 1200 900]);
 % set remaining stimulus variables
 cmap = repmat((0:255)',1,3);
 srcRect = [0 0 size(images,2) size(images,1)];
-destRect = CenterRectOnPoint(srcRect, cx, cy+stimPos(2)*pixelsPerDegree);
+destRect = CenterRectOnPoint(srcRect, cx, cy); %(cy+stimPos(2)*pixelsPerDegree)
 diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
 target.seq = targetTypeSeq;
 
