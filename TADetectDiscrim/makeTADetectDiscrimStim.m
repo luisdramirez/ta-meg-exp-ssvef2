@@ -1,7 +1,7 @@
-% function makeTADetectDiscrimStim(run)
+%function makeTADetectDiscrimStim(run)
 
 %% run setup
-run = 3;
+run = 6;
 saveStim = 1;
 saveFigs = 0;
 
@@ -29,6 +29,8 @@ screenWidth = d.numPixels(1); % (px)
 screenHeight = d.numPixels(2); % (px)
 cx = round(screenWidth/2);
 cy = round(screenHeight/2);
+x_win = 600; %x window size
+y_win = x_win-200; %y window size
 
 %% keys setup
 keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
@@ -36,7 +38,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 3;
+nFramesPerTarget = 20;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
@@ -66,6 +68,7 @@ attBlockNames = {'no-att','att-right'}; % att-right
 % targetBlockNames = {'no-targ','pres-pres'};
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+%posBlockNames = {'n','ne','e','se','s','sw','w','nw'};
 [blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames);
 nBlocks = numel(blockOrder);
 
@@ -74,8 +77,8 @@ stimType = 'checkerboard'; %'grating','checkerboard'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
-stimContrast = 0.64; % 0.64
-targetContrast = 0.64; % 0.64
+stimContrast = 0.5; % 0.64
+targetContrast = 0.5; % 0.64
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
@@ -131,7 +134,7 @@ for iPhase = 1:numel(phases)
                 elseif iPhase==2
                     c = c1~=c2;
                 end
-                s{iPhase, iContrast} = c;
+                s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
             otherwise
                 error('stimType not recognized')
         end
@@ -219,11 +222,30 @@ switch target.type
     case 'cb'
         target.pixelsPerDegree = pixelsPerDegree;
         target.imSize = stimSize; % whole grating square
-        target.stimSize = stimSize/4;
+        target.stimSize = stimSize;
         target.size = 1.5; % 0.5 % sigma of gaussian aperture
         target.spatialFreq = 4;
         target.center = targetCenter;
-    case 'contrast'      
+    case 'contrast'
+        % SPECIFY TARGET PARAMETERS HERE
+        target.phases = phases;
+        target.pixelsPerDegree = pixelsPerDegree;
+        target.stimSize = stimSize;
+        target.spatialFreq = spatialFreq;
+        target.orientation = orientation;
+        target.blurRadius = blurRadius;
+        target.backgroundColor = backgroundColor;
+        target.stim = stim;
+        target.contrast = [0.9 0.1];
+        target.nFramesPerTarget = nFramesPerTarget;
+        target.positions = [1:8]';
+        % CREATE TARGET POSITIONS 
+        nTargetAppears = length(targetBlockOrder(targetBlockOrder == 2)) + ...
+            length(targetBlockOrder(targetBlockOrder == 3)) +...
+            length(targetBlockOrder(targetBlockOrder == 4));
+        positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions));
+        posShuffled = Shuffle(positions_mat);
+        target.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
     otherwise
         error('target.type not recognized')
 end
@@ -314,6 +336,7 @@ targetOn = 0;
 targetAbsIdx = 1; % target absent
 targetAbsOn = 0;
 cueIdx = 1;
+
 for iFrame = 1:numel(seqtiming)
     time = seqtiming(iFrame);
     % start a new block when it's time
@@ -615,17 +638,17 @@ for iFrame = 1:numel(seqtiming)
 end
 
 % show targetOnSeq and trigSeq
-f(1) = figure;
-subplot(3,1,1)
-plot(seqtiming,targetOnSeq)
-subplot(3,1,2)
-plot(seqtiming,trigSeq)
-subplot(3,1,3)
-plot(seqtiming,keyCodeSeq)
+% f(1) = figure;
+% subplot(3,1,1)
+% plot(seqtiming,targetOnSeq)
+% subplot(3,1,2)
+% plot(seqtiming,trigSeq)
+% subplot(3,1,3)
+% plot(seqtiming,keyCodeSeq)
 
 % display triggers by channel
-f(2) = displayTrigger(trigSeq, nBlocks);
-set(f(2),'Position',[0 0 1200 900]);
+% f(2) = displayTrigger(trigSeq, nBlocks);
+% set(f(2),'Position',[0 0 1200 900]);
 
 %% Create stimulus strucutre
 % set remaining stimulus variables
@@ -659,6 +682,75 @@ order.targetBlockOrder = targetBlockOrder;
 order.cueBlockOrder = cueBlockOrder; 
 order.targetTypes = targetTypes;
 order.trialsPresented = trialsPresented;
+
+% create target positions
+posSeq = nan(size(seq)); %what positions to display for frame
+
+% assign positions for every frame
+    % if a target is not present, insert '0' into posSeq
+    % if a target is present, insert an approriate position
+        % what is the condition?
+    % How to keep track of row/column thats already been used 
+    % Keeping track of condition from targetBlockOrder
+    % Every condition has to have the same amount of possible locations
+    % (8), per target stimulus present
+blockPP_ind = 1; %targetBlockOrder == 2 (pres-pres)
+blockPA_ind = 1; %targetBlockOrder == 3 (pres-abs)
+blockAP_ind = 1; %targetBlockOrder == 4 (abs-pres)
+
+targetBlockInd = 1; %once a condition is hit, this index goes up
+framesComplete = 0; %if this hits nFramesPerTarget, add 1 to targetBlockInd
+
+% order.trialsPresented.targets
+% just use how correct response/conditions is assigned? how many frames per
+% block?
+
+for frame = 1:length(posSeq)
+    if target.seq(frame) == 0 && targetBlockOrder(targetBlockInd) == 1 % NO TARG:
+        posSeq(frame) = 0;
+    elseif target.seq(frame) == 0 && targetBlockOrder(targetBlockInd) == 5 % ABS-ABS:
+        posSeq(frame) = 0;
+    elseif target.seq(frame) == 1 % IF TARGET INCREMENT:
+        if targetBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+            posSeq(frame) = posShuffled(blockPP_ind,1);
+            blockPP_ind = blockPP_ind +1;
+            framesComplete = framesComplete + 1;
+        elseif targetBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+            posSeq(frame) = posShuffled(blockPA_ind,2);
+            blockPA_ind = blockPA_ind + 1;
+            framesComplete = framesComplete + 1;
+        elseif targetBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+            posSeq(frame) = posShuffled(blockAP_ind,3);
+            blockAP_ind = blockAP_ind + 1;
+            framesComplete = framesComplete + 1;
+        end
+        if framesComplete == 20
+            targetBlockInd = targetBlockInd + 1;
+            framesComplete = 0;
+        end  
+    elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
+        if targetBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+            posSeq(frame) = posShuffled(blockPP_ind,1);
+            blockPP_ind = blockPP_ind + 1;
+            framesComplete = framesComplete + 1;
+        elseif targetBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+            posSeq(frame) = posShuffled(blockPA_ind,2);
+            blockPA_ind = blockPA_ind + 1;
+            framesComplete = framesComplete + 1;
+        elseif targetBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+            posSeq(frame) = posShuffled(blockAP_ind,3);
+            blockAP_ind = blockAP_ind + 1;
+            framesComplete = framesComplete + 1;
+        end
+        if framesComplete == 20
+            targetBlockInd = targetBlockInd + 1;
+            framesComplete = 0;
+        end
+    end
+end
+
+% store in target structure
+target.posSeq = posSeq;
 
 % save stimulus
 if saveStim

@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % staircase? (adjustment between runs)
-staircase = 1; % set to 0 for first run of the day
+staircase = 0; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -51,7 +51,7 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = .77; % starting settings: 1 [for cb target (range is 0-1)]
+    patchContrast = [.9 .1]; % starting settings: 1 [for cb target (range is 0-1)]
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -175,7 +175,11 @@ if isfield(stimulus, 'target')
             target.destRect(3:4) = target.destRect(1:2) + targetSizePx;
             target.baseOrients = []; % initialize
         case 'contrast'
-%             
+            % CREATE TARGET IMAGES HERE based on parameters specified in
+            % 'makeTADetectDiscrimStim'
+            fprintf('\n[showScanStimulus] contrast: contrast = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
+            target.contrast = patchContrast; %this is variable, not fixed?
+            [backgroundIms, maskedIms, target] = contrastCBP(target);
         otherwise
             error('target.type not recognized')
     end
@@ -235,6 +239,19 @@ for frame = 1:nFrames
                         rot  = baseOrient + tilts(target.seq(frame));
                         Screen('DrawTexture', display.windowPtr, target.textures(1), ...
                             [], target.destRect, rot);
+                    case 'contrast'
+                        % DRAW TARGET HERE                
+                        if stimulus.seq(frame) == 3 
+                            bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255);
+                            tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),1,target.seq(frame)}*255);
+                            Screen('DrawTexture', display.windowPtr, bgtex);
+                            Screen('DrawTexture', display.windowPtr, tex);
+                        elseif stimulus.seq(frame) == 4 
+                            bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{2}*255);
+                            tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),2,target.seq(frame)}*255);            
+                            Screen('DrawTexture', display.windowPtr, bgtex);
+                            Screen('DrawTexture', display.windowPtr, tex);
+                        end
                     otherwise
                         error('target.type not recognized');
                 end
@@ -261,7 +278,8 @@ for frame = 1:nFrames
             end
         end
         
-        drawFixation_rd(display,stimulus.fixSeq(frame));
+        %drawFixation_rd(display,stimulus.fixSeq(frame)); % FIXATION DRAWN HERE
+        contrastFixation
         
         % If we are doing eCOG, then flash photodiode if requested
         if isfield(stimulus, 'diodeSeq')
@@ -361,7 +379,13 @@ for frame = 1:nFrames
     
     %--- update screen
     VBLTimestamp = Screen('Flip',display.windowPtr);
-    
+%     if stimulus.seq(frame) == 3 && stimulus.target.seq(frame) == 1
+%         pause(3)
+%     end
+%     if stimulus.seq(frame) == 4 && stimulus.target.seq(frame) == 1
+%         pause(3)
+%     end
+
     % send trigger for MEG, if requested, and record the color of the PD
     % cue
     if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0

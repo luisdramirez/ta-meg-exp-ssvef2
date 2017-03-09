@@ -1,6 +1,7 @@
 function rd_MEG_TAPilot(run, stimfile)
+commandwindow
 % rd_MEG_TAPilot(run, stimfile)
-% rd_MEG_TAPilot(2, 'taDetectDiscrim')
+% rd_MEG_TAPilot(3, 'taDetectDiscrim')
 
 
 % MEG SSVEP left/right flicker rate x attention expt
@@ -36,11 +37,12 @@ PTBTriggerLength = 0.001;
 
 % debug mode?
 % PsychDebugWindowConfiguration
-skipSyncTests = 0;
+skipSyncTests = 1;
 Screen('Preference', 'SkipSyncTests', skipSyncTests);
 
 %% Initialize Eyetracker and do Calibration
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
+% d.rect = [0 0 800 600];
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
 %     error('Frame rate not set correctly')
@@ -49,6 +51,7 @@ end
 % You have to open a screen first (to get a window pointer), to start
 % the PTBInitEyeTracker;
 d = openScreen(d);
+
 global PTBTheWindowPtr
 PTBTheWindowPtr = d.windowPtr;
 
