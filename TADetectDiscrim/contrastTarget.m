@@ -1,4 +1,4 @@
-function [backgroundIms, maskedIms, target] = contrastCBP(target)
+function [backgroundIms, maskedIms, target] = contrastTarget(display, target)
 % function [backgroundIms, maskedIms] = contrastCBP(target)
 %%% Creating Contrast Checkerboard Target Stimulus
 

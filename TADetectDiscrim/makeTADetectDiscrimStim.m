@@ -1,7 +1,7 @@
-%function makeTADetectDiscrimStim(run)
+% function makeTADetectDiscrimStim(run)
 
 %% run setup
-run = 6;
+run = 6; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
 
@@ -73,7 +73,7 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'checkerboard'; %'grating','checkerboard'
+stimType = 'checkerboard'; %'grating','checkerboard','bullseye'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
@@ -135,6 +135,8 @@ for iPhase = 1:numel(phases)
                     c = c1~=c2;
                 end
                 s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
+            case 'bullseye'
+                s{iPhase, iContrast} = CreateSpiral(pixelsPerDegree, [stimSize stimSize], spatialFre, phase, contrast);      
             otherwise
                 error('stimType not recognized')
         end
@@ -229,6 +231,8 @@ switch target.type
     case 'contrast'
         % SPECIFY TARGET PARAMETERS HERE
         target.phases = phases;
+        target.cx = cx;
+        target.cy = cy;
         target.pixelsPerDegree = pixelsPerDegree;
         target.stimSize = stimSize;
         target.spatialFreq = spatialFreq;
@@ -243,7 +247,8 @@ switch target.type
         nTargetAppears = length(targetBlockOrder(targetBlockOrder == 2)) + ...
             length(targetBlockOrder(targetBlockOrder == 3)) +...
             length(targetBlockOrder(targetBlockOrder == 4));
-        positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions));
+        positions_mat(:,:,1) = repmat(target.positions, 1, nTargetAppears/length(target.positions)); %target increment positions
+        positions_mat(:,:,2) = repmat(target.positions, 1, nTargetAppears/length(target.positions)); %target decrement positions
         posShuffled = Shuffle(positions_mat);
         target.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
     otherwise
@@ -684,73 +689,52 @@ order.targetTypes = targetTypes;
 order.trialsPresented = trialsPresented;
 
 % create target positions
-posSeq = nan(size(seq)); %what positions to display for frame
+posSeq = zeros(size(seq)); 
 
-% assign positions for every frame
-    % if a target is not present, insert '0' into posSeq
-    % if a target is present, insert an approriate position
-        % what is the condition?
-    % How to keep track of row/column thats already been used 
-    % Keeping track of condition from targetBlockOrder
-    % Every condition has to have the same amount of possible locations
-    % (8), per target stimulus present
-blockPP_ind = 1; %targetBlockOrder == 2 (pres-pres)
-blockPA_ind = 1; %targetBlockOrder == 3 (pres-abs)
-blockAP_ind = 1; %targetBlockOrder == 4 (abs-pres)
+targetPresentBlockOrder = targetBlockOrder(targetBlockOrder ~= 1 & targetBlockOrder ~= 5);
 
-targetBlockInd = 1; %once a condition is hit, this index goes up
-framesComplete = 0; %if this hits nFramesPerTarget, add 1 to targetBlockInd
+%targetBlockOrder == 2 (pres-pres)
+%targetBlockOrder == 3 (pres-abs)
+%targetBlockOrder == 4 (abs-pres)
 
-% order.trialsPresented.targets
-% just use how correct response/conditions is assigned? how many frames per
-% block?
+block_ind = [1 1 1]; % [blockPP_ind blockPA_ind blockAP_ind];
+targetBlockInd = 1;
+framesComplete = 0;
 
 for frame = 1:length(posSeq)
-    if target.seq(frame) == 0 && targetBlockOrder(targetBlockInd) == 1 % NO TARG:
-        posSeq(frame) = 0;
-    elseif target.seq(frame) == 0 && targetBlockOrder(targetBlockInd) == 5 % ABS-ABS:
-        posSeq(frame) = 0;
-    elseif target.seq(frame) == 1 % IF TARGET INCREMENT:
-        if targetBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-            posSeq(frame) = posShuffled(blockPP_ind,1);
-            blockPP_ind = blockPP_ind +1;
+    if target.seq(frame) == 1 && framesComplete < 20 % IF TARGET INCREMENT:
+        if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+            posSeq(frame) = posShuffled(block_ind(1),1);
             framesComplete = framesComplete + 1;
-        elseif targetBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-            posSeq(frame) = posShuffled(blockPA_ind,2);
-            blockPA_ind = blockPA_ind + 1;
+        elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+            posSeq(frame) = posShuffled(block_ind(2),2);
             framesComplete = framesComplete + 1;
-        elseif targetBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-            posSeq(frame) = posShuffled(blockAP_ind,3);
-            blockAP_ind = blockAP_ind + 1;
+        elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+            posSeq(frame) = posShuffled(block_ind(3),3);
             framesComplete = framesComplete + 1;
         end
-        if framesComplete == 20
-            targetBlockInd = targetBlockInd + 1;
-            framesComplete = 0;
-        end  
-    elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
-        if targetBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-            posSeq(frame) = posShuffled(blockPP_ind,1);
-            blockPP_ind = blockPP_ind + 1;
+    elseif target.seq(frame) == 2 && framesComplete < 20 % IF TARGET DECREMENT:
+        if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+            posSeq(frame) = posShuffled(block_ind(1),1);
             framesComplete = framesComplete + 1;
-        elseif targetBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-            posSeq(frame) = posShuffled(blockPA_ind,2);
-            blockPA_ind = blockPA_ind + 1;
+        elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+            posSeq(frame) = posShuffled(block_ind(2),2);
             framesComplete = framesComplete + 1;
-        elseif targetBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-            posSeq(frame) = posShuffled(blockAP_ind,3);
-            blockAP_ind = blockAP_ind + 1;
+        elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+            posSeq(frame) = posShuffled(block_ind(3),3);
             framesComplete = framesComplete + 1;
         end
-        if framesComplete == 20
-            targetBlockInd = targetBlockInd + 1;
-            framesComplete = 0;
-        end
+
+    end
+    if framesComplete == 20 && targetBlockInd < length(targetPresentBlockOrder)
+        block_ind(targetPresentBlockOrder(targetBlockInd)-1) = block_ind(targetPresentBlockOrder(targetBlockInd)-1) + 1; 
+        targetBlockInd = targetBlockInd + 1;
+        framesComplete = 0;
     end
 end
 
 % store in target structure
-target.posSeq = posSeq;
+stimulus.target.posSeq = posSeq;
 
 % save stimulus
 if saveStim

@@ -179,7 +179,7 @@ if isfield(stimulus, 'target')
             % 'makeTADetectDiscrimStim'
             fprintf('\n[showScanStimulus] contrast: contrast = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
             target.contrast = patchContrast; %this is variable, not fixed?
-            [backgroundIms, maskedIms, target] = contrastCBP(target);
+            [backgroundIms, maskedIms, target] = contrastTarget(display, target);
         otherwise
             error('target.type not recognized')
     end
