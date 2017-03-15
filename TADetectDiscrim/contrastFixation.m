@@ -1,4 +1,4 @@
-%function fixation = contrastFixation(display, frame)
+function fixation = contrastFixation(display, frame)
 % Generates new dot fixation; called in 'showScanStimulus'
 
 %7 = green; 6 = red;
@@ -7,7 +7,7 @@
 % make frame rect
 rectDiam = 7;
 baseRect = [0 0 rectDiam rectDiam];
-centeredRect = CenterRectOnPointd(baseRect, target.cx, target.cy);
+centeredRect = CenterRectOnPointd(baseRect, display.fixX, display.fixY);
 
 
 fixationColor = [0 0 0]*255;
@@ -15,7 +15,7 @@ fixationMaxDiameter = max(baseRect) * 1.01;
 
 % make fixation rect
 frameRect = [0 0 rectDiam*2 rectDiam*2];
-centeredRect2 = CenterRectOnPointd(frameRect, target.cx, target.cy);
+centeredRect2 = CenterRectOnPointd(frameRect, display.fixX, display.fixY);
 
 %change outer ring color
 if frame == 5;
@@ -46,5 +46,5 @@ frameMaxDiameter = max(frameRect) *1.01;
 Screen('FrameOval', display.windowPtr, frameColor, centeredRect2, frameMaxDiameter)
 Screen('FillOval', display.windowPtr, fixationColor, centeredRect, fixationMaxDiameter)
 Screen('FrameOval', display.windowPtr, fixationColor, centeredRect2)
-%return
+return
 % Screen('Flip', w);

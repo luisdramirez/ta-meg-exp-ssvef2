@@ -279,7 +279,7 @@ for frame = 1:nFrames
         end
         
         %drawFixation_rd(display,stimulus.fixSeq(frame)); % FIXATION DRAWN HERE
-        contrastFixation
+        contrastFixation(display, stimulus.fixSeq(frame))
         
         % If we are doing eCOG, then flash photodiode if requested
         if isfield(stimulus, 'diodeSeq')

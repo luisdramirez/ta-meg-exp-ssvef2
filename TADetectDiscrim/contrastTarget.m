@@ -1,9 +1,9 @@
 function [backgroundIms, maskedIms, target] = contrastTarget(display, target)
-% function [backgroundIms, maskedIms] = contrastCBP(target)
+
 %%% Creating Contrast Checkerboard Target Stimulus
 
 %% Make the stimuli
-phases = target.phases;
+phases = target.phases; %bullseye: [0 pi/2];
 pixelsPerDegree = target.pixelsPerDegree;
 stimSize = target.stimSize;
 spatialFreq = target.spatialFreq;
@@ -16,23 +16,30 @@ for iPhase = 1:numel(phases)
     for iContrast = 1:numel(target.contrast)
         phase = phases(iPhase);
         contrast = target.contrast(iContrast);
-
-        c1 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
-            spatialFreq, orientation, phase, contrast, ...
-            1, 'bw', 1, 1);
-        c2 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
-            spatialFreq, orientation+90, phase, contrast, ...
-            1, 'bw', 1, 1);
-        if iPhase==1
-            c = c1==c2;
-        elseif iPhase==2
-            c = c1~=c2;
+        switch target.stimType
+            case 'checkerboard'
+                c1 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
+                    spatialFreq, orientation, phase, contrast, ...
+                    1, 'bw', 1, 1);
+                c2 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
+                    spatialFreq, orientation+90, phase, contrast, ...
+                    1, 'bw', 1, 1);
+                if iPhase==1
+                    c = c1==c2;
+                elseif iPhase==2
+                    c = c1~=c2;
+                end
+                targ_s{iPhase, iContrast} = contrast*(double(c)-.5) + .5; %CONTRAST CHANGE HERE
+            case 'bullseye'
+                targ_s{iPhase, iContrast} = CreateSpiral(display, stimSize, spatialFreq, phase, contrast); 
+            otherwise
+                error('stimType not recognized')
         end
-        targ_s{iPhase, iContrast} = contrast*(double(c)-.5) + .5; %CONTRAST CHANGE HERE
         
         targ_stim{iPhase, iContrast} = maskWithAnnulus(targ_s{iPhase,iContrast}, ...
             length(targ_s{iPhase,iContrast}), ...
             0, blurRadius, backgroundColor); %STIMULUS IMAGE GENERATED HERE
+        
     end
 end
 
