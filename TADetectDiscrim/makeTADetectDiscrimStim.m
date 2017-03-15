@@ -2,6 +2,7 @@
 
 %% run setup
 % hi
+% hello
 run = 6; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
