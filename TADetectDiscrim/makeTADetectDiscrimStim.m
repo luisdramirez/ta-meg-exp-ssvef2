@@ -1,8 +1,7 @@
 %function makeTADetectDiscrimStim(run)
-
+location = 'L1' ; %'laptop' 'L1'
 %% run setup
-% hi
-% hello
+
 run = 6; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
@@ -10,14 +9,25 @@ saveFigs = 0;
 %% add paths
 % addpath(genpath('../../vistadisp'))
 % addpath('../TAPilot')
-addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp')) %/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp'
-addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp/TAPilot') %/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp/TAPilot'
+switch location
+    case 'laptop'
+        addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp')) 
+        addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp/TAPilot') %
+    case 'L1'
+        addpath(genpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp')) %
+        addpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp/TAPilot') %
+end
 
 %% file i/o
 % stimDir = 'stimuli';
-stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'
-stimFile = sprintf('taDetectDiscrim%d', run);
-
+switch location
+    case 'laptop'
+        stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
+        stimFile = sprintf('taDetectDiscrim%d', run);
+    case 'L1'
+        stimDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
+        stimFile = sprintf('taDetectDiscrim%d', run);
+end
 %% screen setup
 displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
