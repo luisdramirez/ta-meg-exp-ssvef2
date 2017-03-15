@@ -1,8 +1,8 @@
 function makeTADetectDiscrimStim(run)
-location = 'L1' ; %'laptop' 'L1'
+location = 'laptop' ; %'laptop' 'L1'
 %% run setup
 
-%run = 6; % 6 = checkerboard | 7 = bullseye
+%run = 7; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
 
@@ -12,7 +12,7 @@ saveFigs = 0;
 switch location
     case 'laptop'
         addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp')) 
-        addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp/TAPilot') %
+        addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TAPilot') %
     case 'L1'
         addpath(genpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp')) %
         addpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TAPilot') %
@@ -85,7 +85,7 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'checkerboard'; %'grating','checkerboard','bullseye'
+stimType = 'bullseye'; %'grating','checkerboard','bullseye'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
@@ -148,7 +148,7 @@ for iPhase = 1:numel(phases)
                 end
                 s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
             case 'bullseye'
-                s{iPhase, iContrast} = CreateSpiral(d, stimSize, spatialFreq, phase, contrast);
+                s{iPhase, iContrast} = CreateSpiral(d, stimSize, spatialFreq, phase, contrast)./2 + .5;
                 %s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
             otherwise
                 error('stimType not recognized')
@@ -254,7 +254,7 @@ switch target.type
         target.blurRadius = blurRadius;
         target.backgroundColor = backgroundColor;
         target.stim = stim;
-        target.contrast = [0.9 0.1];
+%        target.contrast = [0.1 0.9];
         target.nFramesPerTarget = nFramesPerTarget;
         target.positions = [1:8]';
         % CREATE TARGET POSITIONS 
@@ -770,6 +770,7 @@ end
 
 % store new variables in appropriate structure
 stimulus.target.posSeq = posSeq; %target position sequence
+target.posSeq = posSeq;
 order.targetPresentBlockOrder = targetPresentBlockOrder; %target presence block order
 
 % save stimulus
