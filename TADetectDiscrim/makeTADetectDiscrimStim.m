@@ -1,5 +1,5 @@
 function makeTADetectDiscrimStim(run)
-location = 'laptop' ; %'laptop' 'L1'
+location = 'L1' ; %'laptop' 'L1'
 %% run setup
 
 %run = 7; % 6 = checkerboard | 7 = bullseye
@@ -41,8 +41,6 @@ screenWidth = d.numPixels(1); % (px)
 screenHeight = d.numPixels(2); % (px)
 cx = round(screenWidth/2);
 cy = round(screenHeight/2);
-x_win = 600; %x window size
-y_win = x_win-200; %y window size
 
 %% keys setup
 keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
@@ -254,7 +252,6 @@ switch target.type
         target.blurRadius = blurRadius;
         target.backgroundColor = backgroundColor;
         target.stim = stim;
-%        target.contrast = [0.1 0.9];
         target.nFramesPerTarget = nFramesPerTarget;
         target.positions = [1:8]';
         % CREATE TARGET POSITIONS 
@@ -750,19 +747,20 @@ for frame = 1:length(posSeq)
     
     %reset framesComplete and move onto next block if frame conditions are met
     if targetPresentBlockOrder(targetBlockInd) ~= 2
-        [targetBlockInd targetPresentBlockOrder(targetBlockInd) frame]
         if framesComplete > 20 && targetBlockInd <= length(targetPresentBlockOrder)
             block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
             targetBlockInd = targetBlockInd + 1;
             framesComplete = 0;
+            [targetBlockInd targetPresentBlockOrder(targetBlockInd) frame]
         end
     elseif targetPresentBlockOrder(targetBlockInd) == 2
-        [targetBlockInd targetPresentBlockOrder(targetBlockInd) frame] 
+
         if framesComplete > 40 && targetBlockInd <= length(targetPresentBlockOrder)
             block_ind(targetPresentBlockOrder(targetBlockInd)-1) = block_ind(targetPresentBlockOrder(targetBlockInd)-1) + 1;
             block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
             targetBlockInd = targetBlockInd + 1;
             framesComplete = 0;
+            [targetBlockInd targetPresentBlockOrder(targetBlockInd) frame] 
         end
     end
     

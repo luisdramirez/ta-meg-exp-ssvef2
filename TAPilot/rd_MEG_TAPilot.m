@@ -2,7 +2,7 @@ function rd_MEG_TAPilot(run, stimfile)
 commandwindow
 % rd_MEG_TAPilot(run, stimfile)
 % rd_MEG_TAPilot(3, 'taDetectDiscrim')
-location = 'laptop'; %'laptop' 'L1'
+location = 'L1'; %'laptop' 'L1'
 
 % MEG SSVEP left/right flicker rate x attention expt
 % with exo targets
