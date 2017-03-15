@@ -78,15 +78,19 @@ mycellarray(emptyIndex) = {[NaN,NaN]};
 targetPresented = [cell2mat(mycellarray);[NaN,NaN]];
 
 %% extract target axis order
-p = response.target.baseOrients;
-temp = targetPresented ;
-temp (temp == 0) = NaN;
-[row ,col] = find (temp == 1 | temp  ==2 ) ;
-[row_sorted,idx] = sort(row);
-col_sorted = col(idx,:);
-axis = temp ;
-for i = 1:length(row_sorted)
-    axis (row_sorted(i),col_sorted(i)) = p(i);
+if isfield(response.target,'baseOrients')
+    p = response.target.baseOrients;
+    temp = targetPresented ;
+    temp (temp == 0) = NaN;
+    [row ,col] = find (temp == 1 | temp  ==2 ) ;
+    [row_sorted,idx] = sort(row);
+    col_sorted = col(idx,:);
+    axis = temp ;
+    for i = 1:length(row_sorted)
+        axis (row_sorted(i),col_sorted(i)) = p(i);
+    end
+else
+    axis = nan(size(targetPresented));
 end
 
 % q = NaN; n = 4;
