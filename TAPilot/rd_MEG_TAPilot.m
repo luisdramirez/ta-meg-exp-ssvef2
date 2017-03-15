@@ -2,7 +2,7 @@ function rd_MEG_TAPilot(run, stimfile)
 commandwindow
 % rd_MEG_TAPilot(run, stimfile)
 % rd_MEG_TAPilot(3, 'taDetectDiscrim')
-
+location = 'L1'; %'laptop' 'L1'
 
 % MEG SSVEP left/right flicker rate x attention expt
 % with exo targets
@@ -19,7 +19,12 @@ commandwindow
 % RD, July 2014
 
 %% Add paths
-addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp'));
+switch location
+    case 'laptop'
+        addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp'));
+    case 'L1'
+        addpath(genpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp'));
+end
 
 %% Settings
 displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
@@ -117,7 +122,7 @@ params.devices = params.display.devices;
 doRetinotopyScan(params);
 
 %% Check timing results
-f = dir('~/Desktop/2015*.mat');
+f = dir('~/Desktop/2017*.mat');
 fileName = fullfile('~', 'Desktop', f(end).name);
 load(fileName);
 figure(101); clf
@@ -160,7 +165,12 @@ movefile(fileName, newFileName)
 if strcmp(stimfile, 'taDetectDiscrim')
     %% Analyze data from this run
     dataDir = '~/Desktop';
-    stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
+    switch location
+        case 'laptop'
+            stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
+        case 'L1'
+            stimDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
+    end
     plotLevel = 3; % 3 = fewest plots
     acc = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
     

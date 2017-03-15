@@ -1,8 +1,8 @@
-%function makeTADetectDiscrimStim(run)
+function makeTADetectDiscrimStim(run)
 location = 'L1' ; %'laptop' 'L1'
 %% run setup
 
-run = 6; % 6 = checkerboard | 7 = bullseye
+%run = 6; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
 
@@ -15,7 +15,7 @@ switch location
         addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp/TAPilot') %
     case 'L1'
         addpath(genpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp')) %
-        addpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp/TAPilot') %
+        addpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TAPilot') %
 end
 
 %% file i/o
