@@ -1,8 +1,8 @@
-function makeTADetectDiscrimStim(run)
+%function makeTADetectDiscrimStim(run)
 location = 'L1' ; %'laptop' 'L1'
 %% run setup
 
-%run = 7; % 6 = checkerboard | 7 = bullseye
+run = 7; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
 
@@ -711,60 +711,61 @@ targetPresentBlockOrder = targetBlockOrder(targetBlockOrder ~= 1 & targetBlockOr
 block_ind = [1 1 1 1]; % [blockPP_indT1 blockPP_indT2 blockPA_ind blockAP_ind];
 targetBlockInd = 1;
 framesComplete = 0;
+posUsed = posShuffled;
 
-for frame = 1:length(posSeq)
-    if target.seq(frame) == 1 && targetBlockInd <= length(targetPresentBlockOrder) % IF TARGET INCREMENT:
-        if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-            if framesComplete <= 20
-                posSeq(frame) = posShuffled(block_ind(1),1); %position for T1
-            elseif framesComplete > 20 && framesComplete <= 40
-                posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2
+for frame = 1:length(target.seq)
+    if targetBlockInd <= length(targetPresentBlockOrder)
+        if target.seq(frame) == 1 % INCREMENT:
+            if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+                if framesComplete <= nFramesPerTarget
+                    posSeq(frame) = posShuffled(block_ind(1),1); %position for T1
+                elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
+                    posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2
+                end
+            elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+                posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
+            elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+                posSeq(frame) = posShuffled(block_ind(4),4); %positions for T2
+                
             end
             framesComplete = framesComplete + 1;
-        elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-            posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
-            framesComplete = framesComplete + 1;
-        elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-            posSeq(frame) = posShuffled(block_ind(4),4); %positions for T2
-            framesComplete = framesComplete + 1;
-        end
-    elseif target.seq(frame) == 2 && targetBlockInd <= length(targetPresentBlockOrder) % IF TARGET DECREMENT:
-        if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-            if framesComplete <= 20
-                posSeq(frame) = posShuffled(block_ind(1),1); %positions for T1
-            elseif framesComplete > 20 && framesComplete <= 40
-                posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2   
+        elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
+            if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+                if framesComplete <= nFramesPerTarget
+                    posSeq(frame) = posShuffled(block_ind(1),1); %positions for T1
+                elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
+                    posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2   
+                end
+            elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+                posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
+            elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+                posSeq(frame) = posShuffled(block_ind(4),4); %position for T2
             end
             framesComplete = framesComplete + 1;
-        elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-            posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
-            framesComplete = framesComplete + 1;
-        elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-            posSeq(frame) = posShuffled(block_ind(4),4); %position for T2
-            framesComplete = framesComplete + 1;
         end
-    end
-    
-    %reset framesComplete and move onto next block if frame conditions are met
-    if targetPresentBlockOrder(targetBlockInd) ~= 2
-        if framesComplete > 20 && targetBlockInd <= length(targetPresentBlockOrder)
-            block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
-            targetBlockInd = targetBlockInd + 1;
-            framesComplete = 0;
-            [targetBlockInd targetPresentBlockOrder(targetBlockInd) frame]
-        end
-    elseif targetPresentBlockOrder(targetBlockInd) == 2
 
-        if framesComplete > 40 && targetBlockInd <= length(targetPresentBlockOrder)
-            block_ind(targetPresentBlockOrder(targetBlockInd)-1) = block_ind(targetPresentBlockOrder(targetBlockInd)-1) + 1;
-            block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
-            targetBlockInd = targetBlockInd + 1;
-            framesComplete = 0;
-            [targetBlockInd targetPresentBlockOrder(targetBlockInd) frame] 
+        %reset framesComplete and move onto next block if frame conditions are met
+        if targetPresentBlockOrder(targetBlockInd) ~= 2
+            if framesComplete >= nFramesPerTarget
+                %posUsed(block_ind(targetPresentBlockOrder(targetBlockInd)),targetPresentBlockOrder(targetBlockInd)) = nan;
+                %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
+                block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
+                targetBlockInd = targetBlockInd + 1;
+                framesComplete = 0;        
+            end
+        elseif targetPresentBlockOrder(targetBlockInd) == 2
+            if framesComplete >= nFramesPerTarget*2
+                %posUsed(block_ind(1:2),1:2) = nan;
+                %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
+                block_ind(1:2) = block_ind(1:2) + 1;
+                targetBlockInd = targetBlockInd + 1;
+                framesComplete = 0;
+            end
         end
+        
     end
-    
 end
+%posUsed
 
 % store new variables in appropriate structure
 stimulus.target.posSeq = posSeq; %target position sequence
