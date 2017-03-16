@@ -80,16 +80,8 @@ nPhases = 2; %number of checker board phases
 nConds = 2; %number of contrast conditions 
 nIms = nPos * nPhases * nConds; %total number of images to create 
 
+shuffledCoords = target.shuffledCoords;
 xmax = size(targ_stim{1},1); ymax = size(targ_stim{1},2);
-
-% Generate guassian center coordinates 
-cx2 = 0; cy2 = 0;  %origin of coordiantes
-r = xmax/4; %radius of center coordinates
-theta = 22.5:45:360; theta = deg2rad(theta); 
-x0 = cx2 + r * cos(theta); %generate x coordinates
-y0 = cx2 + r * sin(theta); %generate y coordinates
-gaussCoords = [x0' y0']; %store coordinates
-shuffledCoords = gaussCoords(randperm(size(gaussCoords,1)),:); %chuffle coordinates
 
 % 2D Gaussian parameters
 gaussWidth = xmax;

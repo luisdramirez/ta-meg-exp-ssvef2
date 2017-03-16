@@ -1,6 +1,6 @@
 % rd_plotSeqAllTrials.m
 
-load([pathToExpt('stimuli') '/taDetectDiscrim401.mat'])
+load(['/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices/taDetectDiscrim7.mat'])
 
 blockLengths = stimulus.itiSeq + p.blockDur;
 blockStarts = [0 cumsum(blockLengths(1:end-1))];

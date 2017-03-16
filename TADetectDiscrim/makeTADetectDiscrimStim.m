@@ -1,8 +1,8 @@
-%function makeTADetectDiscrimStim(run)
+function makeTADetectDiscrimStim(run)
 location = 'L1' ; %'laptop' 'L1'
 %% run setup
 
-run = 7; % 6 = checkerboard | 7 = bullseye
+%run = 7; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
 
@@ -259,9 +259,22 @@ switch target.type
             length(targetBlockOrder(targetBlockOrder == 3)) +...
             length(targetBlockOrder(targetBlockOrder == 4));
         positions_mat(:,:,1) = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
-        %positions_mat(:,:,2) = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
         posShuffled = Shuffle(positions_mat);
-        target.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
+        
+        posBlockOrderNames = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
+        order.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
+        
+        % Generate guassian center coordinates 
+        xmax = size(target.stim{1},1); ymax = size(target.stim{1},2);
+        cx2 = 0; cy2 = 0;  %origin of coordiantes
+        r = xmax/4; %radius of center coordinates
+        theta = 22.5:45:360; theta = deg2rad(theta); 
+        x0 = cx2 + r * cos(theta); %generate x coordinates
+        y0 = cx2 + r * sin(theta); %generate y coordinates
+        gaussCoords = [x0' y0']; %store coordinates
+        shuffledCoords = gaussCoords(randperm(size(gaussCoords,1)),:); %shuffle coordinates
+        stimulus.target.shuffledCoords = shuffledCoords;
+        target.shuffledCoords = shuffledCoords; %store coordinates       
     otherwise
         error('target.type not recognized')
 end
@@ -710,7 +723,7 @@ targetPresentBlockOrder = targetBlockOrder(targetBlockOrder ~= 1 & targetBlockOr
 
 block_ind = [1 1 1 1]; % [blockPP_indT1 blockPP_indT2 blockPA_ind blockAP_ind];
 targetBlockInd = 1;
-framesComplete = 0;
+framesComplete = 1;
 posUsed = posShuffled;
 
 for frame = 1:length(target.seq)
@@ -746,20 +759,20 @@ for frame = 1:length(target.seq)
 
         %reset framesComplete and move onto next block if frame conditions are met
         if targetPresentBlockOrder(targetBlockInd) ~= 2
-            if framesComplete >= nFramesPerTarget
+            if framesComplete > nFramesPerTarget
                 %posUsed(block_ind(targetPresentBlockOrder(targetBlockInd)),targetPresentBlockOrder(targetBlockInd)) = nan;
                 %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
                 block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
                 targetBlockInd = targetBlockInd + 1;
-                framesComplete = 0;        
+                framesComplete = 1;        
             end
         elseif targetPresentBlockOrder(targetBlockInd) == 2
-            if framesComplete >= nFramesPerTarget*2
+            if framesComplete > nFramesPerTarget*2
                 %posUsed(block_ind(1:2),1:2) = nan;
                 %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
                 block_ind(1:2) = block_ind(1:2) + 1;
                 targetBlockInd = targetBlockInd + 1;
-                framesComplete = 0;
+                framesComplete = 1;
             end
         end
         
