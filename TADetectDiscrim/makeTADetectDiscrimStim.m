@@ -264,10 +264,8 @@ switch target.type
             length(targetBlockOrder(targetBlockOrder == 4));
         positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
         posShuffled = Shuffle(positions_mat);
-        
         posBlockOrderNames = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
-        order.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
-        
+
         % Generate guassian center coordinates 
         xmax = size(target.stim{1},1); ymax = size(target.stim{1},2);
         cx2 = 0; cy2 = 0;  %origin of coordiantes
@@ -722,6 +720,10 @@ order.blockOrder = blockOrder;
 order.attBlockOrder = attBlockOrder;
 order.targetBlockOrder = targetBlockOrder;
 order.cueBlockOrder = cueBlockOrder; 
+order.targetTypeBlockOrder = targetTypeBlockOrder;
+if strcmp(target.type, 'contrast')
+    order.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
+end
 order.targetTypes = targetTypes;
 order.trialsPresented = trialsPresented;
 
