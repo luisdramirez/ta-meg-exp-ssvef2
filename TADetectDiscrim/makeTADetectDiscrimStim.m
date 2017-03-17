@@ -2,7 +2,7 @@ function makeTADetectDiscrimStim(run)
 location = 'L1' ; %'laptop' 'L1'
 %% run setup
 
-%run = 7; % 6 = checkerboard | 7 = bullseye
+%run = 7;
 saveStim = 1;
 saveFigs = 0;
 
