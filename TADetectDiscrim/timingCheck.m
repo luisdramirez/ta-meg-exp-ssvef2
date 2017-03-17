@@ -1,9 +1,17 @@
 %timing irregularities
-
-timeScanNames = {'irrFlips' 'keyCodeSeq' 'trigSeq' 'soundSeq' 'targetSeq' 'targetPosSeq'};
+location = 'L1'; %'L1' 'laptop'
+timeScanNames = {'sFlips' 'irrFlips' 'keyCodeSeq' 'trigSeq' 'soundSeq' 'targetSeq' 'targetPosSeq'};
 msFlips = diff(response.flip);
-irr = find(msFlips > mean(msFlips)*1.25);
+irrFlips = find(msFlips > mean(msFlips)*1.25);
+sFlips = irrFlips.* (16/1000);
 
-timeScan = table(irr', stimulus.keyCodeSeq(irr), stimulus.trigSeq(irr), stimulus.soundSeq(irr), stimulus.target.seq(irr), stimulus.target.posSeq(irr));
-timeScan.Properties.VariableNames = timeScanNames;
+switch location
+    case 'laptop'
+        timeScan = table(irrFlips', stimulus.keyCodeSeq(irrFlips), stimulus.trigSeq(irrFlips), stimulus.soundSeq(irrFlips), stimulus.target.seq(irrFlips), stimulus.target.posSeq(irrFlips));
+        timeScan.Properties.VariableNames = timeScanNames;
+    case 'L1'
+        timeScan = [irrFlips', stimulus.keyCodeSeq(irrFlips), stimulus.trigSeq(irrFlips), stimulus.soundSeq(irrFlips), stimulus.target.seq(irrFlips), stimulus.target.posSeq(irrFlips)];
+end
+
+disp(timeScanNames);
 disp(timeScan)

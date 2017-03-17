@@ -7,17 +7,15 @@ saveStim = 1;
 saveFigs = 0;
 
 %% add paths
-% addpath(genpath('../../vistadisp'))
-% addpath('../TAPilot')
+
 switch location
     case 'laptop'
         addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp')) 
         addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TAPilot') %
     case 'L1'
-        addpath(genpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp')) %
-        addpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TAPilot') %
+        addpath(genpath('../../vistadisp'))
+        addpath('../TAPilot')
 end
-
 %% file i/o
 % stimDir = 'stimuli';
 switch location

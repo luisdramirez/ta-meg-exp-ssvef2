@@ -13,13 +13,16 @@ for i = 1:nBlocks
     a(i,:) = stimulus.seq(blockIdx(i):blockIdx(i)+window-1);
 end
 
-figure
+%figure
+subplot(3,1,1)
 plot(a')
 xlabel('time (frames)')
 ylabel('image number in stimulus.seq')
 
 offsets = repmat(1:nBlocks,window,1);
-figure
+%figure
+hold on
+subplot(3,1,2)
 plot(a' + offsets);
 xlabel('time (frames)')
 ylabel('image number in stimulus.seq')
