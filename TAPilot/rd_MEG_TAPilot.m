@@ -175,9 +175,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
     [acc, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
     
     %% Adjust difficulty via run-by-run staircase
-    targetType = stim.stimulus.target.type;
-    stimContrast = stim.p.stimContrast;
-    switch targetType
+    switch response.target.type
         case 'cb'
             % only use valid trials, since there's more data
             % shoot for 80% valid, mean across T1 and T2
@@ -195,7 +193,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
                 end
                 validAcc(1,iTT) = mean(validTrialsAcc);
             end
-            staircaseAdjustmentContrastTargets(stimContrast, ...
+            staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
                 response.target.contrast, validAcc);
         otherwise
             error('targetType not recognized')
