@@ -180,7 +180,6 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] contrast: contrast = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
             target.contrast = patchContrast; 
             [backgroundIms, maskedIms, target] = contrastTarget(display, target);
-            stimulus.target.shuffledCoords = target.shuffledCoords;
         otherwise
             error('target.type not recognized')
     end
@@ -381,9 +380,9 @@ for frame = 1:nFrames
     %--- update screen
     VBLTimestamp = Screen('Flip',display.windowPtr);
 
-    if target.seq(frame) == 1 || target.seq(frame) == 2
-        pause(0.8)
-    end
+%     if target.seq(frame) == 1 || target.seq(frame) == 2
+%         pause(0.8)
+%     end
 
     % send trigger for MEG, if requested, and record the color of the PD
     % cue

@@ -48,7 +48,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 20;
+nFramesPerTarget = 10;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)

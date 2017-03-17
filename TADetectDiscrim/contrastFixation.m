@@ -11,17 +11,17 @@ centeredRect = CenterRectOnPointd(baseRect, display.fixX, display.fixY);
 
 
 fixationColor = [0 0 0]*255;
-fixationMaxDiameter = max(baseRect) * 1.01;
+fixationMaxDiameter = max(baseRect)*1.01;
 
 % make fixation rect
 frameRect = [0 0 rectDiam*2 rectDiam*2];
 centeredRect2 = CenterRectOnPointd(frameRect, display.fixX, display.fixY);
 
 %change outer ring color
-if frame == 5;
+if frame == 5
     frameColor = [1 1 1]*255;
 elseif frame == 1
-    frameColor = [0.5 0.5 0.5*255];
+    frameColor = [0.5 0.5 0.5]*255;
 elseif frame == 6
     frameColor =  [1 0 0]*255;
 elseif frame == 7
@@ -30,7 +30,7 @@ elseif frame == 8
     frameColor = [0 0 1]*255;
 end
 
-frameMaxDiameter = max(frameRect) *1.01;
+frameMaxDiameter = max(frameRect)*1.01;
 
 % AssertOpenGL;
 % Screen('Preference', 'SkipSyncTests', 1);
