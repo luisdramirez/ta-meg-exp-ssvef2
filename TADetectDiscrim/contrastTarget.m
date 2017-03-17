@@ -1,9 +1,9 @@
 function [backgroundIms, maskedIms, target] = contrastTarget(display, target)
 
-%%% Creating Contrast Checkerboard Target Stimulus
+%%% Creating Contrast Target Stimulus
 
 %% Make the stimuli
-phases = target.phases; %bullseye: [0 pi/2];
+phases = target.phases; 
 pixelsPerDegree = target.pixelsPerDegree;
 stimSize = target.stimSize;
 spatialFreq = target.spatialFreq;
@@ -31,7 +31,7 @@ for iPhase = 1:numel(phases)
                 end
                 targ_s{iPhase, iContrast} = contrast*(double(c)-.5) + .5; %CONTRAST CHANGE HERE
             case 'bullseye'
-                targ_s{iPhase, iContrast} = CreateSpiral(display, stimSize, spatialFreq, phase, contrast); 
+                targ_s{iPhase, iContrast} = CreateSpiral(display, stimSize, spatialFreq, phase, contrast)./2 + .5; 
             otherwise
                 error('stimType not recognized')
         end
@@ -76,20 +76,12 @@ targ_imageIDs(end+1) = 0;
 %% Create target stimulus
 
 nPos = 8; %number of x,y pairs to place the gaussian
-nCBPhases = 2; %number of checker board phases
+nPhases = 2; %number of checker board phases
 nConds = 2; %number of contrast conditions 
-nIms = nPos * nCBPhases * nConds; %total number of images to create 
+nIms = nPos * nPhases * nConds; %total number of images to create 
 
+shuffledCoords = target.shuffledCoords;
 xmax = size(targ_stim{1},1); ymax = size(targ_stim{1},2);
-
-% Generate guassian center coordinates 
-cx2 = 0; cy2 = 0;  %origin of coordiantes
-r = xmax/4; %radius of center coordinates
-theta = 22.5:45:360; theta = deg2rad(theta); 
-x0 = cx2 + r * cos(theta); %generate x coordinates
-y0 = cx2 + r * sin(theta); %generate y coordinates
-gaussCoords = [x0' y0']; %store coordinates
-shuffledCoords = gaussCoords(randperm(size(gaussCoords,1)),:); %chuffle coordinates
 
 % 2D Gaussian parameters
 gaussWidth = xmax;
@@ -100,7 +92,7 @@ gaussAmp = 1; %gaussian amplitude
 
 % Generate empty cell arrays to store target images
 circBlurs = cell(nPos,1);
-maskedIms = cell(nPos, nConds, nCBPhases);
+maskedIms = cell(nPos, nPhases , nConds);
 
 % target will be on for 4 frames
 % make target images for 2 phases, increment/decrement, 8 locations
@@ -115,7 +107,7 @@ end
 
 % Create target image for each phase and condition
 for frame= 1:nConds %for each condition (column in targStim, page in maskedIms)
-    for j= 1:nCBPhases %for each phase (row in targStim, column in maskedIms)
+    for j= 1:nPhases %for each phase (row in targStim, column in maskedIms)
         im = targ_stim{j,frame};
         for k= 1:nPos 
             maskedIm = cat(3, im, circBlurs{k}); %make masked image
@@ -125,7 +117,7 @@ for frame= 1:nConds %for each condition (column in targStim, page in maskedIms)
 end
 
 % background stim/image
-backgroundIms = cell(nCBPhases,1);
+backgroundIms = cell(nPhases,1);
 backgroundIms{1} = target.stim{1}; %'backgroundIm' is the fixed contrast. last column
 backgroundIms{2} = target.stim{2};
 
@@ -138,7 +130,7 @@ backgroundIms{2} = target.stim{2};
 % Screen(w,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 % for i= 1:nConds
-%     for j= 1:nCBPhases
+%     for j= 1:nPhases
 %         for k=1:nPos
 %             % Make target texture
 %             tex = Screen('MakeTexture', w, maskedIms{k,j,i}*255);
@@ -182,4 +174,3 @@ backgroundIms{2} = target.stim{2};
 % Screen('DrawTexture', w, bgtex);
 % Screen('DrawTexture', w, tex);
 % Screen('Flip',w);
-end

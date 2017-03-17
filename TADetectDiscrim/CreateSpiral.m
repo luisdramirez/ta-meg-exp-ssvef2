@@ -20,7 +20,7 @@ y = Scale(y)*gaborsiz-gaborsiz/2;
 [th,r] = cart2pol(x,y);
 
 %modulator    =exp(-((x/gaborstd).^2)-((y/gaborstd).^2));
-spiral        = cos(r*fre*2*pi+phase*2*pi).*contrast;
+spiral        = cos(r*fre*2*pi+phase).*contrast;
 
 return
 
