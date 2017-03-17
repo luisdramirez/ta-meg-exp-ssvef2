@@ -1,7 +1,8 @@
 function makeTADetectDiscrimStim(run)
-location = 'L1' ; %'laptop' 'L1'
-%% run setup
 
+location = 'rd' ; %'laptop' 'L1' 'rd'
+
+%% run setup
 %run = 7; % 6 = checkerboard | 7 = bullseye
 saveStim = 1;
 saveFigs = 0;
@@ -23,11 +24,13 @@ end
 switch location
     case 'laptop'
         stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
-        stimFile = sprintf('taDetectDiscrim%d', run);
     case 'L1'
         stimDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
-        stimFile = sprintf('taDetectDiscrim%d', run);
+    case 'rd'
+        stimDir = 'stimuli';
 end
+stimFile = sprintf('taDetectDiscrim%d', run);
+
 %% screen setup
 displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
@@ -79,7 +82,8 @@ attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 %posBlockNames = {'n','ne','e','se','s','sw','w','nw'};
-[blockOrder,attBlockOrder, targetBlockOrder,cueBlockOrder] = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames);
+[blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
+    = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
 nBlocks = numel(blockOrder);
 
 %% stim setup  
@@ -117,7 +121,7 @@ p = v2struct(...
     refrate, blockDur, targetDur, targetLeadTime, targetSOA, ...
     attCueLeadTime, respDur, feedbackDur, fastUnit, slowUnit, ...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
-    cueBlockNames, cueBlockOrder, ...
+    cueBlockNames, cueBlockOrder, targetTypeBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
     contrasts, blurRadius, backgroundColor, phases, triggerOption, jitter);
 
@@ -253,12 +257,12 @@ switch target.type
         target.backgroundColor = backgroundColor;
         target.stim = stim;
         target.nFramesPerTarget = nFramesPerTarget;
-        target.positions = [1:8]';
+        target.positions = (1:8)';
         % CREATE TARGET POSITIONS 
         nTargetAppears = length(targetBlockOrder(targetBlockOrder == 2))*2 + ...
             length(targetBlockOrder(targetBlockOrder == 3)) +...
             length(targetBlockOrder(targetBlockOrder == 4));
-        positions_mat(:,:,1) = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
+        positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
         posShuffled = Shuffle(positions_mat);
         
         posBlockOrderNames = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
@@ -426,7 +430,16 @@ for iFrame = 1:numel(seqtiming)
     % specify the target type (for discrimination)
     if targetOn
         if targetOnSeq(iFrame-1)==0 % first frame of target
-            targetType = randi(2); % 1 or 2
+%             targetType = randi(2); % 1 or 2
+            timeSinceCue = time - cueStartTimes(cueIdx-1);
+            if timeSinceCue - (targetLeadTime-attCueLeadTime) < 1e-4
+                whichTarget = 1;
+            elseif timeSinceCue - (targetLeadTime-attCueLeadTime+targetSOA) < 1e-4
+                whichTarget = 2;
+            else
+                error('target onset time does not match expected values')
+            end
+            targetType = targetTypeBlockOrder(whichTarget, blockIdx);
             targetTypeSeq(iFrame,1) = targetType;
             targetTypes(targetIdx) = targetType;
         else
