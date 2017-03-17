@@ -172,16 +172,34 @@ if strcmp(stimfile, 'taDetectDiscrim')
             stimDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
     end
     plotLevel = 3; % 3 = fewest plots
-    acc = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
+    [acc, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
     
     %% Adjust difficulty via run-by-run staircase
-    % only use valid trials, since there's more data
-    % shoot for 80% valid, mean across T1 and T2
-    validIdx = [1 3];
-    validDetect = mean(acc.Detect_means(validIdx));
-    validDiscrim = mean(acc.Discrim1_means(validIdx));
-    staircaseAdjustment(response.target.contrast, response.target.tilts(2), ...
-        validDetect, validDiscrim);
+    targetType = stim.stimulus.target.type;
+    stimContrast = stim.p.stimContrast;
+    switch targetType
+        case 'cb'
+            % only use valid trials, since there's more data
+            % shoot for 80% valid, mean across T1 and T2
+            validIdx = [1 3];
+            validDetect = mean(acc.Detect_means(validIdx));
+            validDiscrim = mean(acc.Discrim1_means(validIdx));
+            staircaseAdjustment(response.target.contrast, response.target.tilts(2), ...
+                validDetect, validDiscrim);
+        case 'contrast'
+            validIdx = [1 3];
+            for iTT = 1:2
+                validTrialsAcc = [];
+                for iVI = 1:numel(validIdx)  
+                    validTrialsAcc = [validTrialsAcc; acc.targetTypeAccAll{validIdx(iVI),iTT}];
+                end
+                validAcc(1,iTT) = mean(validTrialsAcc);
+            end
+            staircaseAdjustmentContrastTargets(stimContrast, ...
+                response.target.contrast, validAcc);
+        otherwise
+            error('targetType not recognized')
+    end
 end
 
 %% Stop Eyetracker when done with experiment

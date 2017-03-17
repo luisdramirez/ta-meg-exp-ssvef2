@@ -1,4 +1,4 @@
-function [accuracy, accuracy2] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel)
+function [accuracy, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel)
 
 dataFile = dir(sprintf('%s/*taDetectDiscrim%d.mat', dataDir, run));
 dd = load(sprintf('%s/%s', dataDir, dataFile(end).name));
@@ -54,7 +54,7 @@ OverallResponse_all ( OverallResponse_all == 3) = 0;
 % blockNames = {'blank','fast-left'}; % fast-left
 % attBlockNames = {'no-att','att-right'}; % att-right
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 
 cueBlockOrder_Indx = [2 4 5 3]; 
 accuracy =[]; % rows: '1-1','2-1','2-2','1-2'; columns: runs 1-10
@@ -104,6 +104,26 @@ for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockN
     accuracy.missedTrials(n) = accuracy.missedTrials(n) + sum(isnan(response_all(condition_Indx)) );
 end
 
+%% Calculate target type 1 valid & invalid; target type 2 valid and invalid
+for k = 1:numel(cueBlockOrder_Indx) %'1-1','2-1','2-2','1-2'
+    cueType = cueBlockOrder_Indx(k);
+    cueName = cueBlockNames{cueType};
+    target = str2num(cueName(end));
+    switch target
+        case 1
+            targetTypeOrder = targetTypeT1;
+        case 2
+            targetTypeOrder = targetTypeT2;
+    end
+    for tt = 1:2 % target type, e.g. decrement vs. increment
+        w = cueBlockOrder==cueType & targetTypeOrder==tt;
+        temp_correct = response_correct(w); 
+%         temp_correct(temp_correct==0) = NaN;
+        temp_correct(temp_correct==-1) = 0;
+        ttacc{k,tt} = temp_correct;
+        ttacc_mean(k,tt) = mean(temp_correct);
+    end
+end
 
 %% calculate means and stes 
 accuracy.Discrim_means = nanmean(accuracy.Discrim_all,2); % rows: '1-1','2-1','2-2','1-2'
@@ -128,6 +148,8 @@ accuracy.CR_stes = nanstd(accuracy.CR_all,0,2)./ sqrt(length(df));
 accuracy.dprime_stes = nanstd(accuracy.dprime,0,2) ./ sqrt(length(df));
 all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_stes];
 
+accuracy.targetTypeAccAll = ttacc; % for single run
+accuracy.targetTypeAcc = ttacc_mean; % for single run
 
 %% plot
 switch plotLevel
