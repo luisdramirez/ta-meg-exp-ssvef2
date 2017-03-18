@@ -1,6 +1,6 @@
 function makeTADetectDiscrimStim(run)
 
-location = 'L1' ; %'laptop' 'L1' 'rd'
+location = 'laptop' ; %'laptop' 'L1' 'rd'
 
 %% run setup
 %run = 7; % 6 = checkerboard | 7 = bullseye
@@ -44,7 +44,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 20;
+nFramesPerTarget = 10;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
@@ -734,6 +734,7 @@ targetBlockInd = 1;
 framesComplete = 1;
 posUsed = posShuffled;
 
+
 if strcmp(target.type, 'contrast')
     for frame = 1:length(target.seq)
         if targetBlockInd <= length(targetPresentBlockOrder)
@@ -746,9 +747,9 @@ if strcmp(target.type, 'contrast')
                     end
                 elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
                     posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
+ 
                 elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
                     posSeq(frame) = posShuffled(block_ind(4),4); %positions for T2
-
                 end
                 framesComplete = framesComplete + 1;
             elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
@@ -771,6 +772,12 @@ if strcmp(target.type, 'contrast')
                 if framesComplete > nFramesPerTarget
                     %posUsed(block_ind(targetPresentBlockOrder(targetBlockInd)),targetPresentBlockOrder(targetBlockInd)) = nan;
                     %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
+                    if targetPresentBlockOrder(targetBlockInd) == 3
+                        targs = [posSeq(frame) 0];
+                    elseif targetPresentBlockOrder(targetBlockInd) == 4
+                        targs = [0 posSeq(frame)];
+                    end
+                    positionsPresented(targetBlockInd).targets = targs;
                     block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
                     targetBlockInd = targetBlockInd + 1;
                     framesComplete = 1;        
@@ -778,7 +785,9 @@ if strcmp(target.type, 'contrast')
             elseif targetPresentBlockOrder(targetBlockInd) == 2
                 if framesComplete > nFramesPerTarget*2
                     %posUsed(block_ind(1:2),1:2) = nan;
-                    %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
+                    %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)]
+                    targs = [posShuffled(block_ind(1),1) posShuffled(block_ind(2),2)];
+                    positionsPresented(targetBlockInd).targets = targs;
                     block_ind(1:2) = block_ind(1:2) + 1;
                     targetBlockInd = targetBlockInd + 1;
                     framesComplete = 1;
@@ -794,6 +803,26 @@ end
 stimulus.target.posSeq = posSeq; %target position sequence
 target.posSeq = posSeq;
 order.targetPresentBlockOrder = targetPresentBlockOrder; %target presence block order
+order.positionsPresented = positionsPresented; %positions of targets
+order.targetIndex = find(order.targetBlockOrder ~=1 & order.targetBlockOrder ~=5)'; %index of targets in targetBlockOrder
+
+% store target positions including no-targ & absent conditions
+for i= 1:length(targetBlockOrder);
+    if  targetBlockOrder(i) == 1
+        posPresented(i,1:2) = nan;
+    elseif targetBlockOrder(i) == 5
+        posPresented(i,1:2) = 0;
+    else
+        posPresented(i,1:2) =nan;
+    end
+end
+
+for i=1:length(order.positionsPresented)
+    posPresented(order.targetIndex(i),1) = order.positionsPresented(i).targets(1);
+    posPresented(order.targetIndex(i),2) = order.positionsPresented(i).targets(2);
+end
+
+order.positionsPresented = posPresented; %positions of targets (includes no-targ and absent trials)
 
 % save stimulus
 if saveStim
