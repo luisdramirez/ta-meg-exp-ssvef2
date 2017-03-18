@@ -1,6 +1,6 @@
 function makeTADetectDiscrimStim(run)
 
-location = 'laptop' ; %'laptop' 'L1' 'rd'
+location = 'L1' ; %'laptop' 'L1' 'rd'
 
 %% run setup
 %run = 7; % 6 = checkerboard | 7 = bullseye
