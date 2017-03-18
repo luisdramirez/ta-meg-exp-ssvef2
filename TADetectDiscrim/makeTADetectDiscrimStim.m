@@ -16,7 +16,7 @@ vistaStimDir = sprintf('../../%s', vistaStimPath);
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;
@@ -75,7 +75,38 @@ stimType = 'bullseye'; %'grating','checkerboard','bullseye'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
-stimContrast = 0.5; % 0.64
+possibleContrasts = [
+    0.0100
+    0.0117
+    0.0137
+    0.0161
+    0.0189
+    0.0221
+    0.0259
+    0.0304
+    0.0356
+    0.0418
+    0.0489
+    0.0574
+    0.0672
+    0.0788
+    0.0924
+    0.1083
+    0.1269
+    0.1487
+    0.1743
+    0.2043
+    0.2395
+    0.2807
+    0.3290
+    0.3857
+    0.4520
+    0.5298
+    0.6210
+    0.7279
+    0.8532
+    1.0000];
+stimContrast = 0.45; % 0.64
 targetContrast = 0.5; % 0.64
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
@@ -661,18 +692,18 @@ for iFrame = 1:numel(seqtiming)
     end
 end
 
-% show targetOnSeq and trigSeq
-f(1) = figure;
-subplot(3,1,1)
-plot(seqtiming,targetOnSeq)
-subplot(3,1,2)
-plot(seqtiming,trigSeq)
-subplot(3,1,3)
-plot(seqtiming,keyCodeSeq)
-
-% display triggers by channel
-f(2) = displayTrigger(trigSeq, nBlocks);
-set(f(2),'Position',[0 0 1200 900]);
+% % show targetOnSeq and trigSeq
+% f(1) = figure;
+% subplot(3,1,1)
+% plot(seqtiming,targetOnSeq)
+% subplot(3,1,2)
+% plot(seqtiming,trigSeq)
+% subplot(3,1,3)
+% plot(seqtiming,keyCodeSeq)
+% 
+% % display triggers by channel
+% f(2) = displayTrigger(trigSeq, nBlocks);
+% set(f(2),'Position',[0 0 1200 900]);
 
 %% Create stimulus strucutre
 % set remaining stimulus variables
