@@ -41,8 +41,8 @@ cueBlockOrder_cue2 = repmat(B,1,4); % for all target conditions
 cueBlockOrder = [cueBlockOrder_cue1 , cueBlockOrder_cue2];
 
 % randomize cue order
-indices = 1:length(cueBlockOrder);
-% indices = randperm(length(cueBlockOrder));
+% indices = 1:length(cueBlockOrder); % for debugging
+indices = randperm(length(cueBlockOrder));
 cueBlockOrder = cueBlockOrder(indices);
 
 %% target order

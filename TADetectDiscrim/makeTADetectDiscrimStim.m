@@ -1,31 +1,22 @@
 function makeTADetectDiscrimStim(run)
 
-location = 'L1' ; %'laptop' 'L1' 'rd'
-
 %% run setup
-%run = 7; % 6 = checkerboard | 7 = bullseye
+%run = 7;
 saveStim = 1;
 saveFigs = 0;
 
 %% add paths
-
 addpath(genpath('../../vistadisp'))
 addpath('../TAPilot')
 
 %% file i/o
-% stimDir = 'stimuli';
-switch location
-    case 'laptop'
-        stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
-    case 'L1'
-        stimDir = '/users/purplab/Desktop/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
-    case 'rd'
-        stimDir = 'stimuli';
-end
+stimDir = 'stimuli';
+vistaStimPath = 'vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
+vistaStimDir = sprintf('../../%s', vistaStimPath);
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1'
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;
@@ -671,17 +662,17 @@ for iFrame = 1:numel(seqtiming)
 end
 
 % show targetOnSeq and trigSeq
-% f(1) = figure;
-% subplot(3,1,1)
-% plot(seqtiming,targetOnSeq)
-% subplot(3,1,2)
-% plot(seqtiming,trigSeq)
-% subplot(3,1,3)
-% plot(seqtiming,keyCodeSeq)
+f(1) = figure;
+subplot(3,1,1)
+plot(seqtiming,targetOnSeq)
+subplot(3,1,2)
+plot(seqtiming,trigSeq)
+subplot(3,1,3)
+plot(seqtiming,keyCodeSeq)
 
 % display triggers by channel
-% f(2) = displayTrigger(trigSeq, nBlocks);
-% set(f(2),'Position',[0 0 1200 900]);
+f(2) = displayTrigger(trigSeq, nBlocks);
+set(f(2),'Position',[0 0 1200 900]);
 
 %% Create stimulus strucutre
 % set remaining stimulus variables
@@ -827,6 +818,7 @@ order.positionsPresented = posPresented; %positions of targets (includes no-targ
 % save stimulus
 if saveStim
     save(sprintf('%s/%s.mat', stimDir, stimFile), 'stimulus', 'p','order')
+    save(sprintf('%s/%s.mat', vistaStimDir, stimFile), 'stimulus', 'p','order')
 end
 
 % save figs
