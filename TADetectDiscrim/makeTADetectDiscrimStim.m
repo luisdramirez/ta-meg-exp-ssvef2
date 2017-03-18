@@ -1,6 +1,6 @@
 function makeTADetectDiscrimStim(run)
 
-location = 'rd' ; %'laptop' 'L1' 'rd'
+location = 'L1' ; %'laptop' 'L1' 'rd'
 
 %% run setup
 %run = 7; % 6 = checkerboard | 7 = bullseye
@@ -9,21 +9,16 @@ saveFigs = 0;
 
 %% add paths
 
-switch location
-    case 'laptop'
-        addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp')) 
-        addpath('/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TAPilot') %
-    case 'L1'
-        addpath(genpath('../../vistadisp'))
-        addpath('../TAPilot')
-end
+addpath(genpath('../../vistadisp'))
+addpath('../TAPilot')
+
 %% file i/o
 % stimDir = 'stimuli';
 switch location
     case 'laptop'
         stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
     case 'L1'
-        stimDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
+        stimDir = '/users/purplab/Desktop/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices'; %
     case 'rd'
         stimDir = 'stimuli';
 end
@@ -49,7 +44,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 10;
+nFramesPerTarget = 20;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
@@ -739,56 +734,58 @@ targetBlockInd = 1;
 framesComplete = 1;
 posUsed = posShuffled;
 
-for frame = 1:length(target.seq)
-    if targetBlockInd <= length(targetPresentBlockOrder)
-        if target.seq(frame) == 1 % INCREMENT:
-            if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-                if framesComplete <= nFramesPerTarget
-                    posSeq(frame) = posShuffled(block_ind(1),1); %position for T1
-                elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
-                    posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2
-                end
-            elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-                posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
-            elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-                posSeq(frame) = posShuffled(block_ind(4),4); %positions for T2
-                
-            end
-            framesComplete = framesComplete + 1;
-        elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
-            if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-                if framesComplete <= nFramesPerTarget
-                    posSeq(frame) = posShuffled(block_ind(1),1); %positions for T1
-                elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
-                    posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2   
-                end
-            elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-                posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
-            elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-                posSeq(frame) = posShuffled(block_ind(4),4); %position for T2
-            end
-            framesComplete = framesComplete + 1;
-        end
+if strcmp(target.type, 'contrast')
+    for frame = 1:length(target.seq)
+        if targetBlockInd <= length(targetPresentBlockOrder)
+            if target.seq(frame) == 1 % INCREMENT:
+                if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+                    if framesComplete <= nFramesPerTarget
+                        posSeq(frame) = posShuffled(block_ind(1),1); %position for T1
+                    elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
+                        posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2
+                    end
+                elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+                    posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
+                elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+                    posSeq(frame) = posShuffled(block_ind(4),4); %positions for T2
 
-        %reset framesComplete and move onto next block if frame conditions are met
-        if targetPresentBlockOrder(targetBlockInd) ~= 2
-            if framesComplete > nFramesPerTarget
-                %posUsed(block_ind(targetPresentBlockOrder(targetBlockInd)),targetPresentBlockOrder(targetBlockInd)) = nan;
-                %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
-                block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
-                targetBlockInd = targetBlockInd + 1;
-                framesComplete = 1;        
+                end
+                framesComplete = framesComplete + 1;
+            elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
+                if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
+                    if framesComplete <= nFramesPerTarget
+                        posSeq(frame) = posShuffled(block_ind(1),1); %positions for T1
+                    elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
+                        posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2   
+                    end
+                elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
+                    posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
+                elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
+                    posSeq(frame) = posShuffled(block_ind(4),4); %position for T2
+                end
+                framesComplete = framesComplete + 1;
             end
-        elseif targetPresentBlockOrder(targetBlockInd) == 2
-            if framesComplete > nFramesPerTarget*2
-                %posUsed(block_ind(1:2),1:2) = nan;
-                %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
-                block_ind(1:2) = block_ind(1:2) + 1;
-                targetBlockInd = targetBlockInd + 1;
-                framesComplete = 1;
+
+            %reset framesComplete and move onto next block if frame conditions are met
+            if targetPresentBlockOrder(targetBlockInd) ~= 2
+                if framesComplete > nFramesPerTarget
+                    %posUsed(block_ind(targetPresentBlockOrder(targetBlockInd)),targetPresentBlockOrder(targetBlockInd)) = nan;
+                    %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
+                    block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
+                    targetBlockInd = targetBlockInd + 1;
+                    framesComplete = 1;        
+                end
+            elseif targetPresentBlockOrder(targetBlockInd) == 2
+                if framesComplete > nFramesPerTarget*2
+                    %posUsed(block_ind(1:2),1:2) = nan;
+                    %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
+                    block_ind(1:2) = block_ind(1:2) + 1;
+                    targetBlockInd = targetBlockInd + 1;
+                    framesComplete = 1;
+                end
             end
+
         end
-        
     end
 end
 %posUsed

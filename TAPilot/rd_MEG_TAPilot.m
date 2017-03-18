@@ -19,12 +19,9 @@ location = 'L1'; %'laptop' 'L1'
 % RD, July 2014
 
 %% Add paths
-switch location
-    case 'laptop'
-        addpath(genpath('/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp'));
-    case 'L1'
-        addpath(genpath('/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp'));
-end
+
+addpath(genpath('../../vistadisp'))
+addpath('../TAPilot')
 
 %% Settings
 displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
@@ -169,7 +166,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
         case 'laptop'
             stimDir = '/Users/luisramirez/Documents/CarrascoLabMEG/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
         case 'L1'
-            stimDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
+            stimDir = '/users/purplab/Desktop/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
     end
     plotLevel = 3; % 3 = fewest plots
     [acc, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
