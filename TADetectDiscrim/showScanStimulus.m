@@ -40,18 +40,26 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % staircase? (adjustment between runs)
-staircase = 0; % set to 0 for first run of the day
+staircase = 1; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
     s = load('staircase.mat');
-    tilts = [-s.tilt s.tilt];
-    patchContrast = s.contrast;
-    fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = %.2f\ntilt = %1.1f\n\n\n\n', patchContrast, tilts(2))
+    switch stimulus.target.type
+        case 'cb'
+            tilts = [-s.tilt s.tilt];
+            patchContrast = s.contrast;
+            fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = %.2f\ntilt = %1.1f\n\n\n\n', patchContrast, tilts(2))
+        case 'contrast'
+            patchContrast = s.contrasts;
+            fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = [%1.2f %1.2f]\n\n\n\n', patchContrast(1), patchContrast(2))
+        otherwise
+            error('stimulus.target.type not recognized')
+    end
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = [0 1]; % starting settings: 1 [for cb target (range is 0-1)]
+    patchContrast = [0.1 1]; % starting settings: 1 [for cb target (range is 0-1)]
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -177,7 +185,7 @@ if isfield(stimulus, 'target')
         case 'contrast'
             % CREATE TARGET IMAGES HERE based on parameters specified in
             % 'makeTADetectDiscrimStim'
-            fprintf('\n[showScanStimulus] contrast: contrast = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
+            fprintf('\n[showScanStimulus] contrast: contrasts = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
             target.contrast = patchContrast; 
             [backgroundIms, maskedIms, target] = contrastTarget(display, target);
         otherwise

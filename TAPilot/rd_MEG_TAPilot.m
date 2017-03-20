@@ -182,7 +182,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
                 for iVI = 1:numel(validIdx)  
                     validTrialsAcc = [validTrialsAcc; acc.targetTypeAccAll{validIdx(iVI),iTT}];
                 end
-                validAcc(1,iTT) = mean(validTrialsAcc);
+                validAcc(1,iTT) = nanmean(validTrialsAcc);
             end
             staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
                 response.target.contrast, validAcc);

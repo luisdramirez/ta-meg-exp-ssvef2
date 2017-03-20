@@ -60,7 +60,7 @@ end
 contrasts(2) = c(cIdx);
 
 %% save staircase file
-% save('staircase.mat', 'contrasts')
+save('staircase.mat', 'contrasts')
 
 %% show new values
 fprintf('new contrasts: [%.2f %.2f]\n', contrasts(1), contrasts(2))
