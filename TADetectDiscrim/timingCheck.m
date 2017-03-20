@@ -38,3 +38,12 @@ for i=1:size(timeScan,2)
     hold on
 end
 xlabel('frames')
+
+% 
+% for i = 1:length(stimulus.seq)
+%     % stimulus.target.seq, 
+% end
+% 
+% for i = 1:length(targetBlockOrder)
+%     % targetBlockOrder, targetTypesBlockOrder, cueBlockOrder
+% end
