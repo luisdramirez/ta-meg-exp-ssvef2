@@ -176,16 +176,25 @@ if strcmp(stimfile, 'taDetectDiscrim')
             staircaseAdjustment(response.target.contrast, response.target.tilts(2), ...
                 validDetect, validDiscrim);
         case 'contrast'
-            validIdx = [1 3];
-            for iTT = 1:2
-                validTrialsAcc = [];
-                for iVI = 1:numel(validIdx)  
-                    validTrialsAcc = [validTrialsAcc; acc.targetTypeAccAll{validIdx(iVI),iTT}];
+            % staircase based on 2 runs
+            if mod(run,2)==0
+                % analyze previous run
+                [acc(2), stim(2)] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run-1, 0);
+                
+                validIdx = [1 3]; 
+                for iTT = 1:2
+                    validTrialsAcc = [];
+                    for iRun = 1:numel(acc)
+                        for iVI = 1:numel(validIdx)
+                            validTrialsAcc = [validTrialsAcc; acc(iRun).targetTypeAccAll{validIdx(iVI),iTT}];
+                        end
+                    end
+                    validAcc(1,iTT) = nanmean(validTrialsAcc);
                 end
-                validAcc(1,iTT) = mean(validTrialsAcc);
+                
+                staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
+                    response.target.contrast, validAcc);
             end
-            staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
-                response.target.contrast, validAcc);
         otherwise
             error('targetType not recognized')
     end
