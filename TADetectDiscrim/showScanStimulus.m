@@ -188,6 +188,8 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] contrast: contrasts = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
             target.contrast = patchContrast; 
             [backgroundIms, maskedIms, target] = contrastTarget(display, target);
+           [madeBgIms, madeTargIms] = makeIms(display, backgroundIms, maskedIms);
+            
         otherwise
             error('target.type not recognized')
     end
@@ -250,13 +252,13 @@ for frame = 1:nFrames
                     case 'contrast'
                         % DRAW TARGET HERE                
                         if stimulus.seq(frame) == 3 
-                            bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255);
-                            tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),1,target.seq(frame)}*255);
+                            bgtex = madeBgIms(1); %Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255);
+                            tex = madeTargIms(target.posSeq(frame),1,target.seq(frame)); %Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),1,target.seq(frame)}*255);
                             Screen('DrawTexture', display.windowPtr, bgtex);
                             Screen('DrawTexture', display.windowPtr, tex);
                         elseif stimulus.seq(frame) == 4 
-                            bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{2}*255);
-                            tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),2,target.seq(frame)}*255);            
+                            bgtex = madeBgIms(2); %Screen('MakeTexture', display.windowPtr, backgroundIms{2}*255);
+                            tex = madeTargIms(target.posSeq(frame), 1, target.seq(frame)); %Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),2,target.seq(frame)}*255);            
                             Screen('DrawTexture', display.windowPtr, bgtex);
                             Screen('DrawTexture', display.windowPtr, tex);
                         end
