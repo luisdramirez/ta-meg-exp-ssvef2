@@ -14,7 +14,7 @@ end
 for iPos=1:size(maskedIms,1) %position
     for iPhase=1:size(maskedIms,2) %phase
         for iCond=1:size(maskedIms,3) %condition
-            tex = Screen('MakeTexture',display.windowPtr, maskedIms{iPos, iPhase, iCond});
+            tex = Screen('MakeTexture',display.windowPtr, maskedIms{iPos, iPhase, iCond}*255);
             madeTargIms{iPos, iPhase, iCond} = tex;
         end
     end
