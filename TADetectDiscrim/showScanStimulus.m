@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % staircase? (adjustment between runs)
-staircase = 1; % set to 0 for first run of the day
+staircase = 0; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -252,15 +252,15 @@ for frame = 1:nFrames
                     case 'contrast'
                         % DRAW TARGET HERE                
                         if stimulus.seq(frame) == 3 
-                            bgtex = madeBgIms(1); %Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255);
-                            tex = madeTargIms(target.posSeq(frame),1,target.seq(frame)); %Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),1,target.seq(frame)}*255);
-                            Screen('DrawTexture', display.windowPtr, bgtex);
-                            Screen('DrawTexture', display.windowPtr, tex);
+                            %bgtex = madeBgIms{1}; %Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255);
+                            %tex = madeTargIms{target.posSeq(frame),1,target.seq(frame)}; %Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),1,target.seq(frame)}*255);
+                            Screen('DrawTexture', display.windowPtr, madeBgIms{1});
+                            Screen('DrawTexture', display.windowPtr, madeTargIms{target.posSeq(frame),1,target.seq(frame)});
                         elseif stimulus.seq(frame) == 4 
-                            bgtex = madeBgIms(2); %Screen('MakeTexture', display.windowPtr, backgroundIms{2}*255);
-                            tex = madeTargIms(target.posSeq(frame), 1, target.seq(frame)); %Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),2,target.seq(frame)}*255);            
-                            Screen('DrawTexture', display.windowPtr, bgtex);
-                            Screen('DrawTexture', display.windowPtr, tex);
+                            %bgtex = madeBgIms{2}; %Screen('MakeTexture', display.windowPtr, backgroundIms{2}*255);
+                            %tex = madeTargIms{target.posSeq(frame), 1, target.seq(frame)}; %Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame),2,target.seq(frame)}*255);            
+                            Screen('DrawTexture', display.windowPtr, madeBgIms{2});
+                            Screen('DrawTexture', display.windowPtr, madeTargIms{target.posSeq(frame),2,target.seq(frame)});
                         end
                     otherwise
                         error('target.type not recognized');
