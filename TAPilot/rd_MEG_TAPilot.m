@@ -191,8 +191,8 @@ if strcmp(stimfile, 'taDetectDiscrim')
                     end
                     validAcc(1,iTT) = nanmean(validTrialsAcc);
                 end
-                
-                staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
+                a = stim.p;
+                staircaseAdjustmentContrastTargets(a.stimContrast, ...
                     response.target.contrast, validAcc);
             end
         otherwise
