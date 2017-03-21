@@ -96,7 +96,8 @@ respSecs = stim.p.respDur;
 feedbackDur = stim.p.feedbackDur;
 refreshRate = stim.p.refrate;  %(frames)
 blockLength = stim.p.blockDur*refreshRate; %(frames)
-respTime = blockLength-(respSecs+feedbackDur)*refreshRate; %frames to respond period
+% respTime = blockLength-(respSecs+feedbackDur)*refreshRate; %frames to respond period
+respTime = (stim.p.targetLeadTime + stim.p.targetSOA + stim.p.cueTargetSOA)*refreshRate;
 keyCodes = stim.p.keyCodes;
 
 %% analyze each run
@@ -112,10 +113,15 @@ for n = 1:length(df);
     else
         itiSeq = [];
     end
+    if isfield(stim.stimulus,'jitSeq')
+        jitSeq = stim.stimulus.jitSeq;
+    else
+        jitSeq = [];
+    end
     
     [temp, responseData_labels] = sl_responseDiscrimData(respTime,trialCount,...
         respSecs,refreshRate, blockLength, keyCodes, dd.response, ...
-        stim.order, n, itiSeq);
+        stim.order, n, itiSeq, jitSeq, stim.p.jitter);
     responseData_all = [responseData_all; temp];  
 end
 
@@ -358,27 +364,28 @@ for n = 1:length(df)
     runIndx = run == n;
     for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
         dd = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
-        for i = 2:5; % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
+        for i = 2:5 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
             condition_Indx =  dd & targetCondition == i ;
-            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
-                 interval = 1;
-                 targetType = targetTypeT1;
-            else interval = 2;
-                 targetType = targetTypeT2;
+            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4
+                interval = 1;
+                targetType = targetTypeT1;
+            else
+                interval = 2;
+                targetType = targetTypeT2;
             end
-              % total correct / total present
-             accuracy2.Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum(ismember(targetType(condition_Indx),[1,2]) );
-             % total correct / total correctly detected
-             accuracy2.Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
-                 sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
-             accuracy2.Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
-                 numel(DetectTargetType(condition_Indx,interval));
-             accuracy2.Overall_all(i-1,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
-                 numel( response_correct(condition_Indx) );
-             
-         end
-     end
+            % total correct / total present
+            accuracy2.Discrim_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                sum(ismember(targetType(condition_Indx),[1,2]) );
+            % total correct / total correctly detected
+            accuracy2.Discrim1_all(i-1,k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
+                sum (DetectTargetType(condition_Indx,interval) == DiscrimResponse_all(condition_Indx) );
+            accuracy2.Detect_all(i-1,k,n) = sum (DetectTargetType(condition_Indx,interval) == DetectResponse_all(condition_Indx) ) /...
+                numel(DetectTargetType(condition_Indx,interval));
+            accuracy2.Overall_all(i-1,k,n) = sum ( response_correct(condition_Indx) == 1 ) / ...
+                numel( response_correct(condition_Indx) );
+            
+        end
+    end
 end
 
 
