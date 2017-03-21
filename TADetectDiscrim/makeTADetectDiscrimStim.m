@@ -45,7 +45,8 @@ respDur = 1.2; % (s)
 feedbackDur = 0.3;
 cueDur = 0.1;
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
-jitter = 1; % add jittered interval between trials
+iti = 1;
+jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
 if refrate==75
     % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
     fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
@@ -297,19 +298,34 @@ switch target.type
 end
 
 %% Determine the stimulus times
-if jitter
-    iti = 0:0.2:1; % recall there is always 0.5 s before cue
-    itiSeq = Shuffle(repmat(iti,1,ceil(nBlocks/numel(iti))));
-    itiSeq = itiSeq(1:nBlocks);
-    runDur = blockDur*nBlocks + sum(itiSeq);
-    blockStartTimes = (0:blockDur:blockDur*nBlocks-blockDur) + cumsum([0 itiSeq(1:end-1)]);
-    nFramesPerBlock = (blockDur + max(itiSeq))*refrate; % number of frames in the longest block
-else
-    itiSeq = zeros(1,nBlocks);
-    runDur = blockDur*nBlocks;
-    blockStartTimes = 0:blockDur:runDur-blockDur;
-    nFramesPerBlock = blockDur*refrate;
+switch jitter
+    case 'blockPrecueInterval'
+        itiSeq = ones(1,nBlocks)*iti;
+        blockDur = blockDur + iti;
+        jit = 0;
+%         jit = 0:0.2:1; % recall there is always 0.5 s before cue
+        jitSeq = Shuffle(repmat(jit,1,ceil(nBlocks/numel(jit))));
+        jitSeq = jitSeq(1:nBlocks);
+        runDur = blockDur*nBlocks + sum(jitSeq);
+        blockStartTimes = (0:blockDur:blockDur*nBlocks-blockDur) + cumsum([0 jitSeq(1:end-1)]);
+        nFramesPerBlock = (blockDur + max(jitSeq))*refrate; % number of frames in the longest block
+    case 'ITI'
+        iti = 0:0.2:1; % recall there is always 0.5 s before cue
+        itiSeq = Shuffle(repmat(iti,1,ceil(nBlocks/numel(iti))));
+        itiSeq = itiSeq(1:nBlocks);
+        runDur = blockDur*nBlocks + sum(itiSeq);
+        blockStartTimes = (0:blockDur:blockDur*nBlocks-blockDur) + cumsum([0 itiSeq(1:end-1)]);
+        nFramesPerBlock = (blockDur + max(itiSeq))*refrate; % number of frames in the longest block
+    case 'none'
+        itiSeq = ones(1,nBlocks)*iti;
+        blockDur = blockDur + iti;
+        runDur = blockDur*nBlocks;
+        blockStartTimes = 0:blockDur:runDur-blockDur;
+        nFramesPerBlock = blockDur*refrate;
+    otherwise
+        error('jitter not recognized')
 end
+p.blockDur = blockDur; % as this may have changed
 
 % fixed target times (T1 and T2) on the attended (right-side) stimulus
 targetStartTimes = [];
@@ -339,15 +355,15 @@ for iBlock = 1:nBlocks
         end
         
         % target present
-        targetTimes = targetTimes + blockStartTimes(iBlock) + targetLeadTime;
+        targetTimes = targetTimes + blockStartTimes(iBlock) + targetLeadTime + jitSeq(iBlock);
         targetStartTimes = [targetStartTimes; targetTimes'];
         
         % target absent
-        targetAbsTimes = targetAbsTimes + blockStartTimes(iBlock) + targetLeadTime;
+        targetAbsTimes = targetAbsTimes + blockStartTimes(iBlock) + targetLeadTime + jitSeq(iBlock);
         targetAbsStartTimes = [targetAbsStartTimes; targetAbsTimes'];
         
         % pre- and post-cues
-        cueTimes = cueTimes + blockStartTimes(iBlock) + targetLeadTime;
+        cueTimes = cueTimes + blockStartTimes(iBlock) + targetLeadTime + jitSeq(iBlock);
         cueStartTimes = [cueStartTimes; cueTimes'];
     end
 end
@@ -487,13 +503,22 @@ for iFrame = 1:numel(seqtiming)
         case 'blank'
             p1 = 0; p2 = 0; c1 = 0; c2 = 0;
         case 'fast-left'
-            p1 = fastPhaseSeq(phaseSeqIdx); % left
-            p2 = slowPhaseSeq(phaseSeqIdx); % right
-            %             c1 = 1; c2 = 1;
+            % if in iti
+            if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < itiSeq(blockIdx) - 0.00001)
+                p1 = 0; p2 = 0;  c1 = 0; c2 = 0;
+            else
+                p1 = fastPhaseSeq(phaseSeqIdx); % left
+                p2 = slowPhaseSeq(phaseSeqIdx); % right
+                %             c1 = 1; c2 = 1;
+            end
         case 'slow-left'
-            p1 = slowPhaseSeq(phaseSeqIdx); % left
-            p2 = fastPhaseSeq(phaseSeqIdx); % right
-            %             c1 = 1; c2 = 1;
+            if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < itiSeq(blockIdx) - 0.00001)
+                p1 = 0; p2 = 0;  c1 = 0; c2 = 0;
+            else
+                p1 = slowPhaseSeq(phaseSeqIdx); % left
+                p2 = fastPhaseSeq(phaseSeqIdx); % right
+                %             c1 = 1; c2 = 1;
+            end
         otherwise
             error('blockName not recognized')
     end
@@ -729,6 +754,7 @@ stimulus.soundSeq = cueSeq;
 stimulus.target = target;
 stimulus.respDur = respDur;
 stimulus.itiSeq = itiSeq; % storage only
+stimulus.jitSeq = jitSeq;
 
 % store in order structure
 order.blockOrder = blockOrder;
