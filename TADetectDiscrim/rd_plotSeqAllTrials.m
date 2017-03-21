@@ -1,22 +1,27 @@
 % rd_plotSeqAllTrials.m
 
-location = 'L1';
-run = '9';
-
-% switch location
-%     case 'L1'
-%         load(['/Users/purplab/Deskptop/Luis/vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices/taDetectDiscrim' run '.mat'])
-% end
-
-blockLengths = stimulus.itiSeq + p.blockDur;
+switch p.jitter
+    case 'ITI'
+        blockLengths = stimulus.itiSeq + p.blockDur;
+    case 'blockPrecueInterval'
+        blockLengths = stimulus.jitSeq + p.blockDur;
+end
 blockStarts = [0 cumsum(blockLengths(1:end-1))];
-blockIdx = blockStarts*p.refrate + 1;
+blockIdx = round(blockStarts*p.refrate + 1);
 nBlocks = numel(blockIdx);
 
-window = 250;
-a = [];
+precueStarts = blockStarts + .5 + stimulus.jitSeq;
+precueIdx = round(precueStarts*p.refrate + 1);
+
+% window = [0 336];
+window = [-90 306];
+windowSz = diff(window);
+a = zeros(nBlocks,windowSz);
 for i = 1:nBlocks
-    a(i,:) = stimulus.seq(blockIdx(i):blockIdx(i)+window-1);
+    win = precueIdx(i)+window(1):precueIdx(i)+window(2)-1;
+    idx = 1:length(win);
+    idx(win<1) = [];
+    a(i,idx) = stimulus.seq(win(idx));
 end
 
 %figure
@@ -25,7 +30,7 @@ plot(a')
 xlabel('time (frames)')
 ylabel('image number in stimulus.seq')
 
-offsets = repmat(1:nBlocks,window,1);
+offsets = repmat(1:nBlocks,windowSz,1);
 %figure
 hold on
 subplot(3,1,2)

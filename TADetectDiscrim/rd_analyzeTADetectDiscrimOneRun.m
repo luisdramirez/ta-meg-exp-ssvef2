@@ -9,7 +9,8 @@ respSecs = stim.p.respDur;
 feedbackDur = stim.p.feedbackDur;
 refreshRate = stim.p.refrate;  %(frames)
 blockLength = stim.p.blockDur*refreshRate; %(frames)
-respTime = blockLength-(respSecs+feedbackDur)*refreshRate; %frames to respond period
+% respTime = blockLength-(respSecs+feedbackDur)*refreshRate; %frames to respond period
+respTime = (stim.p.targetLeadTime + stim.p.targetSOA + stim.p.cueTargetSOA)*refreshRate;
 keyCodes = stim.p.keyCodes;
 order = stim.order;
 if isfield(stim.stimulus,'itiSeq')
@@ -17,13 +18,18 @@ if isfield(stim.stimulus,'itiSeq')
 else
     itiSeq = [];
 end
+if isfield(stim.stimulus,'jitSeq')
+    jitSeq = stim.stimulus.jitSeq;
+else
+    jitSeq = [];
+end
 n = 1;
 df = 1:n; % placeholder for list of data files
 
 [responseData_all, responseData_labels] = ...
     sl_responseDiscrimData(respTime,trialCount,...
     respSecs,refreshRate, blockLength, keyCodes, dd.response, ...
-    order, n, itiSeq);
+    order, n, itiSeq, jitSeq, stim.p.jitter);
 
 %% extract block order from responseData_all
 run = responseData_all(:,1);
