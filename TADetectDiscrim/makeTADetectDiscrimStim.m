@@ -71,7 +71,7 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'bullseye'; %'grating','checkerboard','bullseye'
+stimType = 'bullseye'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
 stimSize = 8;
 spatialFreq = 1;
 orientation = 0;
@@ -167,6 +167,8 @@ for iPhase = 1:numel(phases)
             case 'bullseye'
                 s{iPhase, iContrast} = CreateSpiral(d, stimSize, spatialFreq, phase, contrast)./2 + .5;
                 %s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
+            case 'radialcb'
+                s{iPhase, iContrast} = makeRadialCheckerboards() + 0.5; 
             otherwise
                 error('stimType not recognized')
         end
