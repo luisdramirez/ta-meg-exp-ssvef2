@@ -114,6 +114,11 @@ blurRadius = 0.2;
 backgroundColor = 128/255;
 phases = [0 pi];
 
+radialCB.thetaCycles = 8;
+radialCB.E = 0.05;
+radialCB.A = 1;
+radialCB.b = 0.2;
+
 stimPos = [6 4]; % [x y]
 stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
 
@@ -139,7 +144,7 @@ p = v2struct(...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
     cueBlockNames, cueBlockOrder, targetTypeBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
-    contrasts, blurRadius, backgroundColor, phases, triggerOption, jitter);
+    contrasts, blurRadius, backgroundColor, phases, radialCB, triggerOption, jitter);
 
 %% Make the stimuli
 for iPhase = 1:numel(phases)
@@ -169,7 +174,8 @@ for iPhase = 1:numel(phases)
                 s{iPhase, iContrast} = CreateSpiral(d, stimSize, spatialFreq, phase, contrast)./2 + .5;
                 %s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
             case 'radialcb'
-                s{iPhase, iContrast} = makeRadialCheckerboards() + 0.5; 
+                s{iPhase, iContrast} = makeRadialCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
+                    radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             otherwise
                 error('stimType not recognized')
         end
