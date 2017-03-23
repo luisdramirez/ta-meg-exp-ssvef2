@@ -80,7 +80,7 @@ nPhases = 2; %number of checker board phases
 nConds = 2; %number of contrast conditions 
 nIms = nPos * nPhases * nConds; %total number of images to create 
 
-shuffledCoords = target.shuffledCoords;
+coords = target.coords;
 xmax = size(targ_stim{1},1); ymax = size(targ_stim{1},2);
 
 % 2D Gaussian parameters
@@ -99,7 +99,7 @@ maskedIms = cell(nPos, nPhases , nConds);
 
 % Generate circular mask | use make2DGaussianCentered(w, h, x0, y0, sigma, gaussAmp)
 for frame=1:nPos
-    circBlur = make2DGaussianCentered(gaussWidth, gaussHeight,  shuffledCoords(frame,1), shuffledCoords(frame,2), sigma, gaussAmp); 
+    circBlur = make2DGaussianCentered(gaussWidth, gaussHeight,  coords(frame,1), coords(frame,2), sigma, gaussAmp); 
     circBlurs{frame} = circBlur;
 %     figure(i)
 %     imshow(circBlurs{i})

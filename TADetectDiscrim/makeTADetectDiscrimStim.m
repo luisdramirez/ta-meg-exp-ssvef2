@@ -3,7 +3,7 @@ function makeTADetectDiscrimStim(run)
 %% run setup
 %run = 7;
 saveStim = 1;
-saveFigs = 0;
+saveFigs = 0;   
 
 %% add paths
 addpath(genpath('../../vistadisp'))
@@ -30,6 +30,7 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
+responseOption = 'targetPos'; % 'targetType','targetPos'
 keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
 keyCodes = KbName(keyNames);
 
@@ -47,14 +48,12 @@ cueDur = 0.1;
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
 iti = 1;
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
-if refrate==75
-    % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
-    fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
-    slowUnit = [1 1 1 2 2];
-else
+if refrate==60
     % 60 Hz SSVEP unit sequences: 3 frames (60/3=20 Hz) and 4 frames (60/4=15 Hz)
     fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
     slowUnit = [1 1 2 2];
+else
+    error('refrate must be 60 Hz')
 end
 
 %% target setup
@@ -66,7 +65,6 @@ attBlockNames = {'no-att','att-right'}; % att-right
 % targetBlockNames = {'no-targ','pres-pres'};
 targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-%posBlockNames = {'n','ne','e','se','s','sw','w','nw'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
 nBlocks = numel(blockOrder);
@@ -138,7 +136,7 @@ triggerOption = 'conditionID'; % 'conditionID','combinatorial'
 % sorry this is kind of a horrible way to do this
 p = v2struct(...
     displayName, pixelsPerDegree, screenWidth, screenHeight, cx, cy, ...
-    keyNames, keyCodes, ...
+    responseOption, keyNames, keyCodes, ...
     refrate, blockDur, targetDur, targetLeadTime, targetSOA, cueTargetSOA, ...
     attCueLeadTime, respDur, feedbackDur, fastUnit, slowUnit, ...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
@@ -288,19 +286,21 @@ switch target.type
             length(targetBlockOrder(targetBlockOrder == 4));
         positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
         posShuffled = Shuffle(positions_mat);
-        posBlockOrderNames = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
+        posShuffledHeaders = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
 
+%         posShuffled = ones(8,4);%%%%%%%%%%%
+        
         % Generate guassian center coordinates 
         xmax = size(target.stim{1},1); ymax = size(target.stim{1},2);
         cx2 = 0; cy2 = 0;  %origin of coordiantes
         r = xmax/4; %radius of center coordinates
-        theta = 22.5:45:360; theta = deg2rad(theta); 
+        % start from 6 o'clock and go clockwise (left then right)
+        theta = 22.5+90:45:360+90; theta = deg2rad(mod(theta,360)); 
         x0 = cx2 + r * cos(theta); %generate x coordinates
         y0 = cx2 + r * sin(theta); %generate y coordinates
         gaussCoords = [x0' y0']; %store coordinates
-        shuffledCoords = gaussCoords(randperm(size(gaussCoords,1)),:); %shuffle coordinates
-        stimulus.target.shuffledCoords = shuffledCoords;
-        target.shuffledCoords = shuffledCoords; %store coordinates       
+        target.coords = gaussCoords; %store coordinates    
+        target.responsePosSets = ([1:4; 5:8])';
     otherwise
         error('target.type not recognized')
 end
@@ -405,6 +405,7 @@ targetOn = 0;
 targetAbsIdx = 1; % target absent
 targetAbsOn = 0;
 cueIdx = 1;
+posRowCount = ones(1,size(posShuffled,2));
 
 for iFrame = 1:numel(seqtiming)
     time = seqtiming(iFrame);
@@ -414,6 +415,8 @@ for iFrame = 1:numel(seqtiming)
         blockIdx = blockIdx+1;
         blockName = blockNames{blockOrder(blockIdx)};
         attBlockName = attBlockNames{attBlockOrder(blockIdx)};
+        cueBlockName = cueBlockNames{cueBlockOrder(blockIdx)};
+        targetBlockName = targetBlockNames{targetBlockOrder(blockIdx)};
         phaseSeqIdx = 1;
         newBlock = 1; % used to decide whether block triggers will be on
     else
@@ -481,8 +484,24 @@ for iFrame = 1:numel(seqtiming)
         else
             targetTypeSeq(iFrame,1) = targetTypeSeq(iFrame-1);
         end
+        switch targetBlockName
+            case 'pres-pres'
+                posCol = whichTarget;
+            case 'pres-abs'
+                posCol = 3;
+            case 'abs-pres'
+                posCol = 4;
+            otherwise
+                error('targetBlockName not viable')
+        end
+        posRow = posRowCount(posCol);
+        posSeq(iFrame,1) = posShuffled(posRow,posCol);
+        if posSeq(iFrame-nFramesPerTarget+1)>0
+            posRowCount(posCol) = posRowCount(posCol)+1;
+        end
     else
         targetTypeSeq(iFrame,1) = 0;
+        posSeq(iFrame,1) = 0;
     end
     
     % determine if an absent target is "on" (if it is time for that target)
@@ -578,22 +597,46 @@ for iFrame = 1:numel(seqtiming)
     % determine correct response keycode
     cueBlock = cueBlockNames{cueBlockOrder(blockIdx)};
     if ~strcmp(cueBlock, 'no-cue') && ...
-            time-blockStartTimes(blockIdx) > targetLeadTime + targetSOA + cueTargetSOA && ...
+            time-blockStartTimes(blockIdx) > targetLeadTime + jitSeq(blockIdx) + targetSOA + cueTargetSOA && ...
             blockStartTimes(blockIdx+1)-time > feedbackDur + itiSeq(blockIdx) - 0.00001
         % which target is post-cued?
         responseCue = str2double(cueBlock(end));
-        switch targetBlockNames{targetBlockOrder(blockIdx)}
+        switch targetBlockName
             case 'pres-pres'
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget*2,'last'));
                 targets = targetFrames([1 end])';
-                correctResponse = targets(responseCue);
+                
+                posFrames = posSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget*2,'last'));
+                positions = posFrames([1 end])';
+                
+                switch responseOption
+                    case 'targetType'
+                        correctResponse = targets(responseCue);
+                    case 'targetPos'
+                        [row col] = find(target.responsePosSets==positions(responseCue));
+                        correctResponse = col;
+                    otherwise
+                        error('responseOption not recognized')
+                end
             case 'pres-abs'
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget,'last'));
                 targets = [targetFrames(1) 0];
+                
+                posFrames = posSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget,'last'));
+                positions = [posFrames(1) 0];
+                
                 if responseCue==1
-                    correctResponse = targetFrames(end);
+                    switch responseOption
+                        case 'targetType'
+                            correctResponse = targets(1);
+                        case 'targetPos'
+                            [row col] = find(target.responsePosSets==positions(1));
+                            correctResponse = col;
+                    end
                 else
                     correctResponse = 3; % absent
                 end
@@ -601,16 +644,32 @@ for iFrame = 1:numel(seqtiming)
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget,'last'));
                 targets = [0 targetFrames(1)];
+                
+                posFrames = posSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget,'last'));
+                positions = [0 posFrames(1)];
+                
                 if responseCue==1
                     correctResponse = 3; % absent
                 else
-                    correctResponse = targetFrames(end);
+                    switch responseOption
+                        case 'targetType'
+                            correctResponse = targets(2);
+                        case 'targetPos'
+                            [row col] = find(target.responsePosSets==positions(2));
+                            correctResponse = col;
+                    end
                 end
             case 'abs-abs'
                 targets = [0 0];
+                positions = [0 0];
                 correctResponse = 3; % absent
         end
+        trialsPresented(blockIdx).precue = str2double(cueBlockName(1));
+        trialsPresented(blockIdx).responseCue = responseCue;
         trialsPresented(blockIdx).targets = targets;
+        trialsPresented(blockIdx).positions = positions;
+        trialsPresented(blockIdx).correctResponse = correctResponse;
         keyCodeSeq(iFrame,1) = keyCodes(correctResponse);
     else
         keyCodeSeq(iFrame,1) = 0;
@@ -620,24 +679,6 @@ for iFrame = 1:numel(seqtiming)
         case 'conditionID'
             % determine trigger - condition ID
             if newBlock % only give condition trigger at the first frame of the block
-%                 switch blockName
-%                     case 'blank'
-%                         trig = 7;
-%                     case 'fast-left'
-%                         if strcmp(attBlockName,'att-left')
-%                             trig = NaN; % never happens, so don't use up the trigger
-%                         elseif strcmp(attBlockName,'att-right')
-%                             trig = 1;
-%                         end
-%                     case 'slow-left'
-%                         if strcmp(attBlockName,'att-left')
-%                             trig = NaN; % never happens, so don't use up the trigger
-%                         elseif strcmp(attBlockName,'att-right')
-%                             trig = 2;
-%                         end
-%                     otherwise
-%                         error('blockName not recognized')
-%                 end
                 switch cueBlock
                     case 'no-cue' % blank
                         trig = 7;
@@ -678,47 +719,6 @@ for iFrame = 1:numel(seqtiming)
             
             trigSeq(iFrame,1) = computeTrigger(trig);
             
-        case 'combinatorial'
-            error('sorry, combinatorial trigger code not yet implemented')
-            % determine trigger - combinatorial code
-            if newBlock % only give condition trigger at the first frame of the block
-                if strcmp(blockName,'blank')
-                    blankTrig = 7;
-                else
-                    blankTrig = NaN;
-                end
-                if strcmp(blockName,'fast-left')
-                    fastSideTrig = 1;
-                elseif strcmp(blockName,'slow-left')
-                    fastSideTrig = 2;
-                else
-                    fastSideTrig = NaN;
-                end
-                if strcmp(attBlockName,'att-left')
-                    attSideTrig = 3;
-                elseif strcmp(attBlockName,'att-right')
-                    attSideTrig = 4;
-                else
-                    attSideTrig = NaN;
-                end
-            else
-                blankTrig = NaN;
-                fastSideTrig = NaN;
-                attSideTrig = NaN;
-            end
-            
-            % triger for target side, only on first target frame
-            if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
-                targetTrig = 5; % target on left
-            elseif targetOnSeq(iFrame)==2 && targetOnSeq(iFrame-1)==0
-                targetTrig = 6; % target on right
-            else
-                targetTrig = NaN;
-            end
-            
-            trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
-%             trigSeq(iFrame,1) = 0;
- 
         otherwise
             error('triggerOption not recognized')
     end
@@ -744,6 +744,7 @@ srcRect = [0 0 size(images,2) size(images,1)];
 destRect = CenterRectOnPoint(srcRect, cx, cy); %(cy+stimPos(2)*pixelsPerDegree)
 diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
 target.seq = targetTypeSeq;
+target.posSeq = posSeq;
 
 % store in stimulus structure
 stimulus.images = images*255;
@@ -763,6 +764,15 @@ stimulus.respDur = respDur;
 stimulus.itiSeq = itiSeq; % storage only
 stimulus.jitSeq = jitSeq;
 
+% friendlier format of posBlockOrder
+posBlockOrder = nan(size(targetTypeBlockOrder));
+for iBlock = 1:nBlocks-1
+    positions = trialsPresented(iBlock).positions;
+    if ~isempty(positions)
+        posBlockOrder(:,iBlock) = positions;
+    end
+end
+
 % store in order structure
 order.blockOrder = blockOrder;
 order.attBlockOrder = attBlockOrder;
@@ -771,114 +781,11 @@ order.cueBlockOrder = cueBlockOrder;
 order.targetTypeBlockOrder = targetTypeBlockOrder;
 
 if strcmp(target.type, 'contrast')
-    order.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
+    order.posShuffled = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
+    order.posBlockOrder = posBlockOrder;
 end
 order.targetTypes = targetTypes;
 order.trialsPresented = trialsPresented;
-
-% create target positions
-posSeq = zeros(size(seq)); 
-
-targetPresentBlockOrder = targetBlockOrder(targetBlockOrder ~= 1 & targetBlockOrder ~= 5);
-
-%targetBlockOrder == 2 (pres-pres)
-%targetBlockOrder == 3 (pres-abs)
-%targetBlockOrder == 4 (abs-pres)
-
-block_ind = [1 1 1 1]; % [blockPP_indT1 blockPP_indT2 blockPA_ind blockAP_ind];
-targetBlockInd = 1;
-framesComplete = 1;
-posUsed = posShuffled;
-
-
-if strcmp(target.type, 'contrast')
-    for frame = 1:length(target.seq)
-        if targetBlockInd <= length(targetPresentBlockOrder)
-            if target.seq(frame) == 1 % INCREMENT:
-                if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-                    if framesComplete <= nFramesPerTarget
-                        posSeq(frame) = posShuffled(block_ind(1),1); %position for T1
-                    elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
-                        posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2
-                    end
-                elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-                    posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
- 
-                elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-                    posSeq(frame) = posShuffled(block_ind(4),4); %positions for T2
-                end
-                framesComplete = framesComplete + 1;
-            elseif target.seq(frame) == 2 % IF TARGET DECREMENT:
-                if targetPresentBlockOrder(targetBlockInd) == 2 % IF PRES-PRES
-                    if framesComplete <= nFramesPerTarget
-                        posSeq(frame) = posShuffled(block_ind(1),1); %positions for T1
-                    elseif framesComplete > nFramesPerTarget && framesComplete <= nFramesPerTarget*2
-                        posSeq(frame) = posShuffled(block_ind(2),2); %positions for T2   
-                    end
-                elseif targetPresentBlockOrder(targetBlockInd) == 3 % IF PRES-ABS
-                    posSeq(frame) = posShuffled(block_ind(3),3); %positions for T1
-                elseif targetPresentBlockOrder(targetBlockInd) == 4 % IF ABS-PRES
-                    posSeq(frame) = posShuffled(block_ind(4),4); %position for T2
-                end
-                framesComplete = framesComplete + 1;
-            end
-
-            %reset framesComplete and move onto next block if frame conditions are met
-            if targetPresentBlockOrder(targetBlockInd) ~= 2
-                if framesComplete > nFramesPerTarget
-                    %posUsed(block_ind(targetPresentBlockOrder(targetBlockInd)),targetPresentBlockOrder(targetBlockInd)) = nan;
-                    %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)] 
-                    if targetPresentBlockOrder(targetBlockInd) == 3
-                        targs = [posSeq(frame) 0];
-                    elseif targetPresentBlockOrder(targetBlockInd) == 4
-                        targs = [0 posSeq(frame)];
-                    end
-                    positionsPresented(targetBlockInd).targets = targs;
-                    block_ind(targetPresentBlockOrder(targetBlockInd)) = block_ind(targetPresentBlockOrder(targetBlockInd)) + 1; 
-                    targetBlockInd = targetBlockInd + 1;
-                    framesComplete = 1;        
-                end
-            elseif targetPresentBlockOrder(targetBlockInd) == 2
-                if framesComplete > nFramesPerTarget*2
-                    %posUsed(block_ind(1:2),1:2) = nan;
-                    %[frame framesComplete targetBlockInd targetPresentBlockOrder(targetBlockInd)]
-                    targs = [posShuffled(block_ind(1),1) posShuffled(block_ind(2),2)];
-                    positionsPresented(targetBlockInd).targets = targs;
-                    block_ind(1:2) = block_ind(1:2) + 1;
-                    targetBlockInd = targetBlockInd + 1;
-                    framesComplete = 1;
-                end
-            end
-
-        end
-    end
-end
-%posUsed
-
-% store new variables in appropriate structure
-stimulus.target.posSeq = posSeq; %target position sequence
-target.posSeq = posSeq;
-order.targetPresentBlockOrder = targetPresentBlockOrder; %target presence block order
-order.positionsPresented = positionsPresented; %positions of targets
-order.targetIndex = find(order.targetBlockOrder ~=1 & order.targetBlockOrder ~=5)'; %index of targets in targetBlockOrder
-
-% store target positions including no-targ & absent conditions
-for i= 1:length(targetBlockOrder);
-    if  targetBlockOrder(i) == 1
-        posPresented(i,1:2) = nan;
-    elseif targetBlockOrder(i) == 5
-        posPresented(i,1:2) = 0;
-    else
-        posPresented(i,1:2) =nan;
-    end
-end
-
-for i=1:length(order.positionsPresented)
-    posPresented(order.targetIndex(i),1) = order.positionsPresented(i).targets(1);
-    posPresented(order.targetIndex(i),2) = order.positionsPresented(i).targets(2);
-end
-
-order.positionsPresented = posPresented; %positions of targets (includes no-targ and absent trials)
 
 % save stimulus
 if saveStim
