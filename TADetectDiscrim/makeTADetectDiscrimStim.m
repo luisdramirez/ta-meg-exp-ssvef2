@@ -16,7 +16,7 @@ vistaStimDir = sprintf('../../%s', vistaStimPath);
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'Carrasco_R1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
+displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;
@@ -769,6 +769,7 @@ order.attBlockOrder = attBlockOrder;
 order.targetBlockOrder = targetBlockOrder;
 order.cueBlockOrder = cueBlockOrder; 
 order.targetTypeBlockOrder = targetTypeBlockOrder;
+
 if strcmp(target.type, 'contrast')
     order.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
 end
