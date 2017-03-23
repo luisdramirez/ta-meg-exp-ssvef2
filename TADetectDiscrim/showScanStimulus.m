@@ -395,11 +395,11 @@ for frame = 1:nFrames
 
     % send trigger for MEG, if requested, and record the color of the PD
     % cue
-    if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0
-        PTBSendTrigger(stimulus.trigSeq(frame), 0);
-        fprintf('Trigger sent, %s\n%d', datestr(now), stimulus.trigSeq(frame)); drawnow
-        response.trig(frame) = stimulus.trigSeq(frame);
-    end
+%     if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0
+%         PTBSendTrigger(stimulus.trigSeq(frame), 0);
+%         fprintf('Trigger sent, %s\n%d', datestr(now), stimulus.trigSeq(frame)); drawnow
+%         response.trig(frame) = stimulus.trigSeq(frame);
+%     end
     
     if isfield(stimulus, 'diodeSeq') 
         response.LED(frame)  = colIndex;

@@ -75,11 +75,11 @@ badFrames = flipFrames(badFramesIndx);
 
 plot(stimulus.trigSeq,'b')
 hold on
-% plot(stimulus.soundSeq*100,'m')
+plot(stimulus.soundSeq*100,'m')
 plot(stimulus.target.seq*100,'g')
-% plot(stimulus.keyCodeSeq,'k')
-% plot(diff(response.flip)*1000,'r')
-% legend('trigSeq','soundSeq','targSeq','keyCodeSeq','flip')
+plot(stimulus.keyCodeSeq,'k')
+plot(diff(response.flip)*1000,'r')
+legend('trigSeq','soundSeq','targSeq','keyCodeSeq','flip')
 
 
 %% Verify each trial
