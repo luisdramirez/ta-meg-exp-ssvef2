@@ -99,6 +99,7 @@ blockLength = stim.p.blockDur*refreshRate; %(frames)
 % respTime = blockLength-(respSecs+feedbackDur)*refreshRate; %frames to respond period
 respTime = (stim.p.targetLeadTime + stim.p.targetSOA + stim.p.cueTargetSOA)*refreshRate;
 keyCodes = stim.p.keyCodes;
+responseOption = stim.p.responseOption;
 
 %% analyze each run
 responseData_all = [];
@@ -135,6 +136,11 @@ response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
 targetAxis = responseData_all(:,13:14);
 
+targetPos = stim.order.posBlockOrder';
+targetPosType = targetPos;
+targetPosType(targetPos>=1 & targetPos<=4) = 1;
+targetPosType(targetPos>=5 & targetPos<=8) = 2;
+
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
 DetectTargetType (DetectTargetType == 2) = 1;
@@ -166,11 +172,26 @@ for n = 1:length(df)
     runIndx = run == n;
     for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; 
        condition_Indx = runIndx & cueBlockOrder == cueBlockOrder_Indx(k);
-            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4;
+            if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4
                  interval = 1;
-                 targetType = targetTypeT1;
-            else interval = 2;
-                 targetType = targetTypeT2;
+                 switch responseOption
+                     case 'targetType'
+                         targetType = targetTypeT1;
+                     case 'targetPos'
+                         targetType = targetPosType(:,1);
+                     otherwise
+                         error('responseOption not recognized')
+                 end
+            else
+                interval = 2;
+                switch responseOption
+                    case 'targetType'
+                        targetType = targetTypeT2;
+                    case 'targetPos'
+                        targetType = targetPosType(:,2);
+                    otherwise
+                        error('responseOption not recognized')
+                end
             end
               % total correct / total present
             accuracy.Discrim_all(k,n) = sum (targetType(condition_Indx) == response_all(condition_Indx))/ ...
