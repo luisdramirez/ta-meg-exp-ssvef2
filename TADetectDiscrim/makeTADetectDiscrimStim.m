@@ -1,4 +1,4 @@
-% function makeTADetectDiscrimStim(run)
+function makeTADetectDiscrimStim(run)
 
 %% run setup
 %run = 7;
@@ -288,6 +288,8 @@ switch target.type
         posShuffled = Shuffle(positions_mat);
         posShuffledHeaders = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
 
+%         posShuffled = ones(8,4);%%%%%%%%%%%
+        
         % Generate guassian center coordinates 
         xmax = size(target.stim{1},1); ymax = size(target.stim{1},2);
         cx2 = 0; cy2 = 0;  %origin of coordiantes
