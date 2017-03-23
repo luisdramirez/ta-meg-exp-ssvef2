@@ -636,24 +636,6 @@ for iFrame = 1:numel(seqtiming)
         case 'conditionID'
             % determine trigger - condition ID
             if newBlock % only give condition trigger at the first frame of the block
-%                 switch blockName
-%                     case 'blank'
-%                         trig = 7;
-%                     case 'fast-left'
-%                         if strcmp(attBlockName,'att-left')
-%                             trig = NaN; % never happens, so don't use up the trigger
-%                         elseif strcmp(attBlockName,'att-right')
-%                             trig = 1;
-%                         end
-%                     case 'slow-left'
-%                         if strcmp(attBlockName,'att-left')
-%                             trig = NaN; % never happens, so don't use up the trigger
-%                         elseif strcmp(attBlockName,'att-right')
-%                             trig = 2;
-%                         end
-%                     otherwise
-%                         error('blockName not recognized')
-%                 end
                 switch cueBlock
                     case 'no-cue' % blank
                         trig = 7;
@@ -694,47 +676,6 @@ for iFrame = 1:numel(seqtiming)
             
             trigSeq(iFrame,1) = computeTrigger(trig);
             
-        case 'combinatorial'
-            error('sorry, combinatorial trigger code not yet implemented')
-            % determine trigger - combinatorial code
-            if newBlock % only give condition trigger at the first frame of the block
-                if strcmp(blockName,'blank')
-                    blankTrig = 7;
-                else
-                    blankTrig = NaN;
-                end
-                if strcmp(blockName,'fast-left')
-                    fastSideTrig = 1;
-                elseif strcmp(blockName,'slow-left')
-                    fastSideTrig = 2;
-                else
-                    fastSideTrig = NaN;
-                end
-                if strcmp(attBlockName,'att-left')
-                    attSideTrig = 3;
-                elseif strcmp(attBlockName,'att-right')
-                    attSideTrig = 4;
-                else
-                    attSideTrig = NaN;
-                end
-            else
-                blankTrig = NaN;
-                fastSideTrig = NaN;
-                attSideTrig = NaN;
-            end
-            
-            % triger for target side, only on first target frame
-            if targetOnSeq(iFrame)==1 && targetOnSeq(iFrame-1)==0
-                targetTrig = 5; % target on left
-            elseif targetOnSeq(iFrame)==2 && targetOnSeq(iFrame-1)==0
-                targetTrig = 6; % target on right
-            else
-                targetTrig = NaN;
-            end
-            
-            trigSeq(iFrame,1) = computeTrigger(blankTrig, fastSideTrig, attSideTrig, targetTrig);
-%             trigSeq(iFrame,1) = 0;
- 
         otherwise
             error('triggerOption not recognized')
     end
