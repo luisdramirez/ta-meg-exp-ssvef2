@@ -81,11 +81,11 @@ for trialNum = 1 : trialCount
     end
 end
 %% extract target presented order for each trial
-
-mycellarray  = squeeze(struct2cell(order.trialsPresented));   
-emptyIndex = cellfun(@isempty,mycellarray); 
-mycellarray(emptyIndex) = {[NaN,NaN]}; 
-targetPresented = [cell2mat(mycellarray);[NaN,NaN]];
+% mycellarray  = squeeze(struct2cell(order.trialsPresented));   
+% emptyIndex = cellfun(@isempty,mycellarray); 
+% mycellarray(emptyIndex) = {[NaN,NaN]}; 
+% targetPresented = [cell2mat(mycellarray);[NaN,NaN]];
+targetPresented = order.targetTypeBlockOrder';
 
 %% extract target axis order
 if isfield(response.target,'baseOrients')
