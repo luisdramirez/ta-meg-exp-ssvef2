@@ -47,14 +47,12 @@ cueDur = 0.1;
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
 iti = 1;
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
-if refrate==75
-    % 75 Hz SSVEP unit sequences: 4 frames (75/4=18.75 Hz) and 5 frames (75/5=15 Hz)
-    fastUnit = [1 1 2 2]; % gives the phase (1 or 2) of each frame
-    slowUnit = [1 1 1 2 2];
-else
+if refrate==60
     % 60 Hz SSVEP unit sequences: 3 frames (60/3=20 Hz) and 4 frames (60/4=15 Hz)
     fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
     slowUnit = [1 1 2 2];
+else
+    error('refrate must be 60 Hz')
 end
 
 %% target setup
