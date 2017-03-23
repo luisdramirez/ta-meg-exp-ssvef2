@@ -69,14 +69,18 @@ targFramesInc = 0;
 % for i=1:length(trigFrameIndx)
 %     targTrigFrameIndx(i) = find(trigFrameIndx(i) == targFrameIndx);
 % end
+flipFrames = diff(response.flip);
+badFramesIndx = find(flipFrames > median(flipFrames)*2);
+badFrames = flipFrames(badFramesIndx);
 
-plot(stimulus.trigSeq,'r')
+plot(stimulus.trigSeq,'b')
 hold on
-plot(stimulus.soundSeq*100,'b')
+% plot(stimulus.soundSeq*100,'m')
 plot(stimulus.target.seq*100,'g')
-plot(stimulus.keyCodeSeq,'k')
-plot(diff(response.flip)*1000)
-legend('trigSeq','soundSeq','targSeq','keyCodeSeq','flip')
+% plot(stimulus.keyCodeSeq,'k')
+% plot(diff(response.flip)*1000,'r')
+% legend('trigSeq','soundSeq','targSeq','keyCodeSeq','flip')
+
 
 %% Verify each trial
 
