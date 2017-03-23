@@ -769,6 +769,7 @@ order.attBlockOrder = attBlockOrder;
 order.targetBlockOrder = targetBlockOrder;
 order.cueBlockOrder = cueBlockOrder; 
 order.targetTypeBlockOrder = targetTypeBlockOrder;
+
 if strcmp(target.type, 'contrast')
     order.posBlockOrder = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
 end
