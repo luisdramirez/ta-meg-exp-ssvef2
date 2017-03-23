@@ -73,9 +73,10 @@ flipFrames = diff(response.flip);
 badFramesIndx = find(flipFrames > median(flipFrames)*2);
 badFrames = flipFrames(badFramesIndx);
 
-plot(stimulus.trigSeq,'b')
-hold on
+% plot(stimulus.trigSeq,'b')
+
 plot(stimulus.soundSeq*100,'m')
+hold on
 plot(stimulus.target.seq*100,'g')
 plot(stimulus.keyCodeSeq,'k')
 plot(diff(response.flip)*1000,'r')

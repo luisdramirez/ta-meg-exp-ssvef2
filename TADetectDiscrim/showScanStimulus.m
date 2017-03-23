@@ -39,8 +39,11 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
+% triggers?
+triggersOn = false;
+
 % staircase? (adjustment between runs)
-staircase = 1; % set to 0 for first run of the day
+staircase = 0; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -299,6 +302,7 @@ for frame = 1:nFrames
         if isfield(stimulus, 'soundSeq')
             if stimulus.soundSeq(frame)~=0
                 playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:)*soundAmp)
+                
             end
         end
         
@@ -395,12 +399,12 @@ for frame = 1:nFrames
 
     % send trigger for MEG, if requested, and record the color of the PD
     % cue
-%     if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0
-%         PTBSendTrigger(stimulus.trigSeq(frame), 0);
-%         fprintf('Trigger sent, %s\n%d', datestr(now), stimulus.trigSeq(frame)); drawnow
-%         response.trig(frame) = stimulus.trigSeq(frame);
-%     end
-    
+    if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0 && triggersOn
+        PTBSendTrigger(stimulus.trigSeq(frame), 0);
+        fprintf('Trigger sent, %s\n%d', datestr(now), stimulus.trigSeq(frame)); drawnow
+        response.trig(frame) = stimulus.trigSeq(frame);
+    end
+     
     if isfield(stimulus, 'diodeSeq') 
         response.LED(frame)  = colIndex;
     end
