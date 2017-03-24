@@ -70,9 +70,9 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'bullseye'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
+stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
 stimSize = 8;
-spatialFreq = 1;
+spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
     0.0100
@@ -106,7 +106,7 @@ possibleContrasts = [
     0.8532
     1.0000];
 stimContrast = 0.45; % 0.64
-targetContrast = 0.5; % 0.64
+targetContrast = 0.45; % 0.64
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
@@ -278,6 +278,7 @@ switch target.type
         target.blurRadius = blurRadius;
         target.backgroundColor = backgroundColor;
         target.stim = stim;
+        target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;
         target.positions = (1:8)';
         % CREATE TARGET POSITIONS 

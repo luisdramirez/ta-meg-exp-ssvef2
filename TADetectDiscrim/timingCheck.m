@@ -80,7 +80,7 @@ hold on
 plot(stimulus.target.seq*100,'g')
 plot(stimulus.keyCodeSeq,'k')
 plot(diff(response.flip)*1000,'r')
-legend('trigSeq','soundSeq','targSeq','keyCodeSeq','flip')
+legend('soundSeq','targSeq','keyCodeSeq','flip')
 
 
 %% Verify each trial

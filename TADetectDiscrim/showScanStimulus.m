@@ -43,7 +43,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 triggersOn = false;
 
 % staircase? (adjustment between runs)
-staircase = 0; % set to 0 for first run of the day
+staircase = 1; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -301,7 +301,7 @@ for frame = 1:nFrames
         % Play a sound if requested
         if isfield(stimulus, 'soundSeq')
             if stimulus.soundSeq(frame)~=0
-                playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:)*soundAmp)
+                playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:)*soundAmp);
                 
             end
         end

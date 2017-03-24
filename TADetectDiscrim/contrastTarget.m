@@ -10,6 +10,7 @@ spatialFreq = target.spatialFreq;
 orientation = target.orientation;
 blurRadius = target.blurRadius;
 backgroundColor = target.backgroundColor;
+%radialCB = target.radialCB;
 
 %%
 for iPhase = 1:numel(phases)
@@ -32,6 +33,9 @@ for iPhase = 1:numel(phases)
                 targ_s{iPhase, iContrast} = contrast*(double(c)-.5) + .5; %CONTRAST CHANGE HERE
             case 'bullseye'
                 targ_s{iPhase, iContrast} = CreateSpiral(display, stimSize, spatialFreq, phase, contrast)./2 + .5; 
+            case 'radialcb'
+                targ_s{iPhase, iContrast} = makeRadialCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
+                    radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             otherwise
                 error('stimType not recognized')
         end
