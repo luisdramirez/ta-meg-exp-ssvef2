@@ -45,7 +45,8 @@ end
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
-rootDir = pwd;
+rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
+% rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
@@ -103,6 +104,7 @@ responseOption = stim.p.responseOption;
 
 %% analyze each run
 responseData_all = [];
+targetPosType_all = [];
 
 for n = 1:length(df); 
     name = df(n).name;
@@ -124,6 +126,13 @@ for n = 1:length(df);
         respSecs,refreshRate, blockLength, keyCodes, dd.response, ...
         stim.order, n, itiSeq, jitSeq, stim.p.jitter);
     responseData_all = [responseData_all; temp];  
+    
+    % target pos type
+    targetPos = stim.order.posBlockOrder';
+    targetPosType = targetPos;
+    targetPosType(targetPos>=1 & targetPos<=4) = 1;
+    targetPosType(targetPos>=5 & targetPos<=8) = 2;
+    targetPosType_all = [targetPosType_all; targetPosType];
 end
 
 %% extract block order from responseData_all
@@ -135,11 +144,6 @@ targetTypeT2 = responseData_all(:,8);
 response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
 targetAxis = responseData_all(:,13:14);
-
-targetPos = stim.order.posBlockOrder';
-targetPosType = targetPos;
-targetPosType(targetPos>=1 & targetPos<=4) = 1;
-targetPosType(targetPos>=5 & targetPos<=8) = 2;
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
@@ -153,7 +157,6 @@ DiscrimResponse_all (DiscrimResponse_all  == 2) = 1;
 
 OverallResponse_all = response_all;
 OverallResponse_all ( OverallResponse_all == 3) = 0;
-
 
 
 %% For each run calculate detection and discrimination accuracy for: 
@@ -178,7 +181,7 @@ for n = 1:length(df)
                      case 'targetType'
                          targetType = targetTypeT1;
                      case 'targetPos'
-                         targetType = targetPosType(:,1);
+                         targetType = targetPosType_all(:,1);
                      otherwise
                          error('responseOption not recognized')
                  end
@@ -188,7 +191,7 @@ for n = 1:length(df)
                     case 'targetType'
                         targetType = targetTypeT2;
                     case 'targetPos'
-                        targetType = targetPosType(:,2);
+                        targetType = targetPosType_all(:,2);
                     otherwise
                         error('responseOption not recognized')
                 end
@@ -325,8 +328,9 @@ switch plotLevel
         
         subplot(1,3,1)
         y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
+        xlim([0.5 2.5])
         ylim([0 1])
-        % set(y, 'MarkerSize', 20)
+        set(y,'MarkerSize',20)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});
@@ -336,7 +340,9 @@ switch plotLevel
         
         subplot(1,3,2)
         y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
+        xlim([0.5 2.5])
         ylim([0 1])
+        set(y,'MarkerSize',20)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});
@@ -345,7 +351,9 @@ switch plotLevel
         
         subplot(1,3,3)
         y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
+        xlim([0.5 2.5])
         ylim([0 1])
+        set(y,'MarkerSize',20)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});
