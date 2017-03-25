@@ -10,7 +10,7 @@ spatialFreq = target.spatialFreq;
 orientation = target.orientation;
 blurRadius = target.blurRadius;
 backgroundColor = target.backgroundColor;
-%radialCB = target.radialCB;
+radialCB = target.radialCB;
 
 %%
 for iPhase = 1:numel(phases)
