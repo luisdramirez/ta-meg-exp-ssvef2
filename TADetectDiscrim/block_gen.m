@@ -57,32 +57,38 @@ targetBlockOrder = targetBlockOrder(indices);
 %% target type order
 % hard-coding this for lack of a better method
 % zero means still unassigned, nan means target absent
+if ~isempty(pp) && ~isempty(pa) && ~isempty(ap) && ~isempty(aa)
+    % assigning types for post-cued targets
+    % attempting to evenly distribute target types across conditions, but need
+    % 2 runs to do this because there is an odd number of targets per condition
+    % in each run
+    if mod(run,2) % odd runs
+        targetTypeOrder(:,1) = [1 1 2 0 2 2 1 0 NaN NaN NaN NaN NaN NaN NaN NaN ...
+            0 0 0 2 0 0 0 1 NaN NaN NaN NaN NaN NaN NaN NaN]'; % T1
+        targetTypeOrder(:,2) = [0 0 0 1 NaN NaN NaN NaN 0 0 0 2 NaN NaN NaN NaN ...
+            2 2 1 0 NaN NaN NaN NaN 1 1 2 0 NaN NaN NaN NaN]'; % T2
+    else % even runs
+        targetTypeOrder(:,1) = [2 2 1 0 1 1 2 0 NaN NaN NaN NaN NaN NaN NaN NaN ...
+            0 0 0 1 0 0 0 2 NaN NaN NaN NaN NaN NaN NaN NaN]'; % T1
+        targetTypeOrder(:,2) = [0 0 0 2 NaN NaN NaN NaN 0 0 0 1 NaN NaN NaN NaN ...
+            1 1 2 0 NaN NaN NaN NaN 2 2 1 0 NaN NaN NaN NaN]'; % T2
+    end
+    
+    % assigning types for non-targets
+    % randomly distributing equal number of each target type among all
+    % nontarget positions. not feasible to have a full factorial design and
+    % want target types for T1 and T2 to be independent
+    nontargetTypes = Shuffle([ones(1,8) 2*ones(1,8)]');
+    targetTypeOrder(targetTypeOrder==0) = nontargetTypes;
+    
+    % set NaN to 0 to match previous style
+    targetTypeOrder(isnan(targetTypeOrder)) = 0;
 
-% assigning types for post-cued targets
-% attempting to evenly distribute target types across conditions, but need
-% 2 runs to do this because there is an odd number of targets per condition
-% in each run
-if mod(run,2) % odd runs
-    targetTypeOrder(:,1) = [1 1 2 0 2 2 1 0 NaN NaN NaN NaN NaN NaN NaN NaN ...
-        0 0 0 2 0 0 0 1 NaN NaN NaN NaN NaN NaN NaN NaN]'; % T1
-    targetTypeOrder(:,2) = [0 0 0 1 NaN NaN NaN NaN 0 0 0 2 NaN NaN NaN NaN ...
-        2 2 1 0 NaN NaN NaN NaN 1 1 2 0 NaN NaN NaN NaN]'; % T2
-else % even runs
-    targetTypeOrder(:,1) = [2 2 1 0 1 1 2 0 NaN NaN NaN NaN NaN NaN NaN NaN ...
-        0 0 0 1 0 0 0 2 NaN NaN NaN NaN NaN NaN NaN NaN]'; % T1
-    targetTypeOrder(:,2) = [0 0 0 2 NaN NaN NaN NaN 0 0 0 1 NaN NaN NaN NaN ...
-        1 1 2 0 NaN NaN NaN NaN 2 2 1 0 NaN NaN NaN NaN]'; % T2   
+elseif ~isempty(pp) && isempty(pa) && isempty(ap) && isempty(aa)
+    targetTypeOrder = repmat([1 1 2 2; 1 2 1 2],1,8)';
+else
+    error('target type order not implemented for this set of pp/pa/ap/aa blocks')
 end
-
-% assigning types for non-targets
-% randomly distributing equal number of each target type among all
-% nontarget positions. not feasible to have a full factorial design and
-% want target types for T1 and T2 to be independent
-nontargetTypes = Shuffle([ones(1,8) 2*ones(1,8)]');
-targetTypeOrder(targetTypeOrder==0) = nontargetTypes;
-
-% set NaN to 0 to match previous style
-targetTypeOrder(isnan(targetTypeOrder)) = 0;
 
 targetTypeBlockOrder = targetTypeOrder(indices,:)';
 

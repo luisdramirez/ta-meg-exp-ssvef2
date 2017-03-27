@@ -147,7 +147,7 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] grating tilt = [%1.1f %1.1f], shift = [%1.2f %1.2f]\n\n', tilts(1), tilts(2), shifts(1)/pi, shifts(2)/pi)
             target.tilts = tilts; % store settings
             target.shifts = shifts;
-            for iShift = 1:numel(shifts); % here, shift refers to either a phase shift or an orientation change, depending on the values of "shifts" and "tilts"
+            for iShift = 1:numel(shifts) % here, shift refers to either a phase shift or an orientation change, depending on the values of "shifts" and "tilts"
                 for iP1 = 1:numel(target.phases)
                     for iP2 = 1:numel(target.phases)
                         p2 = target.phases(iP2) + shifts(iShift);

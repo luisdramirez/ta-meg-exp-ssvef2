@@ -3,6 +3,8 @@ function [backgroundIms, maskedIms, target] = contrastTarget(display, target)
 %%% Creating Contrast Target Stimulus
 
 %% Make the stimuli
+positions = target.positions;
+sigmaDeg = target.sigma;
 phases = target.phases; 
 pixelsPerDegree = target.pixelsPerDegree;
 stimSize = target.stimSize;
@@ -12,7 +14,7 @@ blurRadius = target.blurRadius;
 backgroundColor = target.backgroundColor;
 radialCB = target.radialCB;
 
-%%
+%% Create background stimuli
 for iPhase = 1:numel(phases)
     for iContrast = 1:numel(target.contrast)
         phase = phases(iPhase);
@@ -77,9 +79,9 @@ targ_imageIDs(end+1) = 0;
 % stim n,n+1 are same contrast different phase
 % stim n,n+2 are different contrast same phase
 % each row is different phase, each column is different orientation
-%% Create target stimulus
 
-nPos = 8; %number of x,y pairs to place the gaussian
+%% Create target stimulus
+nPos = numel(positions); %number of x,y pairs to place the gaussian
 nPhases = 2; %number of checker board phases
 nConds = 2; %number of contrast conditions 
 nIms = nPos * nPhases * nConds; %total number of images to create 
@@ -90,9 +92,8 @@ xmax = size(targ_stim{1},1); ymax = size(targ_stim{1},2);
 % 2D Gaussian parameters
 gaussWidth = xmax;
 gaussHeight = ymax;
-sigma = 25; %radius of gaussian
+sigma = sigmaDeg*pixelsPerDegree;
 gaussAmp = 1; %gaussian amplitude
-
 
 % Generate empty cell arrays to store target images
 circBlurs = cell(nPos,1);

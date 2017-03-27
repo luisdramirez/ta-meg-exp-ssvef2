@@ -28,6 +28,7 @@ useKbQueue = 0;
 use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
+nStaircaseRuns = 1;
 
 %% Configurations
 % initialize stim tracker for MEG
@@ -177,11 +178,13 @@ if strcmp(stimfile, 'taDetectDiscrim')
                 validDetect, validDiscrim);
         case 'contrast'
             % staircase based on 2 runs
-            if mod(run,2)==0
+            if nStaircaseRuns==2 && mod(run,2)==0
                 % analyze previous run
                 [acc(2), stim(2)] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run-1, 0);
-                
-                validIdx = [1 3]; 
+            end
+            % update staircase
+            if nStaircaseRuns==1 || (nStaircaseRuns==2 && mod(run,2)==0)
+                validIdx = [1 3];
                 for iTT = 1:2
                     validTrialsAcc = [];
                     for iRun = 1:numel(acc)
@@ -191,8 +194,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
                     end
                     validAcc(1,iTT) = nanmean(validTrialsAcc);
                 end
-                a = stim.p;
-                staircaseAdjustmentContrastTargets(a.stimContrast, ...
+                staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
                     response.target.contrast, validAcc);
             end
         otherwise

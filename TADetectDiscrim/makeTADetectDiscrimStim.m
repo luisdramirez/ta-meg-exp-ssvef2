@@ -30,7 +30,7 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-responseOption = 'targetPos'; % 'targetType','targetPos'
+responseOption = 'targetType'; % 'targetType','targetPos'
 keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
 keyCodes = KbName(keyNames);
 
@@ -62,8 +62,8 @@ target.type = 'contrast'; % 'dot','lines','grating','cb','contrast'
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
-% targetBlockNames = {'no-targ','pres-pres'};
-targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
+targetBlockNames = {'no-targ','pres-pres'};
+% targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
@@ -280,28 +280,40 @@ switch target.type
         target.stim = stim;
         target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;
-        target.positions = (1:8)';
+        target.positions = 1; % (1:8)';
+        if numel(target.positions)==1
+            target.sigma = target.stimSize*2;
+        else
+            target.sigma = target.stimSize/8;
+        end
         % CREATE TARGET POSITIONS 
         nTargetAppears = length(targetBlockOrder(targetBlockOrder == 2))*2 + ...
             length(targetBlockOrder(targetBlockOrder == 3)) +...
             length(targetBlockOrder(targetBlockOrder == 4));
-        positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
+        if any(strcmp(targetBlockNames,'pres-abs'))
+            positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
+        else
+            positions_mat = repmat(target.positions, nTargetAppears/length(target.positions)/2, 2);
+        end
         posShuffled = Shuffle(positions_mat);
         posShuffledHeaders = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
-
-%         posShuffled = ones(8,4);%%%%%%%%%%%
         
         % Generate guassian center coordinates 
-        xmax = size(target.stim{1},1); ymax = size(target.stim{1},2);
-        cx2 = 0; cy2 = 0;  %origin of coordiantes
-        r = xmax/4; %radius of center coordinates
-        % start from 6 o'clock and go clockwise (left then right)
-        theta = 22.5+90:45:360+90; theta = deg2rad(mod(theta,360)); 
-        x0 = cx2 + r * cos(theta); %generate x coordinates
-        y0 = cx2 + r * sin(theta); %generate y coordinates
-        gaussCoords = [x0' y0']; %store coordinates
-        target.coords = gaussCoords; %store coordinates    
-        target.responsePosSets = ([1:4; 5:8])';
+        if numel(target.positions)==1
+            target.coords = [0 0];
+        else
+            xmax = size(target.stim{1},1); ymax = size(target.stim{1},2);
+            cx2 = 0; cy2 = 0;  %origin of coordiantes
+            r = xmax/4; %radius of center coordinates
+            % start from 6 o'clock and go clockwise (left then right)
+            theta = 22.5+90:45:360+90; theta = deg2rad(mod(theta,360));
+            x0 = cx2 + r * cos(theta); %generate x coordinates
+            y0 = cx2 + r * sin(theta); %generate y coordinates
+            gaussCoords = [x0' y0']; %store coordinates
+            target.coords = gaussCoords; %store coordinates
+            target.responsePosSets = ([1:numel(target.positions)/2; numel(target.positions)/2+1:numel(target.positions)])';
+        end
+        
     otherwise
         error('target.type not recognized')
 end
@@ -606,7 +618,11 @@ for iFrame = 1:numel(seqtiming)
             case 'pres-pres'
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget*2,'last'));
+                try
                 targets = targetFrames([1 end])';
+                catch
+                    a=0
+                end
                 
                 posFrames = posSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget*2,'last'));
@@ -616,7 +632,7 @@ for iFrame = 1:numel(seqtiming)
                     case 'targetType'
                         correctResponse = targets(responseCue);
                     case 'targetPos'
-                        [row col] = find(target.responsePosSets==positions(responseCue));
+                        [row, col] = find(target.responsePosSets==positions(responseCue));
                         correctResponse = col;
                     otherwise
                         error('responseOption not recognized')
@@ -657,7 +673,7 @@ for iFrame = 1:numel(seqtiming)
                         case 'targetType'
                             correctResponse = targets(2);
                         case 'targetPos'
-                            [row col] = find(target.responsePosSets==positions(2));
+                            [row, col] = find(target.responsePosSets==positions(2));
                             correctResponse = col;
                     end
                 end
