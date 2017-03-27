@@ -12,7 +12,8 @@ fprintf('original contrasts: [%.2f %.2f]\n', contrasts(1), contrasts(2))
 fprintf('performance: [%d %d]%%\n\n', round(perfs(1)*100), round(perfs(2)*100))
 
 %% contrast decrement
-c = logspace(-2,0,30);
+% c = logspace(-2,0,30);
+c = logspace(-.501,-.101,35);
 [val, pIdx] = min(abs(c-pedestal)); % find c closest to pedestal
 c = c(1:pIdx-1);
 

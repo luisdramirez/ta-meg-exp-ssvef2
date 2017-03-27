@@ -36,7 +36,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 10;
+nFramesPerTarget = 6;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
@@ -70,43 +70,48 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'bullseye'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
-stimSize = 8;
+stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
-    0.0100
-    0.0117
-    0.0137
-    0.0161
-    0.0189
-    0.0221
-    0.0259
-    0.0304
-    0.0356
-    0.0418
-    0.0489
-    0.0574
-    0.0672
-    0.0788
-    0.0924
-    0.1083
-    0.1269
-    0.1487
-    0.1743
-    0.2043
-    0.2395
-    0.2807
-    0.3290
-    0.3857
-    0.4520
-    0.5298
-    0.6210
-    0.7279
-    0.8532
-    1.0000];
-stimContrast = 0.45; % 0.64
-targetContrast = 0.45; % 0.64
+    0.2812
+    0.2909
+    0.3009
+    0.3113
+    0.3220
+    0.3331
+    0.3445
+    0.3564
+    0.3687
+    0.3814
+    0.3945
+    0.4081
+    0.4222
+    0.4367
+    0.4517
+    0.4673
+    0.4834
+    0.5000
+    0.5173
+    0.5351
+    0.5535
+    0.5726
+    0.5923
+    0.6127
+    0.6338
+    0.6556
+    0.6782
+    0.7016
+    0.7257
+    0.7507
+    0.7766
+    0.8033
+    0.8310
+    0.8596
+    0.8892];
+stimContrast = 0.5; % 0.64
+targetContrast = 0.5; % 0.64
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
@@ -773,7 +778,7 @@ stimulus.fixSeq = fixSeq;
 stimulus.srcRect = srcRect;
 stimulus.destRect = destRect;
 stimulus.trigSeq = trigSeq;
-stimulus.diodeSeq = diodeSeq;
+% stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 stimulus.target = target;

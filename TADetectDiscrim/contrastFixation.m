@@ -5,7 +5,7 @@ function fixation = contrastFixation(display, frame)
 
 % FIXATION
 % make frame rect
-rectDiam = 7;
+rectDiam = 4;
 baseRect = [0 0 rectDiam rectDiam];
 centeredRect = CenterRectOnPointd(baseRect, display.fixX, display.fixY);
 
@@ -44,7 +44,7 @@ frameMaxDiameter = max(frameRect)*1.01;
 
 % w = 10;
 Screen('FrameOval', display.windowPtr, frameColor, centeredRect2, frameMaxDiameter)
-Screen('FillOval', display.windowPtr, fixationColor, centeredRect, fixationMaxDiameter)
+% Screen('FillOval', display.windowPtr, fixationColor, centeredRect, fixationMaxDiameter)
 Screen('FrameOval', display.windowPtr, fixationColor, centeredRect2)
 return
 % Screen('Flip', w);
