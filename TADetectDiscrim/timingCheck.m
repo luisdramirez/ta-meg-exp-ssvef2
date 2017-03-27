@@ -52,6 +52,9 @@ soundFrameSecs = soundFrameIndx*(1/60);
 
 keyFrameIndx = find(stimulus.keyCodeSeq > 0); %when key code
 keyFrameSecs = keyFrameIndx*(1/60);
+responseDuration = diff(keyFrameIndx);
+responseDurationSec = responseDuration*1/60;
+
 
 targFrameIndx = find(stimulus.seq == 3 | stimulus.seq == 4); % target present (phase of target)
 condFrameIndx = find(stimulus.target.seq == 1 | stimulus.target.seq == 2); %target present (condition of target)
@@ -59,7 +62,7 @@ posFrameIndx = find(stimulus.target.posSeq > 0);
 
 % timing for target displays 
 targFrames = [diff(targFrameIndx) diff(condFrameIndx) diff(posFrameIndx)];
-targFramesSec = [diff(targFrameIndx) diff(condFrameIndx) diff(posFrameIndx)]*(1/60);
+targFramesSec = targFrames.*(1/60);
 targFramesInc = 0;
 
 % for i=1:length(soundFrameIndx)
