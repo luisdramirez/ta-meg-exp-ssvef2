@@ -39,6 +39,9 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
+% fixation?
+stimulus.fixRectDiam = 4;
+
 % triggers?
 triggersOn = false;
 
@@ -291,7 +294,7 @@ for frame = 1:nFrames
         end
         
         %drawFixation_rd(display,stimulus.fixSeq(frame)); % FIXATION DRAWN HERE
-        contrastFixation(display, stimulus.fixSeq(frame))
+        contrastFixation(display, stimulus, frame)
         
         % If we are doing eCOG, then flash photodiode if requested
         if isfield(stimulus, 'diodeSeq')

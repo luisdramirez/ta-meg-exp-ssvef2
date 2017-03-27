@@ -1,11 +1,11 @@
-function fixation = contrastFixation(display, frame)
+function fixation = contrastFixation(display, stimulus, frame)
 % Generates new dot fixation; called in 'showScanStimulus'
 
 %7 = green; 6 = red;
 
 % FIXATION
 % make frame rect
-rectDiam = 4;
+rectDiam = stimulus.fixRectDiam; %4;
 baseRect = [0 0 rectDiam rectDiam];
 centeredRect = CenterRectOnPointd(baseRect, display.fixX, display.fixY);
 
@@ -18,15 +18,15 @@ frameRect = [0 0 rectDiam*2 rectDiam*2];
 centeredRect2 = CenterRectOnPointd(frameRect, display.fixX, display.fixY);
 
 %change outer ring color
-if frame == 5
+if stimulus.fixSeq(frame) == 5
     frameColor = [1 1 1]*255;
-elseif frame == 1
+elseif stimulus.fixSeq(frame) == 1
     frameColor = [0.5 0.5 0.5]*255;
-elseif frame == 6
+elseif stimulus.fixSeq(frame) == 6
     frameColor =  [1 0 0]*255;
-elseif frame == 7
+elseif stimulus.fixSeq(frame) == 7
     frameColor = [0 1 0]*255;
-elseif frame == 8
+elseif stimulus.fixSeq(frame) == 8
     frameColor = [0 0 1]*255;
 end
 
