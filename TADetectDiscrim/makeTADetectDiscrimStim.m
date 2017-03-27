@@ -70,7 +70,7 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 nBlocks = numel(blockOrder);
 
 %% stim setup  
-stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
+stimType = 'bullseye'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
 stimSize = 8;
 spatialFreq = 3;
 orientation = 0;
