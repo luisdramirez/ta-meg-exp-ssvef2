@@ -46,7 +46,7 @@ d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 % d.rect = [0 0 800 600];
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
-%     error('Frame rate not set correctly')
+    error('Frame rate not set correctly')
 end
 
 % You have to open a screen first (to get a window pointer), to start

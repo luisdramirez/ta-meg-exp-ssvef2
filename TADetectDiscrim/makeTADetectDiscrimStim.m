@@ -76,39 +76,35 @@ spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
     0.2812
-    0.2909
-    0.3009
-    0.3113
-    0.3220
-    0.3331
-    0.3445
-    0.3564
-    0.3687
-    0.3814
-    0.3945
-    0.4081
-    0.4222
-    0.4367
-    0.4517
-    0.4673
-    0.4834
+    0.2922
+    0.3036
+    0.3155
+    0.3278
+    0.3407
+    0.3540
+    0.3678
+    0.3822
+    0.3972
+    0.4127
+    0.4289
+    0.4457
+    0.4631
+    0.4812
     0.5000
-    0.5173
-    0.5351
-    0.5535
-    0.5726
-    0.5923
-    0.6127
-    0.6338
-    0.6556
-    0.6782
-    0.7016
-    0.7257
-    0.7507
-    0.7766
-    0.8033
-    0.8310
-    0.8596
+    0.5196
+    0.5399
+    0.5610
+    0.5830
+    0.6058
+    0.6295
+    0.6541
+    0.6797
+    0.7063
+    0.7340
+    0.7627
+    0.7925
+    0.8235
+    0.8557
     0.8892];
 stimContrast = 0.5; % 0.64
 targetContrast = 0.5; % 0.64
@@ -121,6 +117,9 @@ radialCB.thetaCycles = 8;
 radialCB.E = 0.05;
 radialCB.A = 1;
 radialCB.b = 0.2;
+
+% fixation
+fixDiam = 0.15;
 
 stimPos = [6 4]; % [x y]
 stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
@@ -769,6 +768,7 @@ target.seq = targetTypeSeq;
 target.posSeq = posSeq;
 
 % store in stimulus structure
+stimulus.fixDiam = fixDiam;
 stimulus.images = images*255;
 stimulus.sounds = cueTones;
 stimulus.cmap = cmap;

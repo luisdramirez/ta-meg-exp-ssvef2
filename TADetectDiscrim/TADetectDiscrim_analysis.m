@@ -45,8 +45,8 @@ end
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
-rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
-% rootDir = pwd;
+% rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
+rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);

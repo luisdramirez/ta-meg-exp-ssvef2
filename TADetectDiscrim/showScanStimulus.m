@@ -39,14 +39,11 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
-% fixation?
-stimulus.fixRectDiam = 4;
-
 % triggers?
 triggersOn = false;
 
 % staircase? (adjustment between runs)
-staircase = 0; % set to 0 for first run of the day
+staircase = 1; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -65,7 +62,7 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = [0.28 .89]; % starting settings: 1 [for cb target (range is 0-1)]
+    patchContrast = [0.38 .65]; % starting settings: 1 [for cb target (range is 0-1)]
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts

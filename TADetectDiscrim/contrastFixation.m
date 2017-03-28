@@ -1,11 +1,15 @@
-function fixation = contrastFixation(display, stimulus, frame)
+function contrastFixation(display, stimulus, frame)
 % Generates new dot fixation; called in 'showScanStimulus'
 
 %7 = green; 6 = red;
+% pixelsPerDegree = 1/d.pixelSize;
+pixelsPerCm = 1/display.pixelSize;
+degPerCm = atan(1/display.distance)*180/pi;
+pixelsPerDegree = pixelsPerCm/degPerCm;
 
 % FIXATION
 % make frame rect
-rectDiam = stimulus.fixRectDiam; %4;
+rectDiam = stimulus.fixDiam*pixelsPerDegree; %4 = 0.15;
 baseRect = [0 0 rectDiam rectDiam];
 centeredRect = CenterRectOnPointd(baseRect, display.fixX, display.fixY);
 

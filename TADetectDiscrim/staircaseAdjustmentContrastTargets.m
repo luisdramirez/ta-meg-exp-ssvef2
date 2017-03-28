@@ -11,14 +11,17 @@ fprintf('pedestal contrast: %.2f\n', pedestal)
 fprintf('original contrasts: [%.2f %.2f]\n', contrasts(1), contrasts(2))
 fprintf('performance: [%d %d]%%\n\n', round(perfs(1)*100), round(perfs(2)*100))
 
+%% possible contrast values
+% cvals = logspace(-2,0,30);
+cvals = logspace(-.551,-.051,31);
+
 %% contrast decrement
-% c = logspace(-2,0,30);
-c = logspace(-.551,-.051,35);
+c = cvals;
 [val, pIdx] = min(abs(c-pedestal)); % find c closest to pedestal
 c = c(1:pIdx-1);
 
 [val, cIdx] = min(abs(c-contrasts(1))); % find c closest to contrast
-if perfs(1) > 0.90
+if perfs(1) > 0.85 %0.90
     if cIdx < numel(c)
         cIdx = cIdx + 1; % higher is harder
     end
@@ -37,12 +40,12 @@ end
 contrasts(1) = c(cIdx);
 
 %% contrast increment
-c = logspace(-2,0,30);
+c = cvals;
 [val, pIdx] = min(abs(c-pedestal)); % find c closest to pedestal
 c = c(pIdx+1:end);
 
 [val, cIdx] = min(abs(c-contrasts(2))); % find c closest to contrast
-if perfs(2) > 0.90
+if perfs(2) > 0.85 %0.90
     if cIdx > 1
         cIdx = cIdx - 1; % lower is harder
     end
