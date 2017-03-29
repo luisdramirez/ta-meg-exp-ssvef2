@@ -86,7 +86,7 @@ if ~isempty(pp) && ~isempty(pa) && ~isempty(ap) && ~isempty(aa)
 
 elseif ~isempty(pp) && isempty(pa) && isempty(ap) && isempty(aa)
     targetTypeOrder = repmat([1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2; ...
-        1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2],1,2);
+        1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2],1,2)';
 else
     error('target type order not implemented for this set of pp/pa/ap/aa blocks')
 end
