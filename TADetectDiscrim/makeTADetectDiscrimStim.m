@@ -36,7 +36,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 6;
+nFramesPerTarget = 8;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
@@ -126,8 +126,9 @@ stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
 
 %% sound setup
 Fs = 44100;
-cueFreqs = [784 523];
-% cueFreqs = [1046.5 440]; % [higher high C = target 1, lower A = target 2]
+% cueFreqs = [784 523];
+% cueFreqs = [1300 250] % antonio
+cueFreqs = [1046.5 440]; % [higher high C = target 1, lower A = target 2]
 for iTone = 1:numel(cueFreqs)
     tone = MakeBeep(cueFreqs(iTone), cueDur, Fs);
     cueTones(iTone,:) = applyEnvelope(tone, Fs);
