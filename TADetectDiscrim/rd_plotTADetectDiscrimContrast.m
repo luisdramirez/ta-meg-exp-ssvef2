@@ -1,33 +1,38 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'lr';
+subject = 'rd';
 runs = 101:110;
-[acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, [], 1);
-% rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+[acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs);
+rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+
+%% update behavior
+b.responseData_all = responseData_all;
+b.responseData_labels = responseData_labels;
+b = behavior(b);
 
 %% mean contrast
-10.^mean(log10(acc.targetContrast))
+% 10.^mean(log10(acc.targetContrast))
 
-10.^mean(log10(acc.targetContrast(end/2+1:end,:)))
+% 10.^mean(log10(acc.targetContrast(end/2+1:end,:)))
 
 %% overall accuracy
-% runIdx = find(strcmp(responseData_labels, 'run number'));
-% correctIdx = find(strcmp(responseData_labels, 'correct'));
-% nRuns = numel(unique(responseData_all(:,runIdx)));
-% correct = responseData_all(:,correctIdx);
-% correct(correct==-1) = 0;
-% 
-% for iRun = 1:nRuns
-%     w = responseData_all(:,runIdx)==iRun;
-%     correctByRun(iRun) = nanmean(correct(w));
-% end
-% correctOverall = mean(correctByRun);
-
 % quick and dirty
 accvals = acc.Discrim1_all;
 correctByRun = [accvals'*[.75 .25 0 0]' accvals'*[0 0 .75 .25]'];
-correctOverall = mean(correctByRun)
+correctOverall = mean(correctByRun);
+
+%% accuracy as function of target type and response target
+cvs = [1 -1];
+for iT = 1:2
+    for iTT = 1:2
+        for iV = 1:2
+            w = b.responseTarget==iT & b.targetType==iTT & b.cueValidity==cvs(iV);
+            ttAll{iV,iTT,iT} = [b.responseTarget(w) b.targetType(w) b.cueValidity(w) b.acc(w)];
+            ttAcc(iV,iTT,iT) = mean(b.acc(w));
+        end
+    end
+end
 
 %% plot
 ylims = [0 1];
@@ -47,10 +52,19 @@ plot(correctByRun(:,2),'k--')
 ylim(ylims)
 xlabel('run')
 title('T2')
-% rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 figure
 plot(acc.targetContrast)
 xlabel('run')
 ylabel('target contrast')
 
+figure
+for iT = 1:2
+    subplot(1,2,iT)
+    bar(ttAcc(:,:,iT))
+    set(gca,'XTickLabel',{'decrement','increment'})
+    legend('valid','invalid')
+    title(sprintf('T%d',iT))
+end
+rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))

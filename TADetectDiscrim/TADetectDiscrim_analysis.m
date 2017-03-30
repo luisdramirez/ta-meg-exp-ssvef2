@@ -44,8 +44,7 @@ end
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
-% rootDir = pathToExpt;
-rootDir = '/Volumes/purplab-1/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
+rootDir = pathToExpt;
 % rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
