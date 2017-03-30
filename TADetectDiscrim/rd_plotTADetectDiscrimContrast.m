@@ -1,7 +1,7 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'rd';
+subject = 'af';
 runs = 101:110;
 [acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
@@ -29,7 +29,7 @@ for iT = 1:2
         for iV = 1:2
             w = b.responseTarget==iT & b.targetType==iTT & b.cueValidity==cvs(iV);
             ttAll{iV,iTT,iT} = [b.responseTarget(w) b.targetType(w) b.cueValidity(w) b.acc(w)];
-            ttAcc(iV,iTT,iT) = mean(b.acc(w));
+            ttAcc(iV,iTT,iT) = nanmean(b.acc(w));
         end
     end
 end
@@ -62,9 +62,13 @@ ylabel('target contrast')
 figure
 for iT = 1:2
     subplot(1,2,iT)
-    bar(ttAcc(:,:,iT))
-    set(gca,'XTickLabel',{'decrement','increment'})
-    legend('valid','invalid')
+    bar(ttAcc(:,:,iT)')
+    set(gca,'XTickLabel',{'dec','inc'})
+    if iT==1
+        ylabel('proportion correct')
+    end
+    ylim(ylims)
     title(sprintf('T%d',iT))
 end
+legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
