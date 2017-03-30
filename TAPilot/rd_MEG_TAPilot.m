@@ -44,6 +44,7 @@ Screen('Preference', 'SkipSyncTests', skipSyncTests);
 %% Initialize Eyetracker and do Calibration
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 % d.rect = [0 0 800 600];
+d.multisample = 8;
 hz  = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
