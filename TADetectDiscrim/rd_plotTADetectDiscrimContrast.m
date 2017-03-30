@@ -1,10 +1,10 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'rd';
-runs = 66:70;
+subject = 'lr';
+runs = 101:110;
 [acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, [], 1);
-rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+% rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 %% mean contrast
 10.^mean(log10(acc.targetContrast))
@@ -47,7 +47,7 @@ plot(correctByRun(:,2),'k--')
 ylim(ylims)
 xlabel('run')
 title('T2')
-rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+% rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 figure
 plot(acc.targetContrast)
