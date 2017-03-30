@@ -14,4 +14,4 @@ if ~exist('purpdir','var')
     error('cannot find purplab')
 end
 
-exptspath = sprintf('/Volumes/%s/EXPERIMENTS/1_Current Experiments/Rachel',purpdir);
+exptspath = sprintf('/Volumes/%s/EXPERIMENTS/1_Current Experiments',purpdir);
