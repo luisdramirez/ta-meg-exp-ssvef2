@@ -68,7 +68,7 @@ if(~isfield(displayID,'backColorRgb'))
 end
 
 if(~isfield(displayID,'multisample'))
-    displayID.multisample = [];
+    displayID.multisample = 8;
 end
 
 % Skip the annoying blue flickering warning
