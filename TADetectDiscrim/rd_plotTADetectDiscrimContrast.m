@@ -1,10 +1,13 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'lr';
+subject = 'af';
 runs = 101:110;
 date = '20170330';
-[acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, date);
+plotLevel = 1;
+saveFile = 1;
+saveFigs = 1;
+[acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 %% update behavior

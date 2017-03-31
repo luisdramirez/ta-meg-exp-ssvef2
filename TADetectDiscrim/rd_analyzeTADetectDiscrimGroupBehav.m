@@ -1,7 +1,7 @@
 % rd_analyzeTADetectDiscrimGroupBehav.m
 
 %% setup
-exptDir = pathToExpt('data');
+exptDir = pathToExpt;
 
 subjects = {'rd','lr','mj','af'};
 
@@ -10,7 +10,7 @@ nSubjects = numel(subjects);
 %% load data
 for iSubject = 1:nSubjects
     sessionDir = subjects{iSubject}; 
-    behavDir = sprintf('%s/Behavior/%s/analysis', exptDir(1:end-4), sessionDir);
+    behavDir = sprintf('%s/analysis/%s', exptDir, sessionDir);
     behavFile = dir(sprintf('%s/*.mat', behavDir));
     b = load(sprintf('%s/%s', behavDir, behavFile.name));
     behav(iSubject) = behavior(b); % update behav with more info
@@ -106,11 +106,13 @@ for iM = 1:nM
 end
 
 %% plot
+measures = {'discrim1'};
+nM = numel(measures);
 figure('color','w')
 for iM = 1:nM
     subplot(1,nM,iM)
     m = measures{iM};
-    p1 = errorbar(groupMean.(m)', groupSte.(m)');
+    p1 = errorbar(groupMean.(m)', groupSte.(m)','.','MarkerSize',20);
     set(p1(2),'color','r')
     xlim([.5 2.5])
     switch m
@@ -125,11 +127,13 @@ for iM = 1:nM
     end
     title(m)
     set(gca,'XTick',[1 2])
+    set(gca,'XTickLabel',{'T1','T2'})
     box off
 end
 legend('valid','invalid')
 
-indivM = {'overallAcc','discrim1','dprimeDetect','critDetect'};
+indivM = {'discrim1'};
+nM = numel(indivM);
 figure('Color','w','Position',[0 0 1200 800])
 for iS = 1:nSubjects
     for iM = 1:numel(indivM)
@@ -137,9 +141,9 @@ for iS = 1:nSubjects
         if mod(iS,2)
             col = iM;
         else
-            col = iM+5;
+            col = iM+nM+1;
         end
-        subplot(8,9,(row-1)*9+col)
+        subplot(ceil(nSubjects/2),nM*2+1,(row-1)*(nM*2+1)+col)
         m = indivM{iM};
         p1 = plot(groupData.(m)(:,:,iS)');
         set(p1(2),'color','r')
@@ -160,10 +164,11 @@ for iS = 1:nSubjects
 %             set(gca,'XTickLabel','')
 %             set(gca,'YTickLabel','')
         end
-        if col==1 || col==6
-%             ylabel(sprintf('S%d',iS))
+        if col==1 || col==nM+2
+            ylabel(sprintf('%s',subjects{iS}))
         end
         set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'})
         box off
     end
 end

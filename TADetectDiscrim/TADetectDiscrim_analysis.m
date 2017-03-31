@@ -1,5 +1,7 @@
 function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, dates, plotLevel,saveFile,saveFigs)
 
+% function [accuracy,accuracy2,responseData_all,responseData_labels] = TADetectDiscrim_analysis(subject, runs, dates, plotLevel,saveFile,saveFigs)
+%
 % subject is the subject ID, e.g. 'sl'
 % runs is the run numbers to analyze, e.g. 1:10
 % date (optional) is a string with the date of the experiment, e.g. '20141219'
