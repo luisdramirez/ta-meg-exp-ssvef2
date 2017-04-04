@@ -58,6 +58,7 @@ end
 
 %% target setup
 target.type = 'contrast'; % 'dot','lines','grating','cb','contrast'
+target.catchTrials = true;
 
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left, slow-left
@@ -66,7 +67,7 @@ targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
-    = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
+    = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
 
 %% stim setup  
