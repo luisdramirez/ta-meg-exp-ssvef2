@@ -70,6 +70,10 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
 
+if target.catchTrials
+    targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres'};
+end
+
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
 stimSize = 2;
