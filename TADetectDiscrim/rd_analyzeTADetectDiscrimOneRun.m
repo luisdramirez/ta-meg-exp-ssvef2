@@ -146,10 +146,15 @@ for k = 1:numel(cueBlockOrder_Indx) %'1-1','2-1','2-2','1-2'
     for tt = 1:2 % target type, e.g. decrement vs. increment
         w = cueBlockOrder==cueType & targetTypeOrder==tt;
         temp_correct = response_correct(w); 
-%         temp_correct(temp_correct==0) = NaN;
         temp_correct(temp_correct==-1) = 0;
         ttacc{k,tt} = temp_correct;
         ttacc_mean(k,tt) = mean(temp_correct);
+    end
+    if catchTrials
+        tt = 0; % target absent catch trials
+        w = cueBlockOrder==cueType & targetTypeOrder==tt;
+
+        ttcatch{k,tt} = temp_correct;
     end
 end
 

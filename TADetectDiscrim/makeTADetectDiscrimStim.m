@@ -300,10 +300,14 @@ switch target.type
         nTargetAppears = length(targetBlockOrder(targetBlockOrder == 2))*2 + ...
             length(targetBlockOrder(targetBlockOrder == 3)) +...
             length(targetBlockOrder(targetBlockOrder == 4));
-        if any(strcmp(targetBlockNames,'pres-abs'))
+        if any(strcmp(targetBlockNames,'pres-abs')) && ~target.catchTrials
             positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
         else
-            positions_mat = repmat(target.positions, nTargetAppears/length(target.positions)/2, 2);
+            if target.catchTrials
+                positions_mat = repmat(target.positions, nTargetAppears/length(target.positions)/2, 4);
+            else
+                positions_mat = repmat(target.positions, nTargetAppears/length(target.positions)/2, 2);
+            end
         end
         posShuffled = Shuffle(positions_mat);
         posShuffledHeaders = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
@@ -628,11 +632,7 @@ for iFrame = 1:numel(seqtiming)
             case 'pres-pres'
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget*2,'last'));
-                try
                 targets = targetFrames([1 end])';
-                catch
-                    a=0
-                end
                 
                 posFrames = posSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget*2,'last'));
@@ -665,7 +665,12 @@ for iFrame = 1:numel(seqtiming)
                             correctResponse = col;
                     end
                 else
-                    correctResponse = 3; % absent
+                    if target.catchTrials
+                        % random correct response for absent catch trials
+                        correctResponse = round(rand)+1;
+                    else
+                        correctResponse = 3; % absent
+                    end
                 end
             case 'abs-pres'
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
@@ -677,7 +682,12 @@ for iFrame = 1:numel(seqtiming)
                 positions = [0 posFrames(1)];
                 
                 if responseCue==1
-                    correctResponse = 3; % absent
+                    if target.catchTrials
+                        % random correct response for absent catch trials
+                        correctResponse = round(rand)+1;
+                    else
+                        correctResponse = 3; % absent
+                    end
                 else
                     switch responseOption
                         case 'targetType'
