@@ -22,7 +22,8 @@ perfs = dprime;
 fprintf('pedestal contrast: %.2f\n', pedestal)
 fprintf('original contrasts: [%.2f %.2f]\n', contrasts(1), contrasts(2))
 fprintf('valid trial accuracy: [%d %d]%%\n', round(acc(1)*100), round(acc(2)*100))
-fprintf('target type 1 bias: %.2f\n\n', tt1report)
+fprintf('target type 1 bias: %.2f\n', tt1report)
+fprintf('valid trial d-prime: [%1.2f %1.2f]\n\n', dprime(1), dprime(2))
 
 %% possible contrast values
 cvals = logspace(-.551,-.051,31);
