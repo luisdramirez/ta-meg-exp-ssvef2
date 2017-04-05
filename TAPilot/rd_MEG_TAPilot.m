@@ -166,6 +166,13 @@ if strcmp(stimfile, 'taDetectDiscrim')
     stimDir = sprintf('../../%s', vistaStimPath);
     plotLevel = 3; % 3 = fewest plots
     [acc, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
+
+    %% Check for catch trials
+    if isfield(stim.stimulus.target,'catchTrials')
+        catchTrials = stim.stimulus.target.catchTrials;
+    else
+        catchTrials = false;
+    end
     
     %% Adjust difficulty via run-by-run staircase
     switch response.target.type
@@ -187,17 +194,27 @@ if strcmp(stimfile, 'taDetectDiscrim')
             if nStaircaseRuns==1 || (nStaircaseRuns==2 && mod(run,2)==0)
                 validIdx = [1 3];
                 for iTT = 1:2
-                    validTrialsAcc = [];
+                    validTrialsAcc{iTT} = [];
                     for iRun = 1:numel(acc)
                         for iVI = 1:numel(validIdx)
-                            validTrialsAcc = [validTrialsAcc; acc(iRun).targetTypeAccAll{validIdx(iVI),iTT}];
+                            validTrialsAcc{iTT} = [validTrialsAcc{iTT}; acc(iRun).targetTypeAccAll{validIdx(iVI),iTT}];
                         end
                     end
-                    validAcc(1,iTT) = nanmean(validTrialsAcc);
-%                     validDprime(1,iTT) = rd_dprime2(nnz(validTrialsAcc)
+                    validAcc(1,iTT) = nanmean(validTrialsAcc{iTT});
                 end
-                staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
-                    response.target.contrast, validAcc);
+                if catchTrials
+                    validTrialsCatch = [];
+                    for iRun = 1:numel(acc)
+                        for iVI = 1:numel(validIdx)
+                            validTrialsCatch = [validTrialsCatch; acc(iRun).catchTrialRespAll{validIdx(iVI)}];
+                        end
+                    end
+                    staircaseAdjustmentContrastTargetsDprime(stim.p.stimContrast, ...
+                        response.target.contrast, validTrialsAcc, validTrialsCatch);
+                else
+                    staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
+                        response.target.contrast, validAcc);
+                end
             end
         otherwise
             error('targetType not recognized')
