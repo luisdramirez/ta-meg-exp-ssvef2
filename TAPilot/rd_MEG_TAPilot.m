@@ -29,6 +29,7 @@ use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 2;
+faWeight = 0.3;
 runGUI = false;
 
 %% Configurations
@@ -211,7 +212,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
                         end
                     end
                     staircaseAdjustmentContrastTargetsDprime(stim(1).p.stimContrast, ...
-                        response.target.contrast, validTrialsAcc, validTrialsCatch);
+                        response.target.contrast, validTrialsAcc, validTrialsCatch, faWeight);
                 else
                     staircaseAdjustmentContrastTargets(stim(1).p.stimContrast, ...
                         response.target.contrast, validAcc);
