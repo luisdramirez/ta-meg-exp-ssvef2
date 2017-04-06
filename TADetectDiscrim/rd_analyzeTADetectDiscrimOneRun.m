@@ -14,7 +14,12 @@ respTime = (stim.p.targetLeadTime + stim.p.targetSOA + stim.p.cueTargetSOA)*refr
 keyCodes = stim.p.keyCodes;
 order = stim.order;
 responseOption = stim.p.responseOption;
-catchTrials = stim.stimulus.target.catchTrials;
+
+if isfield(stim.stimulus.target, 'catchTrials')
+    catchTrials = stim.stimulus.target.catchTrials;
+else
+    catchTrials = false;
+end
 
 if isfield(stim.stimulus,'itiSeq')
     itiSeq = stim.stimulus.itiSeq;
@@ -184,7 +189,9 @@ all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_st
 % for single run
 accuracy.targetTypeAccAll = ttacc; 
 accuracy.targetTypeAcc = ttacc_mean; 
-accuracy.catchTrialRespAll = ttcatch; 
+if catchTrials
+    accuracy.catchTrialRespAll = ttcatch;
+end
 
 %% plot
 switch plotLevel

@@ -62,7 +62,7 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = [0.38 0.68]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
+    patchContrast = [0.29 0.79]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
