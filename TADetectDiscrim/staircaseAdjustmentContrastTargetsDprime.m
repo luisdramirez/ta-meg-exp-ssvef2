@@ -39,11 +39,11 @@ c = cvals;
 c = c(1:pIdx-1);
 
 [val, cIdx] = min(abs(c-contrasts(1))); % find c closest to contrast
-if perfs(1) > 1.17
+if perfs(1) > 0.83
     if cIdx < numel(c)
         cIdx = cIdx + 1; % higher is harder
     end
-elseif perfs(1) < 0.77
+elseif perfs(1) < 0.49
     if cIdx > 1
         cIdx = cIdx - 1; % lower is easier
     end
@@ -58,11 +58,11 @@ c = cvals;
 c = c(pIdx+1:end);
 
 [val, cIdx] = min(abs(c-contrasts(2))); % find c closest to contrast
-if perfs(2) > 1.17
+if perfs(2) > 0.83
     if cIdx > 1
         cIdx = cIdx - 1; % lower is harder
     end
-elseif perfs(2) < 0.77
+elseif perfs(2) < 0.49
     if cIdx < numel(c)
         cIdx = cIdx + 1; % higher is easier
     end
