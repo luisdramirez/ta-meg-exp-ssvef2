@@ -615,7 +615,11 @@ for iFrame = 1:numel(seqtiming)
             if blockStartTimes(blockIdx+1)-time < feedbackDur + itiSeq(blockIdx) - 0.00001 && ...
                 blockStartTimes(blockIdx+1)-time > itiSeq(blockIdx) - 0.00001
                 % display feedback at the end of the block
-                fixSeq(iFrame,1) = 8; % blue
+                if target.catchTrials && ~isempty(strfind(targetBlockName,'abs'))
+                    fixSeq(iFrame,1) = 9; % gray
+                else
+                    fixSeq(iFrame,1) = 8; % blue
+                end
              else
                 fixSeq(iFrame,1) = 4;
             end
@@ -623,7 +627,11 @@ for iFrame = 1:numel(seqtiming)
             if blockStartTimes(blockIdx+1)-time < feedbackDur + itiSeq(blockIdx) - 0.00001 && ...
                 blockStartTimes(blockIdx+1)-time > itiSeq(blockIdx) - 0.00001
                 % display feedback at the end of the block
-                fixSeq(iFrame,1) = 8; % blue
+                if target.catchTrials && ~isempty(strfind(targetBlockName,'abs'))
+                    fixSeq(iFrame,1) = 9; % gray
+                else
+                    fixSeq(iFrame,1) = 8; % blue
+                end
             else
                 fixSeq(iFrame,1) = 5;
             end
@@ -675,12 +683,12 @@ for iFrame = 1:numel(seqtiming)
                             correctResponse = col;
                     end
                 else
-                    if target.catchTrials
-                        % random correct response for absent catch trials
-                        correctResponse = round(rand)+1;
-                    else
+%                     if target.catchTrials
+%                         % random correct response for absent catch trials
+%                         correctResponse = round(rand)+1;
+%                     else
                         correctResponse = 3; % absent
-                    end
+%                     end
                 end
             case 'abs-pres'
                 targetFrames = targetTypeSeq(find(targetTypeSeq>0,...
@@ -692,12 +700,12 @@ for iFrame = 1:numel(seqtiming)
                 positions = [0 posFrames(1)];
                 
                 if responseCue==1
-                    if target.catchTrials
-                        % random correct response for absent catch trials
-                        correctResponse = round(rand)+1;
-                    else
+%                     if target.catchTrials
+%                         % random correct response for absent catch trials
+%                         correctResponse = round(rand)+1;
+%                     else
                         correctResponse = 3; % absent
-                    end
+%                     end
                 else
                     switch responseOption
                         case 'targetType'

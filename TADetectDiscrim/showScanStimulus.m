@@ -272,15 +272,15 @@ for frame = 1:nFrames
         
         % determine feedback according to response accuracy
         % sorry some of this is hard-coded for now
-        if stimulus.fixSeq(frame)==8 % feedback period
+        if stimulus.fixSeq(frame)>=8 % feedback period
             % if first frame of feedback period, determine accuracy
-            if stimulus.fixSeq(frame-1)~=8 
+            if stimulus.fixSeq(frame-1)<8 
                 nRespFrames = display.frameRate*respDur; % look respDur s back
                 responseWindow = response.correct(frame-nRespFrames:frame-1);
                 correct = responseWindow(responseWindow~=0);
             end
             % change fixation according to accuracy
-            if ~isempty(correct)
+            if ~isempty(correct) && stimulus.fixSeq(frame)~=9 % keep 9 (catch trial) regardless of response
                 correct = correct(1); % take first response
                 if correct==1
                     stimulus.fixSeq(frame) = 7; % green
