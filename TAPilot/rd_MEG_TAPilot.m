@@ -86,7 +86,8 @@ params.skipSyncTests    = skipSyncTests;
 params.loadMatrix = sprintf('%s%d.mat', stimfile, run);
 
 % load the rest of the params, but don't start yet (rd version)
-params = ret_rd(params); 
+runGUI = true;
+params = ret_rd(params, runGUI); 
 
 % adjust display params
 % rd version has white stick on bottom to work with rotated cross
