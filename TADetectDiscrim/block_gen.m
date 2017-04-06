@@ -1,4 +1,5 @@
-function [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] = block_gen(blockNames, attBlockNames, targetBlockNames, cueBlockNames, run)
+function [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] = ...
+    block_gen(blockNames, attBlockNames, targetBlockNames, cueBlockNames, run, catchTrials)
 % Random block generator for makeTADetectStim: one run (32 trials in one 
 % repetition = 4 trials for each target (4) x cue (2) condition ) with
 % added blank trials every 4 target trials 
@@ -8,6 +9,9 @@ function [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetType
 
 if nargin < 5
     run = 1;
+end
+if nargin < 6
+    catchTrials = false;
 end
 
 %% define indices
@@ -40,19 +44,11 @@ cueBlockOrder_cue2 = repmat(B,1,4); % for all target conditions
 
 cueBlockOrder = [cueBlockOrder_cue1 , cueBlockOrder_cue2];
 
-% randomize cue order
-% indices = 1:length(cueBlockOrder); % for debugging
-indices = randperm(length(cueBlockOrder));
-cueBlockOrder = cueBlockOrder(indices);
-
 %% target order
 dummy = repmat([pp,pa,ap,aa],[4,1]);
 targetBlockOrder_cue1 = dummy(:)';
 % targetBlockOrder = repmat(targetBlockOrder_cue1,[1,2]);
 targetBlockOrder = repmat(targetBlockOrder_cue1,[1,numel(cueBlockOrder)/numel(targetBlockOrder_cue1)]);
-
-% randomize target order
-targetBlockOrder = targetBlockOrder(indices);
 
 %% target type order
 % hard-coding this for lack of a better method
@@ -87,10 +83,59 @@ if ~isempty(pp) && ~isempty(pa) && ~isempty(ap) && ~isempty(aa)
 elseif ~isempty(pp) && isempty(pa) && isempty(ap) && isempty(aa)
     targetTypeOrder = repmat([1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2; ...
         1 1 1 1 2 2 2 2 1 1 1 1 2 2 2 2],1,2)';
+    
+    if catchTrials
+        % trial indices by response target, cue validity, and target type
+        T1iIdx = find(cueBlockOrder==c2c1);
+        T2iIdx = find(cueBlockOrder==c1c2);
+        T1vIdx = find(cueBlockOrder==c1c1);
+        T2vIdx = find(cueBlockOrder==c2c2);
+        
+        % pseudorandomly select absent targets across blocks
+        T1iTT1 = Shuffle(T1iIdx(targetTypeOrder(T1iIdx,1)==1)); % target type 1 = decrement
+        T1iTT2 = Shuffle(T1iIdx(targetTypeOrder(T1iIdx,1)==2)); % target type 2 = increment
+        T1vTT1 = Shuffle(T1vIdx(targetTypeOrder(T1vIdx,1)==1));
+        T1vTT2 = Shuffle(T1vIdx(targetTypeOrder(T1vIdx,1)==2));
+        
+        T2iTT1 = Shuffle(T2iIdx(targetTypeOrder(T2iIdx,2)==1));
+        T2iTT2 = Shuffle(T2iIdx(targetTypeOrder(T2iIdx,2)==2));
+        T2vTT1 = Shuffle(T2vIdx(targetTypeOrder(T2vIdx,2)==1));
+        T2vTT2 = Shuffle(T2vIdx(targetTypeOrder(T2vIdx,2)==2));
+        
+        if mod(run,2) % odd runs
+            % T1iTT1 -> abs | T2iTT2 -> abs
+            % T1vTT1 x 1 -> abs, T1vTT2 x 2 -> abs | T2vTT1 x 2 -> abs, T2vTT2 x 1 -> abs
+            % T1 and T2 target absent trials
+            a1 = [T1iTT1(1) T1vTT1(1) T1vTT2(1:2)];
+            a2 = [T2iTT2(1) T2vTT1(1:2) T2vTT2(1)];
+        else
+            % T1iTT2 -> abs | T2iTT1 -> abs
+            % T1vTT2 x 1 -> abs, T1vTT1 x 2 -> abs | T2vTT2 x 2 -> abs, T2vTT1 x 1 -> abs
+            % T1 and T2 target absent trials
+            a1 = [T1iTT2(1) T1vTT2(1) T1vTT1(1:2)];
+            a2 = [T2iTT1(1) T2vTT2(1:2) T2vTT1(1)];
+        end
+        
+        % set selected targets to absent
+        targetTypeOrder(a1,1) = 0;
+        targetTypeOrder(a2,2) = 0;
+        
+        % update targetBlockOrder to reflect new pa and ap trials
+        newAP = targetTypeOrder(:,1)==0;
+        newPA = targetTypeOrder(:,2)==0;
+        
+        targetBlockOrder(newPA) = 3; % from makeTADetectDiscrim
+        targetBlockOrder(newAP) = 4;
+    end
 else
     error('target type order not implemented for this set of pp/pa/ap/aa blocks')
 end
 
+%% randomize trial order
+% indices = 1:length(cueBlockOrder); % for debugging
+indices = randperm(length(cueBlockOrder));
+cueBlockOrder = cueBlockOrder(indices);
+targetBlockOrder = targetBlockOrder(indices);
 targetTypeBlockOrder = targetTypeOrder(indices,:)';
 
 %% insert blank trials 

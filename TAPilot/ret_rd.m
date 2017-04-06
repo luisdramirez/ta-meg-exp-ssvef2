@@ -40,7 +40,7 @@ if runGUI == true
 
     % if user aborted GUI, exit gracefully
     if notDefined('params'), return; end
-    
+
 elseif runGUI == false
     % now set rest of the params
     if strcmp(params.experiment,'Experiment From File')
@@ -52,6 +52,7 @@ params = setRetinotopyParams(params.experiment, params);
 
 % set response device
 params = setRetinotopyDevices(params);
+
 
 % % go
 % doRetinotopyScan(params);

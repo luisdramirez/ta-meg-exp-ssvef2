@@ -14,6 +14,7 @@ respTime = (stim.p.targetLeadTime + stim.p.targetSOA + stim.p.cueTargetSOA)*refr
 keyCodes = stim.p.keyCodes;
 order = stim.order;
 responseOption = stim.p.responseOption;
+catchTrials = stim.stimulus.target.catchTrials;
 
 if isfield(stim.stimulus,'itiSeq')
     itiSeq = stim.stimulus.itiSeq;
@@ -146,10 +147,14 @@ for k = 1:numel(cueBlockOrder_Indx) %'1-1','2-1','2-2','1-2'
     for tt = 1:2 % target type, e.g. decrement vs. increment
         w = cueBlockOrder==cueType & targetTypeOrder==tt;
         temp_correct = response_correct(w); 
-%         temp_correct(temp_correct==0) = NaN;
         temp_correct(temp_correct==-1) = 0;
         ttacc{k,tt} = temp_correct;
         ttacc_mean(k,tt) = mean(temp_correct);
+    end
+    if catchTrials
+        tt = 0; % target absent catch trials
+        w = cueBlockOrder==cueType & targetTypeOrder==tt;
+        ttcatch{k,1} = OverallResponse_all(w);
     end
 end
 
@@ -176,8 +181,10 @@ accuracy.CR_stes = nanstd(accuracy.CR_all,0,2)./ sqrt(length(df));
 accuracy.dprime_stes = nanstd(accuracy.dprime,0,2) ./ sqrt(length(df));
 all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_stes];
 
-accuracy.targetTypeAccAll = ttacc; % for single run
-accuracy.targetTypeAcc = ttacc_mean; % for single run
+% for single run
+accuracy.targetTypeAccAll = ttacc; 
+accuracy.targetTypeAcc = ttacc_mean; 
+accuracy.catchTrialRespAll = ttcatch; 
 
 %% plot
 switch plotLevel
