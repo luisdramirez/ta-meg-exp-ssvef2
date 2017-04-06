@@ -75,7 +75,7 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb'
+stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
 stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
@@ -119,9 +119,16 @@ backgroundColor = 128/255;
 phases = [0 pi];
 
 radialCB.thetaCycles = 8;
-radialCB.E = 0.05;
 radialCB.A = 1;
 radialCB.b = 0.2;
+switch stimType
+    case 'radialcb'
+        radialCB.E = 0.05;
+    case 'spiralcb'
+        radialCB.E = 0.1;
+    otherwise
+        error('stimType not recognized')
+end
 
 % fixation
 fixDiam = 0.15;
@@ -183,6 +190,9 @@ for iPhase = 1:numel(phases)
                 %s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
             case 'radialcb'
                 s{iPhase, iContrast} = makeRadialCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
+                    radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
+            case 'spiralcb'
+                s{iPhase, iContrast} = makeSpiralCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             otherwise
                 error('stimType not recognized')
