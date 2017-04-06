@@ -29,6 +29,7 @@ use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 2;
+faWeight = 0.3;
 
 %% Configurations
 % initialize stim tracker for MEG
@@ -210,7 +211,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
                         end
                     end
                     staircaseAdjustmentContrastTargetsDprime(stim.p.stimContrast, ...
-                        response.target.contrast, validTrialsAcc, validTrialsCatch);
+                        response.target.contrast, validTrialsAcc, validTrialsCatch, faWeight);
                 else
                     staircaseAdjustmentContrastTargets(stim.p.stimContrast, ...
                         response.target.contrast, validAcc);

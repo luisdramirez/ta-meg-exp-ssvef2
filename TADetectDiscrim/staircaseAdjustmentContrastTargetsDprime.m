@@ -1,10 +1,15 @@
-function contrasts = staircaseAdjustmentContrastTargetsDprime(pedestal, contrasts, trialacc, trialcatch)
+function contrasts = staircaseAdjustmentContrastTargetsDprime(pedestal, contrasts, trialacc, trialcatch, faweight)
 %
 % function staircaseAdjustment(contrasts, discrims)
 %
 % contrast is [low-contrast(decrement) high-contrast(increment)]
 % discrim is [valid-discrim-targetType1(decrement)
 % valid-discrim-targetType2(increment)]
+
+%% inputs
+if nargin<5
+    faweight = 1;
+end
 
 %% performance metrics
 acc = [mean(trialacc{1}) mean(trialacc{2})];
@@ -14,7 +19,7 @@ for iTT = 1:numel(trialacc)
     nsignal = numel(trialacc{iTT});
     nfa = sum(trialcatch==iTT);
     nnoise = numel(trialcatch);
-    [dprime(iTT), criterion(iTT)] = rd_dprime2(nh, nfa, nsignal, nnoise);
+    [dprime(iTT), criterion(iTT)] = rd_dprimeWeighted(nh, nfa, nsignal, nnoise, faweight);
 end
 perfs = dprime;
 
