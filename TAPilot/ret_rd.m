@@ -1,4 +1,4 @@
-function params = ret_rd(params)
+function params = ret_rd(params, runGUI)
 % [params] = ret_rd([params])
 %
 % ret - program to start retinotopic mapping experiments (under OSX)
@@ -33,18 +33,29 @@ function params = ret_rd(params)
 %clear mex; clear all;
 %pack;
 
-% get some parameters from graphical interface
-if ~exist('params', 'var'), params = []; end
-params = retMenu(params);
+if runGUI == true
+    % get some parameters from graphical interface
+    if ~exist('params', 'var'), params = []; end
+    params = retMenu(params);
 
-% if user aborted GUI, exit gracefully
-if notDefined('params'), return; end
+    % if user aborted GUI, exit gracefully
+    if notDefined('params'), return; end
 
-% now set rest of the params
-params = setRetinotopyParams(params.experiment, params);
+    % now set rest of the params
+    params = setRetinotopyParams(params.experiment, params);
 
-% set response device
-params = setRetinotopyDevices(params);
+    % set response device
+    params = setRetinotopyDevices(params);
+elseif runGUI == false
+    if strcmp(params.experiment,'Experiment From File')
+        params.experiment = 'experiment from file';
+    end
+    % now set rest of the params
+    params = setRetinotopyParams(params.experiment, params);
+
+    % set response device
+    params = setRetinotopyDevices(params);
+end
 
 % % go
 % doRetinotopyScan(params);

@@ -29,6 +29,7 @@ use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 2;
+runGUI = false;
 
 %% Configurations
 % initialize stim tracker for MEG
@@ -86,7 +87,7 @@ params.skipSyncTests    = skipSyncTests;
 params.loadMatrix = sprintf('%s%d.mat', stimfile, run);
 
 % load the rest of the params, but don't start yet (rd version)
-params = ret_rd(params); 
+params = ret_rd(params, runGUI); 
 
 % adjust display params
 % rd version has white stick on bottom to work with rotated cross
