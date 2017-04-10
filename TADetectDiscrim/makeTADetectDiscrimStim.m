@@ -84,7 +84,7 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'spiralcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
+stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
 stimSize = 8;
 spatialFreq = 3;
 orientation = 0;
@@ -129,7 +129,6 @@ phases = [0 pi];
 
 radialCB.thetaCycles = 8;
 radialCB.A = 1;
-
 switch stimType
     case 'radialcb'
         radialCB.b = 0.2;
