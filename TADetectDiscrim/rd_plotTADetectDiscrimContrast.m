@@ -5,8 +5,8 @@ subject = 'lr';
 runs = 101800:101804;
 date = '20170410';
 plotLevel = 1;
-saveFile = 1;
-saveFigs = 1;
+saveFile = 0;
+saveFigs = 0;
 [acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 

@@ -48,10 +48,19 @@ cueDur = 0.1;
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
 iti = 1;
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
+flickerType = 'onoff'; % 'counterphase','onoff'
 if refrate==60
     % 60 Hz SSVEP unit sequences: 3 frames (60/3=20 Hz) and 4 frames (60/4=15 Hz)
-    fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
-    slowUnit = [1 1 2 2];
+    switch flickerType
+        case 'counterphase'
+            fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
+            slowUnit = [1 1 2 2];
+        case 'onoff'
+            fastUnit = [1 1 0];
+            slowUnit = [1 0 1 0];
+        otherwise
+            error('flickerType not recognized')
+    end
 else
     error('refrate must be 60 Hz')
 end
@@ -159,7 +168,7 @@ p = v2struct(...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
     cueBlockNames, cueBlockOrder, targetTypeBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
-    contrasts, blurRadius, backgroundColor, phases, radialCB, triggerOption, jitter);
+    contrasts, blurRadius, backgroundColor, phases, radialCB, triggerOption, jitter, flickerType);
 
 %% Make the stimuli
 for iPhase = 1:numel(phases)
@@ -585,6 +594,8 @@ for iFrame = 1:numel(seqtiming)
         otherwise
             error('blockName not recognized')
     end
+    if p1==0, c1 = 0; end
+    if p2==0, c2 = 0; end
     phaseSeqIdx = phaseSeqIdx + 1;
     imageID = 10*p2 + c2; %(1000*p1 + 100*c1 + ) removed from front
     
