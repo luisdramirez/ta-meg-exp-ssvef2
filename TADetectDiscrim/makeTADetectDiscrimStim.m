@@ -75,8 +75,8 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
-stimSize = 2;
+stimType = 'spiralcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
+stimSize = 8;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
@@ -120,14 +120,14 @@ phases = [0 pi];
 
 radialCB.thetaCycles = 8;
 radialCB.A = 1;
-radialCB.b = 0.2;
+
 switch stimType
     case 'radialcb'
+        radialCB.b = 0.2;
         radialCB.E = 0.05;
     case 'spiralcb'
+        radialCB.b = 0.4;
         radialCB.E = 0.1;
-    otherwise
-        error('stimType not recognized')
 end
 
 % fixation

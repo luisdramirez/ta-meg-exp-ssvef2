@@ -38,6 +38,9 @@ for iPhase = 1:numel(phases)
             case 'radialcb'
                 targ_s{iPhase, iContrast} = makeRadialCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
+            case 'spiralcb'
+                targ_s{iPhase, iContrast} = makeSpiralCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
+                    radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             otherwise
                 error('stimType not recognized')
         end

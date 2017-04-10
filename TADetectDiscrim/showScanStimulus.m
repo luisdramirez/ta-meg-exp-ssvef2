@@ -43,7 +43,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 triggersOn = false;
 
 % staircase? (adjustment between runs)
-staircase = 1; % set to 0 for first run of the day
+staircase = 0; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
