@@ -33,7 +33,7 @@ elseif stimulus.fixSeq(frame) == 7
 elseif stimulus.fixSeq(frame) == 8
     frameColor = [0 0 1]*255;
 elseif stimulus.fixSeq(frame) == 9
-    frameColor = [0.2 0.2 0.2]*255;
+    frameColor = [0.3 0.3 0.3]*255;
 end
 
 frameMaxDiameter = max(frameRect)*1.01;
