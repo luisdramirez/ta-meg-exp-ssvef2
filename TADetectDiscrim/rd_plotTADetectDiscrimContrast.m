@@ -2,11 +2,11 @@
 
 %% initial analysis
 subject = 'af';
-runs = 111:120;
-date = '20170406';
+runs = 121:130;
+date = '20170407';
 plotLevel = 1;
-saveFile = 1;
-saveFigs = 1;
+saveFile = 0;
+saveFigs = 0;
 [acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
