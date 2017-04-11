@@ -62,7 +62,8 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = [0.38 0.63]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
+%     patchContrast = [0.38 0.63]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
+    patchContrast = [0.1 .25 .7 1];
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -252,17 +253,18 @@ for frame = 1:nFrames
                         Screen('DrawTexture', display.windowPtr, target.textures(1), ...
                             [], target.destRect, rot);
                     case 'contrast'
-                        % DRAW TARGET HERE                
+                        % DRAW TARGET HERE   
+                        targetIdx = (target.pedestalSeq(frame)-1)*2 + target.seq(frame);
                         if stimulus.seq(frame) == 3 
                             %bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255); OR madeBgIms{1}; 
                             %tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame), 1, target.seq(frame)}*255); OR madeTargIms{target.posSeq(frame),1,target.seq(frame)}; 
                             Screen('DrawTexture', display.windowPtr, madeBgIms{1});
-                            Screen('DrawTexture', display.windowPtr, madeTargIms{target.posSeq(frame),1,target.seq(frame)});
+                            Screen('DrawTexture', display.windowPtr, madeTargIms{target.posSeq(frame),1,targetIdx});
                         elseif stimulus.seq(frame) == 4 
                             %bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{2}*255); OR madeBgIms{2}; 
                             %tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame), 2, target.seq(frame)}*255); OR madeTargIms{target.posSeq(frame), 2, target.seq(frame)};          
                             Screen('DrawTexture', display.windowPtr, madeBgIms{2});
-                            Screen('DrawTexture', display.windowPtr, madeTargIms{target.posSeq(frame), 2, target.seq(frame)});
+                            Screen('DrawTexture', display.windowPtr, madeTargIms{target.posSeq(frame), 2, targetIdx});
                         end
                     otherwise
                         error('target.type not recognized');
