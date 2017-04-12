@@ -48,7 +48,7 @@ cueDur = 0.1;
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
 iti = 1;
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
-flickerType = 'onoff'; % 'counterphase','onoff'
+flickerType = 'counterphase'; % 'counterphase','onoff'
 if refrate==60
     % 60 Hz SSVEP unit sequences: 3 frames (60/3=20 Hz) and 4 frames (60/4=15 Hz)
     switch flickerType
@@ -67,7 +67,7 @@ end
 
 %% target setup
 target.type = 'contrast'; % 'dot','lines','grating','cb','contrast'
-target.catchTrials = true;
+target.catchTrials = false;
 
 %% blocks setup (one run)
 blockNames = {'blank','fast-left'}; % fast-left, slow-left
@@ -85,7 +85,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
-stimSize = 2;
+stimSize = 8;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
@@ -129,20 +129,19 @@ phases = [0 pi];
 
 radialCB.thetaCycles = 8;
 radialCB.A = 1;
-radialCB.b = 0.2;
 switch stimType
     case 'radialcb'
+        radialCB.b = 0.2;
         radialCB.E = 0.05;
     case 'spiralcb'
+        radialCB.b = 0.4;
         radialCB.E = 0.1;
-    otherwise
-        error('stimType not recognized')
 end
 
 % fixation
 fixDiam = 0.15;
 
-stimPos = [6 4]; % [x y]
+stimPos = [0 0]; % [x y]
 stimSpacerWidth = (stimPos(1)-stimSize/2)*2;
 
 %% sound setup
@@ -310,6 +309,7 @@ switch target.type
         target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;
         target.positions = 1; % (1:8)';
+        target.nPedestals = 2; % 1 for normal discrimination from baseline
         if numel(target.positions)==1
             target.sigma = target.stimSize*2;
         else
@@ -321,15 +321,21 @@ switch target.type
             length(targetBlockOrder(targetBlockOrder == 4));
         if any(strcmp(targetBlockNames,'pres-abs')) && ~target.catchTrials
             positions_mat = repmat(target.positions, 1, nTargetAppears/length(target.positions)); 
+            
+            % Pedestals (for contrast discrimination)
+            pedestals_mat = repmat((1:target.nPedestals)', 1, nTargetAppears/target.nPedestals);
         else
             if target.catchTrials
                 positions_mat = repmat(target.positions, nTargetAppears/length(target.positions)/2, 4);
+                pedestals_mat = repmat((1:target.nPedestals)', nTargetAppears/target.nPedestals/2, 4);
             else
                 positions_mat = repmat(target.positions, nTargetAppears/length(target.positions)/2, 2);
+                pedestals_mat = repmat((1:target.nPedestals)', nTargetAppears/target.nPedestals/2, 2);
             end
         end
         posShuffled = Shuffle(positions_mat);
         posShuffledHeaders = {'pres-presT1', 'pres-presT2','pres-abs','abs-pres'};
+        pedestalShuffled = Shuffle(pedestals_mat);
         
         % Generate guassian center coordinates 
         if numel(target.positions)==1
@@ -542,12 +548,14 @@ for iFrame = 1:numel(seqtiming)
         end
         posRow = posRowCount(posCol);
         posSeq(iFrame,1) = posShuffled(posRow,posCol);
+        pedestalSeq(iFrame,1) = pedestalShuffled(posRow,posCol);
         if posSeq(iFrame-nFramesPerTarget+1)>0
             posRowCount(posCol) = posRowCount(posCol)+1;
         end
     else
         targetTypeSeq(iFrame,1) = 0;
         posSeq(iFrame,1) = 0;
+        pedestalSeq(iFrame,1) = 0;
     end
     
     % determine if an absent target is "on" (if it is time for that target)
@@ -667,6 +675,10 @@ for iFrame = 1:numel(seqtiming)
                     nFramesPerTarget*2,'last'));
                 positions = posFrames([1 end])';
                 
+                pedFrames = pedestalSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget*2,'last'));
+                pedestals = pedFrames([1 end])';
+                
                 switch responseOption
                     case 'targetType'
                         correctResponse = targets(responseCue);
@@ -684,6 +696,10 @@ for iFrame = 1:numel(seqtiming)
                 posFrames = posSeq(find(targetTypeSeq>0,...
                     nFramesPerTarget,'last'));
                 positions = [posFrames(1) 0];
+                
+                pedFrames = pedestalSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget,'last'));
+                pedestals = [pedFrames(1) 0];
                 
                 if responseCue==1
                     switch responseOption
@@ -710,6 +726,10 @@ for iFrame = 1:numel(seqtiming)
                     nFramesPerTarget,'last'));
                 positions = [0 posFrames(1)];
                 
+                pedFrames = pedestalSeq(find(targetTypeSeq>0,...
+                    nFramesPerTarget,'last'));
+                pedestals = [0 pedFrames(1)];
+                
                 if responseCue==1
 %                     if target.catchTrials
 %                         % random correct response for absent catch trials
@@ -735,6 +755,7 @@ for iFrame = 1:numel(seqtiming)
         trialsPresented(blockIdx).responseCue = responseCue;
         trialsPresented(blockIdx).targets = targets;
         trialsPresented(blockIdx).positions = positions;
+        trialsPresented(blockIdx).pedestals = pedestals;
         trialsPresented(blockIdx).correctResponse = correctResponse;
         keyCodeSeq(iFrame,1) = keyCodes(correctResponse);
     else
@@ -811,6 +832,7 @@ destRect = CenterRectOnPoint(srcRect, cx, cy); %(cy+stimPos(2)*pixelsPerDegree)
 diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
 target.seq = targetTypeSeq;
 target.posSeq = posSeq;
+target.pedestalSeq = pedestalSeq;
 
 % store in stimulus structure
 stimulus.fixDiam = fixDiam;
@@ -840,6 +862,15 @@ for iBlock = 1:nBlocks-1
     end
 end
 
+% friendlier format of pedestalBlockOrder
+pedestalBlockOrder = nan(size(targetTypeBlockOrder));
+for iBlock = 1:nBlocks-1
+    pedestals = trialsPresented(iBlock).pedestals;
+    if ~isempty(pedestals)
+        pedestalBlockOrder(:,iBlock) = pedestals;
+    end
+end
+
 % store in order structure
 order.blockOrder = blockOrder;
 order.attBlockOrder = attBlockOrder;
@@ -850,6 +881,8 @@ order.targetTypeBlockOrder = targetTypeBlockOrder;
 if strcmp(target.type, 'contrast')
     order.posShuffled = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
     order.posBlockOrder = posBlockOrder;
+    order.pedestalShuffled = pedestalShuffled;
+    order.pedestalBlockOrder = pedestalBlockOrder;
 end
 order.targetTypes = targetTypes;
 order.trialsPresented = trialsPresented;

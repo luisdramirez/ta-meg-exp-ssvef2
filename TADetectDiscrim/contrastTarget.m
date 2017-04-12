@@ -3,6 +3,7 @@ function [backgroundIms, maskedIms, target] = contrastTarget(display, target)
 %%% Creating Contrast Target Stimulus
 
 %% Make the stimuli
+contrasts = target.contrast;
 positions = target.positions;
 sigmaDeg = target.sigma;
 phases = target.phases; 
@@ -16,9 +17,9 @@ radialCB = target.radialCB;
 
 %% Create background stimuli
 for iPhase = 1:numel(phases)
-    for iContrast = 1:numel(target.contrast)
+    for iContrast = 1:numel(contrasts)
         phase = phases(iPhase);
-        contrast = target.contrast(iContrast);
+        contrast = contrasts(iContrast);
         switch target.stimType
             case 'checkerboard'
                 c1 = buildColorGrating(pixelsPerDegree, [stimSize stimSize], ...
@@ -52,32 +53,32 @@ for iPhase = 1:numel(phases)
     end
 end
 
-% generate all combinations of phase, contrast, and side of screen
-for iP1 = 1:numel(phases)
-    for iC1 = 1:numel(target.contrast)
-        for iP2 = 1:numel(phases)
-            for iC2 = 1:numel(target.contrast)
-                
-                targ_stimMatrix{iP2,iC2} = ... %iP1,iC1,
-                    [targ_stim{iP2,iC2}]; %stim{iP1,iC1} 
-                
-                targ_stimIDs(iP2,iC2) = ... %iP1,iC1,
-                    iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right] iP1*1000 + iC1*100 +
-            end
-        end
-    end
-end
-
-% put into images, keeping track of the IDs
-for iIm = 1:numel(targ_stimMatrix)
-    targ_images(:,:,iIm) = targ_stimMatrix{iIm};
-    targ_imageIDs(iIm,1) = targ_stimIDs(iIm);
-end
-imageIDHeaders = {'right-phase', 'right-contrast'}; %'left-phase', 'left-contrast', 
-
-% add blank stimulus
-targ_images(:,:,end+1) = ones(size(targ_images(:,:,1)))*backgroundColor;
-targ_imageIDs(end+1) = 0;
+% % generate all combinations of phase, contrast, and side of screen
+% for iP1 = 1:numel(phases)
+%     for iC1 = 1:numel(contrasts)
+%         for iP2 = 1:numel(phases)
+%             for iC2 = 1:numel(contrasts)
+%                 
+%                 targ_stimMatrix{iP2,iC2} = ... %iP1,iC1,
+%                     [targ_stim{iP2,iC2}]; %stim{iP1,iC1} 
+%                 
+%                 targ_stimIDs(iP2,iC2) = ... %iP1,iC1,
+%                     iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right] iP1*1000 + iC1*100 +
+%             end
+%         end
+%     end
+% end
+% 
+% % put into images, keeping track of the IDs
+% for iIm = 1:numel(targ_stimMatrix)
+%     targ_images(:,:,iIm) = targ_stimMatrix{iIm};
+%     targ_imageIDs(iIm,1) = targ_stimIDs(iIm);
+% end
+% imageIDHeaders = {'right-phase', 'right-contrast'}; %'left-phase', 'left-contrast', 
+% 
+% % add blank stimulus
+% targ_images(:,:,end+1) = ones(size(targ_images(:,:,1)))*backgroundColor;
+% targ_imageIDs(end+1) = 0;
 
 % stim n,n+1 are same contrast different phase
 % stim n,n+2 are different contrast same phase
@@ -85,8 +86,8 @@ targ_imageIDs(end+1) = 0;
 
 %% Create target stimulus
 nPos = numel(positions); %number of x,y pairs to place the gaussian
-nPhases = 2; %number of checker board phases
-nConds = 2; %number of contrast conditions 
+nPhases = numel(phases); %number of checker board phases
+nConds = numel(contrasts); %number of contrast conditions 
 nIms = nPos * nPhases * nConds; %total number of images to create 
 
 coords = target.coords;
