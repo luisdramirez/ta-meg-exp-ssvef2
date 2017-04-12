@@ -37,6 +37,8 @@ for iT = 1:2
         end
     end
 end
+%% accuracy as a function of trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
+
 
 %% plot
 ylims = [0 1];
