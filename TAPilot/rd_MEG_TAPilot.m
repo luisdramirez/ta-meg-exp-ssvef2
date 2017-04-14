@@ -28,9 +28,9 @@ useKbQueue = 0;
 use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
-nStaircaseRuns = 2;
+nStaircaseRuns = 2; % #runs for staircase to update
 faWeight = 0.3;
-runGUI = false;
+runGUI = false; % turn GUI ON/OFF
 
 %% Configurations
 % initialize stim tracker for MEG
