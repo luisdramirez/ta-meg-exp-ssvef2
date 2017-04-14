@@ -62,8 +62,13 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-%     patchContrast = [0.38 0.63]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
-    patchContrast = [0.1 .25 .7 1];
+%     patchContrast = [0.38 0.65]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
+%     cvals = logspace(-.601,-.001,31); % -.301 for 0.5
+%     patchContrast = cvals([-15 -10 10 15]+16);
+%     cvals = logspace(-.861,-.021,22);
+%     patchContrast = cvals([1 9 19 22]);
+%     patchContrast = [0 .29 .78 1]; % lr
+    patchContrast = [.1 .29 .78 1]; % rd
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -254,7 +259,11 @@ for frame = 1:nFrames
                             [], target.destRect, rot);
                     case 'contrast'
                         % DRAW TARGET HERE   
-                        targetIdx = (target.pedestalSeq(frame)-1)*2 + target.seq(frame);
+                        if isfield(target,'pedestalSeq')
+                            targetIdx = (target.pedestalSeq(frame)-1)*2 + target.seq(frame);
+                        else
+                            targetIdx = target.seq(frame);
+                        end
                         if stimulus.seq(frame) == 3 
                             %bgtex = Screen('MakeTexture', display.windowPtr, backgroundIms{1}*255); OR madeBgIms{1}; 
                             %tex = Screen('MakeTexture', display.windowPtr, maskedIms{target.posSeq(frame), 1, target.seq(frame)}*255); OR madeTargIms{target.posSeq(frame),1,target.seq(frame)}; 

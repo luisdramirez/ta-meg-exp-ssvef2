@@ -74,7 +74,8 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
@@ -85,7 +86,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
-stimSize = 8;
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
