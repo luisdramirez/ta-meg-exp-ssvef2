@@ -43,10 +43,10 @@ targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.2; % (s)
-feedbackDur = 0.3;
-cueDur = 0.1;
+feedbackDur = 0.3; % (s)
+cueDur = 0.1; % (s)
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
-iti = 1;
+iti = 1; % (s)
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
 flickerType = 'counterphase'; % 'counterphase','onoff'
 if refrate==60

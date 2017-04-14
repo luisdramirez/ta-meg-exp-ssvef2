@@ -304,7 +304,6 @@ for frame = 1:nFrames
         if isfield(stimulus, 'soundSeq')
             if stimulus.soundSeq(frame)~=0
                 playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:)*soundAmp);
-                
             end
         end
         
