@@ -46,8 +46,8 @@ end
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
-% rootDir = pathToExpt;
-rootDir =  ~/Documents/ta-meg-exp-ssvef2/TADetectDiscrim' %'/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
+%rootDir = pathToExpt;
+rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim/';%'/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
@@ -107,6 +107,7 @@ responseOption = stim.p.responseOption;
 %% analyze each run
 responseData_all = [];
 targetPosType_all = [];
+targetPedestal_all = [];
 
 for n = 1:length(df)
     name = df(n).name;
@@ -136,11 +137,18 @@ for n = 1:length(df)
     targetPosType(targetPos>=5 & targetPos<=8) = 2;
     targetPosType_all = [targetPosType_all; targetPosType];
     
+    % target pedestal
+    targetPedestal = stim.order.pedestalBlockOrder';
+    targetPedestal_all = [targetPedestal_all; targetPedestal];
+    
     % target contrast
     if isfield(dd.response.target,'contrast')
         targetContrast(n,:) = dd.response.target.contrast;
     end
 end
+
+responseData_all(:,end+1) = targetPedestal_all;
+responseData_labels{end+1} = 'targetPedestal';
 
 %% extract block order from responseData_all
 run = responseData_all(:,1);
