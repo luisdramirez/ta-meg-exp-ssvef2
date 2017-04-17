@@ -38,7 +38,7 @@ for iT = 1:2
     end
 end
 %% accuracy as a function of trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
-
+%pedestalSeq (below(1)/above(2) baseline), targetTypeBlockOrder (), pedestalBlockOrder
 
 %% plot
 ylims = [0 1];
