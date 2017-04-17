@@ -2,13 +2,8 @@
 
 %% initial analysis
 subject = 'lr';
-<<<<<<< HEAD
-runs = 201:210;
-date = '20170414';
-=======
-runs = 201:209;
-date = '20170412';
->>>>>>> 53a23b85d3d53fe2892685096f8ca17a32a227b2
+runs = 207:210;
+date = '20170417';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;

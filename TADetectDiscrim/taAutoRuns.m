@@ -1,12 +1,12 @@
 %rd_MEG_TAPilot automatic runs
-function taAutoRuns(subj, runs)
+function taAutoRuns(runs,subj)
     % runs is a vector 
     for iRun = 1:length(runs)
         curr_run = runs(iRun);
         rd_MEG_TAPilot(curr_run, 'taDetectDiscrim')
         sca
         % move data file movefile(source, destinataion) 
-        % movefile('Desktop',['Documents/TADetectDiscrim/data/' subj]) ??
+        % movefile('~/Desktop/2017...',['~/Documents/TADetectDiscrim/data/' subj]) ??
     end
     
 %implement graceful exit
