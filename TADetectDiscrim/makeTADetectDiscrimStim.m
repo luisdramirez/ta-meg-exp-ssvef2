@@ -85,7 +85,7 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
+stimType = 'radialcbgrad'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
 stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
@@ -131,13 +131,14 @@ phases = [0 pi];
 radialCB.thetaCycles = 8;
 radialCB.A = 1;
 switch stimType
-    case 'radialcb'
+    case {'radialcb','radialcbgrad'}
         radialCB.b = 0.2;
         radialCB.E = 0.05;
     case 'spiralcb'
         radialCB.b = 0.4;
         radialCB.E = 0.1;
 end
+radialCB.gradientAngles = [-135 -45 135 45]; % top left higher contrast, top right, bottom left, bottom right
 
 % fixation
 fixDiam = 0.15;
@@ -197,7 +198,7 @@ for iPhase = 1:numel(phases)
             case 'bullseye'
                 s{iPhase, iContrast} = CreateSpiral(d, stimSize, spatialFreq, phase, contrast)./2 + .5;
                 %s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
-            case 'radialcb'
+            case {'radialcb','radialcbgrad'}
                 s{iPhase, iContrast} = makeRadialCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             case 'spiralcb'
@@ -306,6 +307,7 @@ switch target.type
         target.orientation = orientation;
         target.blurRadius = blurRadius;
         target.backgroundColor = backgroundColor;
+        target.backgroundContrast = stimContrast;
         target.stim = stim;
         target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;
