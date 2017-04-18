@@ -1,6 +1,10 @@
-function img = makeRadialCheckerboardGradient(pixelsPerDegree, sz, phase, contrast, thetaCycles, E, A, b, gradientSlope, gradientAngle)
+function img = makeRadialCheckerboardGradient(pixelsPerDegree, sz, phase, contrast, thetaCycles, E, A, b, gradientAngle)
 %
-% img = makeRadialCheckerboard(pixelsPerDegree, sz, phase, contrast, thetaCycles, E, A, b, gradientSlope, gradientAngle)
+% img = makeRadialCheckerboard(pixelsPerDegree, sz, phase, contrast, thetaCycles, E, A, b, gradientAngle)
+%
+% Schira 2007 J Neurophys:
+% M = 19.2./(abs(grid) + .77);
+% plot(grid, 1./M)
 
 if nargin==0
     pixelsPerDegree = 100;
@@ -9,15 +13,12 @@ if nargin==0
     E = 0.05;
     A = 1; % 0.8;
     b = 0.2; %.04;
-    contrast = 0.5;
+    contrast = 1;
     phase = 0;
-    gradientSlope = 1;
     gradientAngle = 0;
 end
 
-% Schira 2007 J Neurophys:
-% M = 19.2./(abs(grid) + .77);
-% plot(grid, 1./M)
+gradientSlope = 1; % with respect to degrees of visual angle, later overridden by contrast
 
 % Meshgrid
 grid = -sz/2:1/pixelsPerDegree:sz/2;
@@ -41,7 +42,13 @@ yxRatio = tan(gradientAngle*pi/180);
 mx = gradientSlope/(1+yxRatio);
 my = gradientSlope-mx;
 g = mx.*x + my.*y;
+g = exp(g); % convert from log contrast units (log(c)=x, c=exp(x))
+
+% Scale gradient
+glims = [min(g(:)) max(g(:))];
+g = g*contrast/diff(glims);
 
 % scale images according to contrast and place within [0 1] range
-img = (img * contrast) / 2 + 0.5;
+% img = (img .* (g + 0.5)) / 2 + 0.5;
+img = (img .* g) / 2 + 0.5;
 
