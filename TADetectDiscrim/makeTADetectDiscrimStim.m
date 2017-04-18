@@ -39,7 +39,7 @@ refrate = 60; % (Hz)
 nFramesPerTarget = 8;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
+targetSOA = 16/60; %0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.2; % (s)
@@ -74,8 +74,8 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-cueBlockNames = {'no-cue','1-1','2-2'};
+cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+% cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
@@ -85,7 +85,7 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
+stimType = 'radialcbgrad'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
 stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
@@ -131,13 +131,14 @@ phases = [0 pi];
 radialCB.thetaCycles = 8;
 radialCB.A = 1;
 switch stimType
-    case 'radialcb'
+    case {'radialcb','radialcbgrad'}
         radialCB.b = 0.2;
         radialCB.E = 0.05;
     case 'spiralcb'
         radialCB.b = 0.4;
         radialCB.E = 0.1;
 end
+radialCB.gradientAngles = [-135 -45 135 45]; % top left higher contrast, top right, bottom left, bottom right
 
 % fixation
 fixDiam = 0.15;
@@ -197,7 +198,7 @@ for iPhase = 1:numel(phases)
             case 'bullseye'
                 s{iPhase, iContrast} = CreateSpiral(d, stimSize, spatialFreq, phase, contrast)./2 + .5;
                 %s{iPhase, iContrast} = (c-0.5)*contrast+0.5;
-            case 'radialcb'
+            case {'radialcb','radialcbgrad'}
                 s{iPhase, iContrast} = makeRadialCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             case 'spiralcb'
@@ -306,6 +307,7 @@ switch target.type
         target.orientation = orientation;
         target.blurRadius = blurRadius;
         target.backgroundColor = backgroundColor;
+        target.backgroundContrast = stimContrast;
         target.stim = stim;
         target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;

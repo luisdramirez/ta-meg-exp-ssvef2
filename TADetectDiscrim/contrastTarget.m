@@ -13,6 +13,7 @@ spatialFreq = target.spatialFreq;
 orientation = target.orientation;
 blurRadius = target.blurRadius;
 backgroundColor = target.backgroundColor;
+backgroundContrast = target.backgroundContrast;
 radialCB = target.radialCB;
 
 %% Create background stimuli
@@ -42,52 +43,36 @@ for iPhase = 1:numel(phases)
             case 'spiralcb'
                 targ_s{iPhase, iContrast} = makeSpiralCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
+            case 'radialcbgrad'
+                for iAngle = 1:numel(radialCB.gradientAngles)
+                    angle = radialCB.gradientAngles(iAngle);
+                    targ_s{iPhase, iAngle} = makeRadialCheckerboardGradient(pixelsPerDegree, stimSize, phase, contrast, ...
+                        radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b, angle, backgroundContrast);
+                end
             otherwise
                 error('stimType not recognized')
         end
         
-        targ_stim{iPhase, iContrast} = maskWithAnnulus(targ_s{iPhase,iContrast}, ...
-            length(targ_s{iPhase,iContrast}), ...
-            0, blurRadius, backgroundColor); %STIMULUS IMAGE GENERATED HERE
-        
+        %STIMULUS IMAGE GENERATED HERE
+        switch target.stimType
+            case 'radialcbgrad'
+                for iAngle = 1:numel(radialCB.gradientAngles)
+                    targ_stim{iPhase, iAngle} = maskWithAnnulus(targ_s{iPhase,iAngle}, ...
+                        length(targ_s{iPhase,iAngle}), ...
+                        0, blurRadius, backgroundColor); 
+                end
+            otherwise
+                targ_stim{iPhase, iContrast} = maskWithAnnulus(targ_s{iPhase,iContrast}, ...
+                    length(targ_s{iPhase,iContrast}), ...
+                    0, blurRadius, backgroundColor);
+        end
     end
 end
 
-% % generate all combinations of phase, contrast, and side of screen
-% for iP1 = 1:numel(phases)
-%     for iC1 = 1:numel(contrasts)
-%         for iP2 = 1:numel(phases)
-%             for iC2 = 1:numel(contrasts)
-%                 
-%                 targ_stimMatrix{iP2,iC2} = ... %iP1,iC1,
-%                     [targ_stim{iP2,iC2}]; %stim{iP1,iC1} 
-%                 
-%                 targ_stimIDs(iP2,iC2) = ... %iP1,iC1,
-%                     iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right] iP1*1000 + iC1*100 +
-%             end
-%         end
-%     end
-% end
-% 
-% % put into images, keeping track of the IDs
-% for iIm = 1:numel(targ_stimMatrix)
-%     targ_images(:,:,iIm) = targ_stimMatrix{iIm};
-%     targ_imageIDs(iIm,1) = targ_stimIDs(iIm);
-% end
-% imageIDHeaders = {'right-phase', 'right-contrast'}; %'left-phase', 'left-contrast', 
-% 
-% % add blank stimulus
-% targ_images(:,:,end+1) = ones(size(targ_images(:,:,1)))*backgroundColor;
-% targ_imageIDs(end+1) = 0;
-
-% stim n,n+1 are same contrast different phase
-% stim n,n+2 are different contrast same phase
-% each row is different phase, each column is different orientation
-
 %% Create target stimulus
 nPos = numel(positions); %number of x,y pairs to place the gaussian
-nPhases = numel(phases); %number of checker board phases
-nConds = numel(contrasts); %number of contrast conditions 
+nPhases = size(targ_stim, 1); %number of checker board phases
+nConds = size(targ_stim, 2); %number of contrast conditions 
 nIms = nPos * nPhases * nConds; %total number of images to create 
 
 coords = target.coords;
@@ -131,7 +116,6 @@ backgroundIms{1} = target.stim{1}; %'backgroundIm' is the fixed contrast. last c
 backgroundIms{2} = target.stim{2};
 
 %% Display 
-
 % AssertOpenGL;
 % Screen('Preference', 'SkipSyncTests', 1);
 % screenNumber=max(Screen('Screens'));        
@@ -162,24 +146,3 @@ backgroundIms{2} = target.stim{2};
 % end
 % sca
 
-
-% % TESTING
-% AssertOpenGL;
-% Screen('Preference', 'SkipSyncTests', 1);
-% screenNumber=max(Screen('Screens'));        
-% [w, wRect]=Screen('OpenWindow',screenNumber, 0,[0 0 x_win y_win],32,2);
-% Screen(w,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-% 
-% % Blank sceen
-% gray=GrayIndex(screenNumber); 
-% Screen('FillRect',w, uint8(gray));
-% 
-% %Make target texture
-% tex = Screen('MakeTexture', w, maskedIms{1,1,1}*255);
-% %Make background texture
-% bgtex = Screen('MakeTexture', w, backgroundIms{1}*255);
-% 
-% %Show image
-% Screen('DrawTexture', w, bgtex);
-% Screen('DrawTexture', w, tex);
-% Screen('Flip',w);
