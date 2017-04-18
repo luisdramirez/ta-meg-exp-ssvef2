@@ -138,6 +138,10 @@ cueBlockOrder = cueBlockOrder(indices);
 targetBlockOrder = targetBlockOrder(indices);
 targetTypeBlockOrder = targetTypeOrder(indices,:)';
 
+%% block order (one condition) and attention order
+blockOrder = repmat(fast_side,1,length(cueBlockOrder));
+attBlockOrder = repmat(att_right,1,length(cueBlockOrder));
+
 %% insert blank trials 
 % (every 4 target trials for target and cue block order)
 blank_tar = repmat(nt,[1,(length(targetBlockOrder)/4) + 1]);
@@ -145,6 +149,8 @@ ind = zeros(1, length(targetBlockOrder)+ length(blank_tar));
 ind (1:5:length(ind)) = blank_tar;
 ind2 = ind;
 ind3 = repmat(ind,2,1);
+ind4 = ind;
+ind5 = ind;
 ind3(ind3==1) = NaN;
 ind2 (ind == nt ) = nc;
 ind(ind == 0) = targetBlockOrder;
@@ -155,12 +161,20 @@ ind3(1, ind3(1,:) == 0) = targetTypeBlockOrder(1,:);
 ind3(2, ind3(2,:) == 0) = targetTypeBlockOrder(2,:);
 targetTypeBlockOrder = ind3;
 
-%% block order (one condition) and attention order
-block = [blank,repmat(fast_side,1,4)];
-blockOrder = [repmat(block,1,8),blank];
+ind4(ind4==1) = blank;
+ind4(ind4 == 0) = blockOrder;
+blockOrder = ind4;
 
-att = [no_att,repmat(att_right,1,4)];
-attBlockOrder = [repmat(att,1,8),no_att];
+ind5(ind5==1) = no_att;
+ind5(ind5 == 0) = attBlockOrder;
+attBlockOrder = ind5;
+
+%% block order (one condition) and attention order
+% block = [blank,repmat(fast_side,1,4)];
+% blockOrder = [repmat(block,1,8),blank];
+% 
+% att = [no_att,repmat(att_right,1,4)];
+% attBlockOrder = [repmat(att,1,8),no_att];
 
 end
 

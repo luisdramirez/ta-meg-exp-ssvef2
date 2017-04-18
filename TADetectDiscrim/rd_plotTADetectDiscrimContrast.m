@@ -2,8 +2,8 @@
 
 %% initial analysis
 subject = 'lr';
-runs = 101800:101804;
-date = '20170410';
+runs = 207:210;
+date = '20170417';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -37,6 +37,8 @@ for iT = 1:2
         end
     end
 end
+%% accuracy as a function of trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
+%pedestalSeq (below(1)/above(2) baseline), targetTypeBlockOrder (), pedestalBlockOrder
 
 %% plot
 ylims = [0 1];

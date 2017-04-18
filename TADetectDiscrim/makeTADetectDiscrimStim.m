@@ -43,10 +43,10 @@ targetSOA = 0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.2; % (s)
-feedbackDur = 0.3;
-cueDur = 0.1;
+feedbackDur = 0.3; % (s)
+cueDur = 0.1; % (s)
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
-iti = 1;
+iti = 1; % (s)
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
 flickerType = 'counterphase'; % 'counterphase','onoff'
 if refrate==60
@@ -74,7 +74,8 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
@@ -85,7 +86,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb'
-stimSize = 8;
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
