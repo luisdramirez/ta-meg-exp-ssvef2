@@ -67,8 +67,8 @@ else
 %     patchContrast = cvals([-15 -10 10 15]+16);
 %     cvals = logspace(-.861,-.021,22);
 %     patchContrast = cvals([1 9 19 22]);
-%     patchContrast = [.16 .29 .78 .89]; % lr
-    patchContrast = [.24 .29 .78 .92]; % rd
+    patchContrast = [.12 .29 .78 .92]; % lr
+%     patchContrast = [.24 .29 .78 .92]; % rd
     
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
