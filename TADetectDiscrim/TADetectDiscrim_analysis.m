@@ -147,7 +147,7 @@ for n = 1:length(df)
     end
 end
 
-responseData_all(:,end+1) = targetPedestal_all;
+responseData_all(:,end:end+1) = targetPedestal_all;
 responseData_labels{end+1} = 'targetPedestal';
 
 %% extract block order from responseData_all
