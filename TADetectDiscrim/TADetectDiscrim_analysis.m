@@ -46,8 +46,8 @@ end
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
-%rootDir = pathToExpt;
-rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim/';%'/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
+rootDir = pathToExpt;
+%rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim/';%'/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
@@ -147,7 +147,7 @@ for n = 1:length(df)
     end
 end
 
-responseData_all(:,end+1) = targetPedestal_all;
+responseData_all(:,end:end+1) = targetPedestal_all;
 responseData_labels{end+1} = 'targetPedestal';
 
 %% extract block order from responseData_all

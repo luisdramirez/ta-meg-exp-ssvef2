@@ -2,8 +2,8 @@
 
 %% initial analysis
 subject = 'lr';
-runs = 207:210;
-date = '20170417';
+runs = 201:210;
+date = '20170414';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -38,8 +38,20 @@ for iT = 1:2
     end
 end
 %% accuracy as a function of trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
-%pedestalSeq (below(1)/above(2) baseline), targetTypeBlockOrder (), pedestalBlockOrder
-
+%pedestalSeq (below(1)/above(2) baseline), targetTypeBlockOrder (darker(1)/brighter(2)), pedestalBlockOrder
+b.targetPedestal = b.responseData_all(:,end-1:end);
+for iT = 1:2
+    for iP = 1:2
+        for iTT = 1:2
+            for iV = 1:2
+                w = b.responseTarget==iT & b.targetType==iTT & b.targetPedestal(:,iT)==iP & b.cueValidity==cvs(iV);
+                pAll{iV,iTT,iP,iT} = [b.responseTarget(w) b.targetType(w) b.targetPedestal(w) b.cueValidity(w) b.acc(w)];
+                pAcc(iV,iTT,iP,iT) = nanmean(b.acc(w)); % row = validity, col = pedestal, page = targettype, vol = target
+            end
+        end
+    end
+end
+            
 %% plot
 ylims = [0 1];
 figure
@@ -78,3 +90,25 @@ for iT = 1:2
 end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+
+figure
+% plot valid vs invalid for dec-dec, dec-inc, inc-dec, inc-inc (8 bars
+% total)
+% row = validity, col = targettype , page =  pedestal, vol = target
+% for each target plot
+    %valid&invalid for a pedestal and both levels of that pedestal (16 bars total)
+for iT = 1:2
+    %for iP = 1:2
+    subplot(1,2,iT)
+    bar([pAcc(:,:,1,iT) pAcc(:,:,2,iT)]')
+    set(gca,'XTickLabel',{'dec-1','dec-2','inc-1','inc-2'})
+    if iT == 1
+        ylabel('proportion correct')
+    end
+    ylim(ylims)
+    title(sprintf('T%d',iT))
+    %end
+end
+legend('valid','invalid')
+rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+
