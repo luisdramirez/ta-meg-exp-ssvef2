@@ -67,9 +67,9 @@ else
 %     patchContrast = cvals([-15 -10 10 15]+16);
 %     cvals = logspace(-.861,-.021,22);
 %     patchContrast = cvals([1 9 19 22]);
-    patchContrast = [.12 .29 .78 .92]; % lr
+    %patchContrast = [.12 .29 .78 .92]; % lr
 %     patchContrast = [.24 .29 .78 .92]; % rd
-    
+    patchContrast = 1;
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
@@ -194,7 +194,7 @@ if isfield(stimulus, 'target')
         case 'contrast'
             % CREATE TARGET IMAGES HERE based on parameters specified in
             % 'makeTADetectDiscrimStim'
-            fprintf('\n[showScanStimulus] contrast: contrasts = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
+%s            fprintf('\n[showScanStimulus] contrast: contrasts = [%1.2f %1.2f]\n\n', patchContrast(1), patchContrast(2))
             target.contrast = patchContrast; 
             [backgroundIms, maskedIms, target] = contrastTarget(display, target);
             [madeBgIms, madeTargIms] = makeIms(display, backgroundIms, maskedIms);

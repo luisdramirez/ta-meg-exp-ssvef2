@@ -1,9 +1,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'lr';
-runs = 211:220;
-date = '20170418';
+subject = 'rd';
+runs = 201:210;
+date = '20170417';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -101,7 +101,7 @@ for iT = 1:2
     %for iP = 1:2
     subplot(1,2,iT)
     bar([pAcc(:,:,1,iT) pAcc(:,:,2,iT)]')
-    set(gca,'XTickLabel',{'dec-1','dec-2','inc-1','inc-2'})
+    set(gca,'XTickLabel',{'p1-dec','p1-inc','p2-dec','p2-inc'})
     if iT == 1
         ylabel('proportion correct')
     end
