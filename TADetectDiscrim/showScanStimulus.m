@@ -42,6 +42,9 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 % triggers?
 triggersOn = false;
 
+% unlimited response window?
+waitUntilResponse = true;
+
 % staircase? (adjustment between runs)
 staircase = 0; % set to 0 for first run of the day
 
@@ -334,7 +337,11 @@ for frame = 1:nFrames
         % Scan the keyboard for subject response
         if useKbQueue
             % Use KbQueue
-            [keyIsDown, firstPress] = KbQueueCheck();
+            if waitUntilResponse
+                [keyIsDown, firstPress] = KbQueueWait();
+            else
+                [keyIsDown, firstPress] = KbQueueCheck();
+            end
             if keyIsDown
                 secs = min(firstPress(firstPress~=0));
                 ssKeyCode = firstPress==secs;
@@ -362,8 +369,12 @@ for frame = 1:nFrames
             end
         else
             % Use KbCheck
-            %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
-            [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(-1);
+            if waitUntilResponse
+                [ssKeyIsDown,ssSecs,ssKeyCode] = KbWait(-1);
+            else
+                %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
+                [ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(-1);
+            end
             if(ssKeyIsDown)
                 kc = find(ssKeyCode);
                 response.keyCode(frame) = kc(1);
