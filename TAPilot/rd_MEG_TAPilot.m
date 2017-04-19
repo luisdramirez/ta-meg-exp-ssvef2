@@ -176,12 +176,20 @@ if strcmp(stimfile, 'taDetectDiscrim')
         catchTrials = false;
     end
     
+    %% Choose the target property by which to group targets
+    if numel(response.target.contrast)==4
+        tg = 'targetPedestalAccAll';
+        validIdx = [1 4];
+    else
+        tg = 'targetTypeAccAll';
+        validIdx = [1 3];
+    end
+    
     %% Adjust difficulty via run-by-run staircase
     switch response.target.type
         case 'cb'
             % only use valid trials, since there's more data
             % shoot for 80% valid, mean across T1 and T2
-            validIdx = [1 3];
             validDetect = mean(acc.Detect_means(validIdx));
             validDiscrim = mean(acc.Discrim1_means(validIdx));
             staircaseAdjustment(response.target.contrast, response.target.tilts(2), ...
@@ -194,12 +202,11 @@ if strcmp(stimfile, 'taDetectDiscrim')
             end
             % update staircase
             if nStaircaseRuns==1 || (nStaircaseRuns==2 && mod(run,2)==0)
-                validIdx = [1 3];
                 for iTT = 1:2
                     validTrialsAcc{iTT} = [];
                     for iRun = 1:numel(acc)
                         for iVI = 1:numel(validIdx)
-                            validTrialsAcc{iTT} = [validTrialsAcc{iTT}; acc(iRun).targetTypeAccAll{validIdx(iVI),iTT}];
+                            validTrialsAcc{iTT} = [validTrialsAcc{iTT}; acc(iRun).(tg){validIdx(iVI),iTT}];
                         end
                     end
                     validAcc(1,iTT) = nanmean(validTrialsAcc{iTT});
