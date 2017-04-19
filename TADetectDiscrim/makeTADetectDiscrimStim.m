@@ -30,8 +30,8 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-responseOption = 'targetType'; % 'targetType','targetPos'
-keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
+responseOption = 'targetContrast4Levels'; % 'targetType','targetPos','targetContrast4Levels'
+keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
 keyCodes = KbName(keyNames);
 
 %% timing setup
@@ -688,6 +688,8 @@ for iFrame = 1:numel(seqtiming)
                     case 'targetPos'
                         [row, col] = find(target.responsePosSets==positions(responseCue));
                         correctResponse = col;
+                    case 'targetContrast4Levels'
+                        correctResponse = 2*(pedestals(responseCue)-1) + targets(responseCue);
                     otherwise
                         error('responseOption not recognized')
                 end
@@ -711,6 +713,8 @@ for iFrame = 1:numel(seqtiming)
                         case 'targetPos'
                             [row col] = find(target.responsePosSets==positions(1));
                             correctResponse = col;
+                        case 'targetContrast4Levels'
+                            correctResponse = 2*(pedestals(1)-1) + targets(1);
                     end
                 else
 %                     if target.catchTrials
@@ -747,6 +751,8 @@ for iFrame = 1:numel(seqtiming)
                         case 'targetPos'
                             [row, col] = find(target.responsePosSets==positions(2));
                             correctResponse = col;
+                        case 'targetContrast4Levels'
+                            correctResponse = 2*(pedestals(2)-1) + targets(2);
                     end
                 end
             case 'abs-abs'
