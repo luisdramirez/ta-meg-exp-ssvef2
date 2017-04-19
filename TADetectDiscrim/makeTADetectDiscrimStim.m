@@ -39,7 +39,7 @@ refrate = 60; % (Hz)
 nFramesPerTarget = 8;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = .6;%16/60; %0.6; % (s) % SOA between targets (- difference from .8)
+targetSOA = 16/60; %0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.2; % (s)
@@ -74,8 +74,8 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-% cueBlockNames = {'no-cue','1-1','2-2'};
+% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
@@ -85,8 +85,8 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcbgrad'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 4;
+stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
