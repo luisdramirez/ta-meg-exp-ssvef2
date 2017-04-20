@@ -43,7 +43,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 triggersOn = false;
 
 % unlimited response window?
-waitUntilResponse = true;
+waitUntilResponse = false;
 
 % staircase? (adjustment between runs)
 staircase = 0; % set to 0 for first run of the day
