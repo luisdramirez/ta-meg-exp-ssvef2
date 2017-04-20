@@ -333,11 +333,18 @@ for frame = 1:nFrames
     waitTime = getWaitTime(stimulus, response, frame,  t0, timeFromT0);
     
     %--- get inputs (subject or experimentor)
+    % check if this is the last frame of the response window
+    if frame < nFrames && stimulus.fixSeq(frame)<8 && stimulus.fixSeq(frame+1)==8
+        lastResponseFrame = 1;
+    else
+        lastResponseFrame = 0;
+    end
+    
     while(waitTime<0)
         % Scan the keyboard for subject response
         if useKbQueue
             % Use KbQueue
-            if waitUntilResponse
+            if waitUntilResponse && lastResponseFrame
                 [keyIsDown, firstPress] = KbQueueWait();
             else
                 [keyIsDown, firstPress] = KbQueueCheck();
@@ -369,7 +376,7 @@ for frame = 1:nFrames
             end
         else
             % Use KbCheck
-            if waitUntilResponse
+            if waitUntilResponse && lastResponseFrame
                 [ssKeyIsDown,ssSecs,ssKeyCode] = KbWait(-1);
             else
                 %[ssKeyIsDown,ssSecs,ssKeyCode] = KbCheck(display.devices.keyInputExternal);
