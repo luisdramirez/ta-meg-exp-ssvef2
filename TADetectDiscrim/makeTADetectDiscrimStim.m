@@ -31,6 +31,7 @@ cy = round(screenHeight/2);
 
 %% keys setup
 responseOption = 'targetContrast4Levels'; % 'targetType','targetPos','targetContrast4Levels'
+% keyNames = {'2@','3#'}; % [contrast2 contrast3]
 keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
 keyCodes = KbName(keyNames);
 

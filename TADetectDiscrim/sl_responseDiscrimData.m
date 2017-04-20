@@ -24,6 +24,10 @@ if nargin < 12
     jitter = [];
 end
 
+if numel(keyCodes)==2
+    keyCodes = [keyCodes NaN];
+end
+
 switch jitter
     case 'blockPrecueInterval'
         blockLengths = jitSeq*refreshRate + blockLength;
