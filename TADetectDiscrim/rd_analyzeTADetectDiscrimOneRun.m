@@ -87,7 +87,7 @@ for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockN
     if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4
         interval = 1;
         switch responseOption
-            case 'targetType'
+            case {'targetType','targetContrast4Levels'}
                 targetType = targetTypeT1;
             case 'targetPos'
                 targetType = targetPosType(:,1);
@@ -97,7 +97,7 @@ for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockN
     else
         interval = 2;
         switch responseOption
-            case 'targetType'
+            case {'targetType','targetContrast4Levels'}
                 targetType = targetTypeT2;
             case 'targetPos'
                 targetType = targetPosType(:,2);

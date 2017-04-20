@@ -17,10 +17,6 @@ commandwindow
 % Modified from runme_MEG_OnOffLeftRight_ET_M2008.m
 % RD, July 2014
 
-%% Add paths
-addpath(genpath('../../vistadisp'))
-addpath('../TAPilot')
-
 %% Settings
 displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
@@ -28,7 +24,7 @@ useKbQueue = 0;
 use_eyetracker = false;
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
-nStaircaseRuns = 2; % #runs for staircase to update
+nStaircaseRuns = 1; % #runs for staircase to update
 faWeight = 0.3;
 runGUI = false; % turn GUI ON/OFF
 
@@ -177,12 +173,17 @@ if strcmp(stimfile, 'taDetectDiscrim')
     end
     
     %% Choose the target property by which to group targets
-    if numel(response.target.contrast)==4
-        tg = 'targetPedestalAccAll';
-        validIdx = [1 4];
-    else
-        tg = 'targetTypeAccAll';
-        validIdx = [1 3];
+    switch stim.p.responseOption
+        case 'targetContrast4Levels'
+            tg = 'targetPedestalAccAll';
+            validIdx = [1 4];
+            contrasts = response.target.contrast([1 4]);
+            pedestal = response.target.contrast([2 3]);
+        otherwise
+            tg = 'targetTypeAccAll';
+            validIdx = [1 3];
+            contrasts = response.target.contrast;
+            pedestal = stim(1).p.stimContrast;
     end
     
     %% Adjust difficulty via run-by-run staircase
@@ -218,11 +219,11 @@ if strcmp(stimfile, 'taDetectDiscrim')
                             validTrialsCatch = [validTrialsCatch; acc(iRun).catchTrialRespAll{validIdx(iVI)}];
                         end
                     end
-                    staircaseAdjustmentContrastTargetsDprime(stim(1).p.stimContrast, ...
-                        response.target.contrast, validTrialsAcc, validTrialsCatch, faWeight);
+                    staircaseAdjustmentContrastTargetsDprime(pedestal, ...
+                        contrasts, validTrialsAcc, validTrialsCatch, faWeight);
                 else
-                    staircaseAdjustmentContrastTargets(stim(1).p.stimContrast, ...
-                        response.target.contrast, validAcc);
+                    staircaseAdjustmentContrastTargets(pedestal, ...
+                        contrasts, validAcc);
                 end
             end
         otherwise
