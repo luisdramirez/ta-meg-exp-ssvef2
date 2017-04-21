@@ -68,9 +68,12 @@ else
 %     cvals = logspace(-.861,-.021,22);
 %     patchContrast = cvals([1 9 19 22]);
 %     patchContrast = [.12 .29 .78 .92]; % lr
-    patchContrast = [.20 .29 .78 .92]; % rd
-%     patchContrast = [0.15 .29 .85 .95]; % mj
-%     patchContrast = [.29 .79];
+%     patchContrast = [.20 .29 .78 .92]; % rd
+    patchContrast = [0.15 .29 .85 1]; % mj
+%     patchContrast = [0.05 .29 .79 1]; % af
+%     patchContrast = [0 .18 .88 1]; % hl
+%     patchContrast = [.18 .88]; %[.29 .79]; %for run 1221=1222
+%     patchContrast = [.05 .29 .79 1]; % for run 2221
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)

@@ -30,9 +30,9 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-responseOption = 'targetContrast4Levels'; % 'targetType','targetPos','targetContrast4Levels'
-% keyNames = {'2@','3#'}; % [contrast2 contrast3]
-keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
+responseOption = 'targetType'; % 'targetType','targetPos','targetContrast4Levels'
+keyNames = {'2@','3#'}; % [contrast2 contrast3]
+% keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
 keyCodes = KbName(keyNames);
 
 %% timing setup
@@ -313,7 +313,7 @@ switch target.type
         target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;
         target.positions = 1; % (1:8)';
-        target.nPedestals = 2; % 1 for normal discrimination from baseline
+        target.nPedestals = 1; % 1 for normal discrimination from baseline
         if numel(target.positions)==1
             target.sigma = target.stimSize*2;
         else
