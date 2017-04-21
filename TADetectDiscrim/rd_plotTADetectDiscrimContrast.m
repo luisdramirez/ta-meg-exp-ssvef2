@@ -37,7 +37,7 @@ for iT = 1:2
         end
     end
 end
-%% accuracy as a function of trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
+%% accuracy as a function of pedestal & trial type
 %pedestalSeq (below(1)/above(2) baseline), targetTypeBlockOrder (darker(1)/brighter(2)), pedestalBlockOrder
 b.targetPedestal = b.responseData_all(:,end-1:end);
 for iT = 1:2
@@ -51,7 +51,18 @@ for iT = 1:2
         end
     end
 end
-            
+
+%% trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
+% compare target type to other target type
+% for iT = 1:2
+%     for iTT = 1:2
+%         for iV = 1:2
+%             w = b.responseTarget==iT & b.targetType==iTT & b.cueValidity==cvs(iV);
+%             typeAll{iV,iTT,iT} = [b.responseTarget(w) b.targetType(w) b.cueValidity(w) b.acc(w)];
+%             typeAcc(iV,iTT,iT) = nanmean(b.acc(w));
+%         end
+%     end
+% end
 %% plot
 ylims = [0 1];
 figure
@@ -92,13 +103,7 @@ legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 figure
-% plot valid vs invalid for dec-dec, dec-inc, inc-dec, inc-inc (8 bars
-% total)
-% row = validity, col = targettype , page =  pedestal, vol = target
-% for each target plot
-    %valid&invalid for a pedestal and both levels of that pedestal (16 bars total)
 for iT = 1:2
-    %for iP = 1:2
     subplot(1,2,iT)
     bar([pAcc(:,:,1,iT) pAcc(:,:,2,iT)]')
     set(gca,'XTickLabel',{'p1-dec','p1-inc','p2-dec','p2-inc'})
@@ -107,8 +112,18 @@ for iT = 1:2
     end
     ylim(ylims)
     title(sprintf('T%d',iT))
-    %end
 end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
+% figure
+% for iT = 1:2
+%     subplot(1,2,iT)
+%     bar([]')
+%     set(gca, 'XTickLabel',{'dec-dec','dec-inc','inc-inc','inc-dec'})
+%     if iT == 1
+%         ylabel('proportion correct')
+%     end
+%     ylim(ylims)
+%     title(sprintf('T%d',iT))
+% end
