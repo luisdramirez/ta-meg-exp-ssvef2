@@ -6,18 +6,23 @@ function contrasts = staircaseAdjustmentContrastTargets(pedestal, contrasts, per
 % discrim is [valid-discrim-targetType1(decrement)
 % valid-discrim-targetType2(increment)]
 
+%% pedestal can be 1 or 2 elements
+if numel(pedestal)==1
+    pedestal = [pedestal pedestal];
+end
+
 %% report current values
-fprintf('pedestal contrast: %.2f\n', pedestal)
+fprintf('pedestal contrast: [%.2f %.2f]\n', pedestal(1), pedestal(2))
 fprintf('original contrasts: [%.2f %.2f]\n', contrasts(1), contrasts(2))
 fprintf('performance: [%d %d]%%\n\n', round(perfs(1)*100), round(perfs(2)*100))
 
 %% possible contrast values
-% cvals = logspace(-2,0,30);
-cvals = logspace(-.551,-.051,31);
+% cvals = logspace(-.551,-.051,31);
+cvals = logspace(-.861,-.021,22);
 
 %% contrast decrement
 c = cvals;
-[val, pIdx] = min(abs(c-pedestal)); % find c closest to pedestal
+[val, pIdx] = min(abs(c-pedestal(1))); % find c closest to pedestal
 c = c(1:pIdx-1);
 
 [val, cIdx] = min(abs(c-contrasts(1))); % find c closest to contrast
@@ -41,7 +46,7 @@ contrasts(1) = c(cIdx);
 
 %% contrast increment
 c = cvals;
-[val, pIdx] = min(abs(c-pedestal)); % find c closest to pedestal
+[val, pIdx] = min(abs(c-pedestal(2))); % find c closest to pedestal
 c = c(pIdx+1:end);
 
 [val, cIdx] = min(abs(c-contrasts(2))); % find c closest to contrast
@@ -63,10 +68,15 @@ else
 end
 contrasts(2) = c(cIdx);
 
-%% save staircase file
-save('staircase.mat', 'contrasts')
-
 %% show new values
 fprintf('new contrasts: [%.2f %.2f]\n', contrasts(1), contrasts(2))
 
+
+%% if 4 contrast levels
+if pedestal(1)<pedestal(2)
+    contrasts = [contrasts(1) pedestal contrasts(2)];
+end
+
+%% save staircase file
+save('staircase.mat', 'contrasts')
 

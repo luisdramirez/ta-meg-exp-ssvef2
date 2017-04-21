@@ -30,8 +30,9 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-responseOption = 'targetType'; % 'targetType','targetPos'
-keyNames = {'1!','2@','3#'}; % [target1 target2 absent]
+responseOption = 'targetContrast4Levels'; % 'targetType','targetPos','targetContrast4Levels'
+% keyNames = {'2@','3#'}; % [contrast2 contrast3]
+keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
 keyCodes = KbName(keyNames);
 
 %% timing setup
@@ -39,10 +40,10 @@ refrate = 60; % (Hz)
 nFramesPerTarget = 8;
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 16/60; %0.6; % (s) % SOA between targets (- difference from .8)
+targetSOA = 16/60; %16/60; %0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
-respDur = 1.2; % (s)
+respDur = 1.6; %1.2; % (s) % if unlimited response window, then 1 frame (see showScanStimulus)
 feedbackDur = 0.3; % (s)
 cueDur = 0.1; % (s)
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
@@ -74,8 +75,8 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-% cueBlockNames = {'no-cue','1-1','2-2'};
+% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
@@ -85,8 +86,8 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcbgrad'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 4;
+stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
@@ -688,6 +689,8 @@ for iFrame = 1:numel(seqtiming)
                     case 'targetPos'
                         [row, col] = find(target.responsePosSets==positions(responseCue));
                         correctResponse = col;
+                    case 'targetContrast4Levels'
+                        correctResponse = 2*(pedestals(responseCue)-1) + targets(responseCue);
                     otherwise
                         error('responseOption not recognized')
                 end
@@ -711,6 +714,8 @@ for iFrame = 1:numel(seqtiming)
                         case 'targetPos'
                             [row col] = find(target.responsePosSets==positions(1));
                             correctResponse = col;
+                        case 'targetContrast4Levels'
+                            correctResponse = 2*(pedestals(1)-1) + targets(1);
                     end
                 else
 %                     if target.catchTrials
@@ -747,6 +752,8 @@ for iFrame = 1:numel(seqtiming)
                         case 'targetPos'
                             [row, col] = find(target.responsePosSets==positions(2));
                             correctResponse = col;
+                        case 'targetContrast4Levels'
+                            correctResponse = 2*(pedestals(2)-1) + targets(2);
                     end
                 end
             case 'abs-abs'

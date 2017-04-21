@@ -137,18 +137,11 @@ for n = 1:length(df)
     targetPosType(targetPos>=5 & targetPos<=8) = 2;
     targetPosType_all = [targetPosType_all; targetPosType];
     
-    % target pedestal
-    targetPedestal = stim.order.pedestalBlockOrder';
-    targetPedestal_all = [targetPedestal_all; targetPedestal];
-    
     % target contrast
     if isfield(dd.response.target,'contrast')
         targetContrast(n,:) = dd.response.target.contrast;
     end
 end
-
-responseData_all(:,end:end+1) = targetPedestal_all;
-responseData_labels{end+1} = 'targetPedestal';
 
 %% extract block order from responseData_all
 run = responseData_all(:,1);

@@ -24,6 +24,10 @@ if nargin < 12
     jitter = [];
 end
 
+if numel(keyCodes)==2
+    keyCodes = [keyCodes NaN];
+end
+
 switch jitter
     case 'blockPrecueInterval'
         blockLengths = jitSeq*refreshRate + blockLength;
@@ -87,6 +91,12 @@ end
 % targetPresented = [cell2mat(mycellarray);[NaN,NaN]];
 targetPresented = order.targetTypeBlockOrder';
 
+if isfield(order,'pedestalBlockOrder')
+    pedestalBlockOrder = order.pedestalBlockOrder';
+else
+    pedestalBlockOrder = [];
+end
+
 %% extract target axis order
 if isfield(response.target,'baseOrients')
     p = response.target.baseOrients;
@@ -113,10 +123,11 @@ end
 %% Create final output matrix
 
 runLabels = {'run number', 'trial number','fast side','cue condition','attended side',... 
-    'target condition','target type T1','target type T2','key code', 'response', 'correct', 'RT','target axis T1','target axis T2'};
+    'target condition','target type T1','target type T2','key code', 'response', 'correct', 'RT',...
+    'target axis T1','target axis T2','target pedestal T1','target pedestal T2'};
 responseData = horzcat(repmat(runNum,trialCount,1),(1:trialCount)', order.blockOrder', ...
     order.cueBlockOrder',order.attBlockOrder',order.targetBlockOrder', ...
-    targetPresented,rData.keyCode, rData.response,rData.correct,rData.RT,axis);
+    targetPresented,rData.keyCode, rData.response,rData.correct,rData.RT,axis,pedestalBlockOrder);
 
 end
 

@@ -13,8 +13,10 @@ spatialFreq = target.spatialFreq;
 orientation = target.orientation;
 blurRadius = target.blurRadius;
 backgroundColor = target.backgroundColor;
-backgroundContrast = target.backgroundContrast;
 radialCB = target.radialCB;
+if isfield(target,'backgroundContrast')
+    backgroundContrast = target.backgroundContrast;
+end
 
 %% Create background stimuli
 for iPhase = 1:numel(phases)

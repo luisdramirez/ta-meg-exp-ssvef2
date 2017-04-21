@@ -48,6 +48,7 @@ targetTypeT2 = responseData_all(:,8);
 response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
 targetAxis = responseData_all(:,13:14);
+targetPedestal = responseData_all(:,15:16);
 
 targetPos = stim.order.posBlockOrder';
 targetPosType = targetPos;
@@ -86,7 +87,7 @@ for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockN
     if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4
         interval = 1;
         switch responseOption
-            case 'targetType'
+            case {'targetType','targetContrast4Levels'}
                 targetType = targetTypeT1;
             case 'targetPos'
                 targetType = targetPosType(:,1);
@@ -96,7 +97,7 @@ for k = 1:length(cueBlockOrder_Indx) % cueBlockOrder_Indx = [2 4 5 3]; cueBlockN
     else
         interval = 2;
         switch responseOption
-            case 'targetType'
+            case {'targetType','targetContrast4Levels'}
                 targetType = targetTypeT2;
             case 'targetPos'
                 targetType = targetPosType(:,2);
@@ -146,8 +147,10 @@ for k = 1:numel(cueBlockOrder_Indx) %'1-1','2-1','2-2','1-2'
     switch target
         case 1
             targetTypeOrder = targetTypeT1;
+            pedestalOrder = targetPedestal(:,1);
         case 2
             targetTypeOrder = targetTypeT2;
+            pedestalOrder = targetPedestal(:,2);
     end
     for tt = 1:2 % target type, e.g. decrement vs. increment
         w = cueBlockOrder==cueType & targetTypeOrder==tt;
@@ -160,6 +163,13 @@ for k = 1:numel(cueBlockOrder_Indx) %'1-1','2-1','2-2','1-2'
         tt = 0; % target absent catch trials
         w = cueBlockOrder==cueType & targetTypeOrder==tt;
         ttcatch{k,1} = OverallResponse_all(w);
+    end
+    for tped = 1:2 % pedestal, e.g. low contrast vs. high contrast
+        w = cueBlockOrder==cueType & pedestalOrder==tped;
+        temp_correct = response_correct(w); 
+        temp_correct(temp_correct==-1) = 0;
+        tpedacc{k,tped} = temp_correct;
+        tpedacc_mean(k,tped) = mean(temp_correct);
     end
 end
 
@@ -192,6 +202,8 @@ accuracy.targetTypeAcc = ttacc_mean;
 if catchTrials
     accuracy.catchTrialRespAll = ttcatch;
 end
+accuracy.targetPedestalAccAll = tpedacc;
+accuracy.targetPedestalAcc = tpedacc_mean;
 
 %% plot
 switch plotLevel

@@ -67,9 +67,10 @@ else
 %     patchContrast = cvals([-15 -10 10 15]+16);
 %     cvals = logspace(-.861,-.021,22);
 %     patchContrast = cvals([1 9 19 22]);
-    %patchContrast = [.12 .29 .78 .92]; % lr
-%     patchContrast = [.24 .29 .78 .92]; % rd
-    patchContrast = 1;
+%     patchContrast = [.12 .29 .78 .92]; % lr
+    patchContrast = [.20 .29 .78 .92]; % rd
+%     patchContrast = [0.15 .29 .85 .95]; % mj
+%     patchContrast = [.29 .79];
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
@@ -77,11 +78,11 @@ end
 soundAmp = 1; % 0.10 for MEG
 
 % input checks
-if nargin < 2,
+if nargin < 2
     help(mfilename);
     return;
 end;
-if nargin < 3 || isempty(t0),
+if nargin < 3 || isempty(t0)
     t0 = GetSecs; % "time 0" to keep timing going
 end;
 
@@ -330,11 +331,12 @@ for frame = 1:nFrames
     waitTime = getWaitTime(stimulus, response, frame,  t0, timeFromT0);
     
     %--- get inputs (subject or experimentor)
-    while(waitTime<0),
+    % check if this is the last frame of the response window
+    while(waitTime<0)
         % Scan the keyboard for subject response
         if useKbQueue
             % Use KbQueue
-            [keyIsDown firstPress] = KbQueueCheck();
+            [keyIsDown, firstPress] = KbQueueCheck();
             if keyIsDown
                 secs = min(firstPress(firstPress~=0));
                 ssKeyCode = firstPress==secs;
@@ -347,16 +349,16 @@ for frame = 1:nFrames
                     response.correct(frame) = -1;
                 end
                 
-                if(ssKeyCode(quitProgKey)),
+                if(ssKeyCode(quitProgKey))
                     quitProg = 1;
                     break; % out of while loop
                 end;
-                if(response.correct(frame)~=0), %%% TO ADD OTHERWISE OVERWRITE THE response.correct VARIABLE
+                if(response.correct(frame)~=0) %%% TO ADD OTHERWISE OVERWRITE THE response.correct VARIABLE
                     break; % out of while loop
                 end;
             else
                 response.correct(frame) = 0;
-                if(response.correct(frame)==0), %%% TO ADD OTHERWISE OVERWRITE THE response.correct VARIABLE
+                if(response.correct(frame)==0) %%% TO ADD OTHERWISE OVERWRITE THE response.correct VARIABLE
                     break; % out of while loop
                 end;
             end
@@ -376,7 +378,7 @@ for frame = 1:nFrames
                     response.correct(frame) = -1;
                 end
                 
-                if(ssKeyCode(quitProgKey)),
+                if(ssKeyCode(quitProgKey))
                     quitProg = 1;
                     break; % out of while loop
                 end;
@@ -395,7 +397,7 @@ for frame = 1:nFrames
     end;
     
     %--- stop?
-    if quitProg,
+    if quitProg
         fprintf('[%s]:Quit signal recieved.\n',mfilename);
         break;
     end;
@@ -454,7 +456,7 @@ function waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0)
 if timeFromT0
     waitTime = (GetSecs-t0)-stimulus.seqtiming(frame);
 else
-    if frame > 1,
+    if frame > 1
         lastFlip = response.flip(frame-1);
         desiredWaitTime = stimulus.seqtiming(frame) - stimulus.seqtiming(frame-1);
     else
