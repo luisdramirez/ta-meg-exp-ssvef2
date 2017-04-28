@@ -186,7 +186,7 @@ for n = 1:length(df)
         if cueBlockOrder_Indx(k) == 2 || cueBlockOrder_Indx(k) == 4
             interval = 1;
             switch responseOption
-                case 'targetType'
+                case {'targetType','targetContrast4Levels'}
                     targetType = targetTypeT1;
                 case 'targetPos'
                     targetType = targetPosType_all(:,1);
@@ -196,7 +196,7 @@ for n = 1:length(df)
         else
             interval = 2;
             switch responseOption
-                case 'targetType'
+                case {'targetType','targetContrast4Levels'}
                     targetType = targetTypeT2;
                 case 'targetPos'
                     targetType = targetPosType_all(:,2);
