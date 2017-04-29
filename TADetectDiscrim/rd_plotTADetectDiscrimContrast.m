@@ -2,7 +2,7 @@
 
 %% initial analysis
 subject = 'hl';
-runs = 226:230;
+runs = 221:230;
 date = [];
 plotLevel = 1;
 saveFile = 0;

@@ -75,14 +75,18 @@ for trialNum = 1 : trialCount
     rData.correct(trialNum,:) = RespVal;
     
     % Create translation column for what keyCode means (response)
-    switch keyVal
-        case keyCodes(1)
-            rData.response(trialNum,:) = 1;
-        case keyCodes(2)
-            rData.response(trialNum,:) = 2;
-        case keyCodes(3)
-            rData.response(trialNum,:) = 3;
+    keyIdx = find(keyCodes==keyVal);
+    if ~isempty(keyIdx)
+        rData.response(trialNum,1) = keyIdx;
     end
+%     switch keyVal
+%         case keyCodes(1)
+%             rData.response(trialNum,:) = 1;
+%         case keyCodes(2)
+%             rData.response(trialNum,:) = 2;
+%         case keyCodes(3)
+%             rData.response(trialNum,:) = 3;
+%     end
 end
 %% extract target presented order for each trial
 % mycellarray  = squeeze(struct2cell(order.trialsPresented));   
