@@ -107,7 +107,6 @@ responseOption = stim.p.responseOption;
 %% analyze each run
 responseData_all = [];
 targetPosType_all = [];
-targetPedestal_all = [];
 
 for n = 1:length(df)
     name = df(n).name;
@@ -152,20 +151,25 @@ targetTypeT2 = responseData_all(:,8);
 response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
 targetAxis = responseData_all(:,13:14);
+targetPedestal = responseData_all(:,15:16);
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
 DetectTargetType (DetectTargetType == 2) = 1;
 DetectResponse_all = response_all;
-DetectResponse_all (DetectResponse_all  == 2) = 1;
-DetectResponse_all (DetectResponse_all  == 3) = 0;
-
 DiscrimResponse_all = response_all;
-DiscrimResponse_all (DiscrimResponse_all  == 2) = 1;
-
 OverallResponse_all = response_all;
-OverallResponse_all ( OverallResponse_all == 3) = 0;
-
+        
+switch stim.p.responseOption
+    case 'targetContrast4Levels'
+        DetectResponse_all (DetectResponse_all >= 1 & DetectResponse_all <= 4) = 1;
+        DiscrimResponse_all (DiscrimResponse_all >= 1 & DiscrimResponse_all <= 4) = 1;
+    otherwise
+        DetectResponse_all (DetectResponse_all  == 2) = 1;
+        DetectResponse_all (DetectResponse_all  == 3) = 0;
+        DiscrimResponse_all (DiscrimResponse_all  == 2) = 1;
+        OverallResponse_all ( OverallResponse_all == 3) = 0;
+end
 
 %% For each run calculate detection and discrimination accuracy for:
 % postcue T1 valid & invalid; postcue T2 valid & invalid; overall accuracy
@@ -188,6 +192,12 @@ for n = 1:length(df)
             switch responseOption
                 case 'targetType'
                     targetType = targetTypeT1;
+                case 'targetContrast4Levels'
+                    if numel(stim.p.keyCodes==4)
+                        targetType = 2*(targetPedestal(:,1)-1) + targetTypeT1;
+                    else
+                        targetType = targetTypeT1;
+                    end
                 case 'targetPos'
                     targetType = targetPosType_all(:,1);
                 otherwise
@@ -198,6 +208,12 @@ for n = 1:length(df)
             switch responseOption
                 case 'targetType'
                     targetType = targetTypeT2;
+                case 'targetContrast4Levels'
+                    if numel(stim.p.keyCodes==4)
+                        targetType = 2*(targetPedestal(:,2)-1) + targetTypeT2;
+                    else
+                        targetType = targetTypeT2;
+                    end
                 case 'targetPos'
                     targetType = targetPosType_all(:,2);
                 otherwise
