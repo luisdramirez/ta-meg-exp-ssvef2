@@ -1,9 +1,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'hl';
+subject = 'mj';
 runs = 221:230;
-date = [];
+date = '20170421';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -59,8 +59,8 @@ for iT = 1:2
         for iNP = 1:2
             for iV = 1:2
                 iNT = 3 - iT;
-                w = b.responseTarget==iT & b.targetPedestal(:,iT)==iP & b.targetPedestal(:,iNT)==iP & b.cueValidity==cvs(iV);
-                typeAll{iV,iNP,iP,iT} = [b.responseTarget(w) b.targetType(w) b.cueValidity(w) b.acc(w)];
+                w = b.responseTarget==iT & b.targetPedestal(:,iT)==iP & b.targetPedestal(:,iNT)==iNP & b.cueValidity==cvs(iV);
+                typeAll{iV,iNP,iP,iT} = [b.responseTarget(w) b.targetPedestal(w) b.cueValidity(w) b.acc(w)];
                 typeAcc(iV,iNP,iP,iT) = nanmean(b.acc(w));
             end
         end
