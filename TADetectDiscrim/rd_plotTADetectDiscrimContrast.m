@@ -1,9 +1,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'rd';
-runs = 211:220;
-date = '20170419';
+subject = 'mj';
+runs = 221:230;
+date = '20170421';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -53,16 +53,20 @@ for iT = 1:2
 end
 
 %% trial type: dec-dec, dec-inc, inc-dec, inc-inc (contrast analysis func)
-% compare target type to other target type
-% for iT = 1:2
-%     for iTT = 1:2
-%         for iV = 1:2
-%             w = b.responseTarget==iT & b.targetType==iTT & b.cueValidity==cvs(iV);
-%             typeAll{iV,iTT,iT} = [b.responseTarget(w) b.targetType(w) b.cueValidity(w) b.acc(w)];
-%             typeAcc(iV,iTT,iT) = nanmean(b.acc(w));
-%         end
-%     end
-% end
+%compare target type to other target type
+for iT = 1:2
+    for iP = 1:2
+        for iNP = 1:2
+            for iV = 1:2
+                iNT = 3 - iT;
+                w = b.responseTarget==iT & b.targetPedestal(:,iT)==iP & b.targetPedestal(:,iNT)==iP & b.cueValidity==cvs(iV);
+                typeAll{iV,iNP,iP,iT} = [b.responseTarget(w) b.targetType(w) b.cueValidity(w) b.acc(w)];
+                typeAcc(iV,iNP,iP,iT) = nanmean(b.acc(w));
+            end
+        end
+    end
+end
+        
 %% plot
 ylims = [0 1];
 figure
@@ -116,14 +120,16 @@ end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-% figure
-% for iT = 1:2
-%     subplot(1,2,iT)
-%     bar([]')
-%     set(gca, 'XTickLabel',{'dec-dec','dec-inc','inc-inc','inc-dec'})
-%     if iT == 1
-%         ylabel('proportion correct')
-%     end
-%     ylim(ylims)
-%     title(sprintf('T%d',iT))
-% end
+figure
+for iT = 1:2
+    subplot(1,2,iT)
+    bar([typeAcc(:,:,1,iT) typeAcc(:,:,2,iT)]')
+    set(gca, 'XTickLabel',{'dec-dec','dec-inc','inc-inc','inc-dec'})
+    if iT == 1
+        ylabel('proportion correct')
+    end
+    ylim(ylims)
+    title(sprintf('T%d',iT))
+end
+legend('valid','invalid')
+rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
