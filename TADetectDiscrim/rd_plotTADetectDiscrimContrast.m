@@ -1,9 +1,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'mj';
-runs = 221:230;
-date = '20170421';
+subject = 'lr';
+runs = 232:240;
+date = '20170503';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
