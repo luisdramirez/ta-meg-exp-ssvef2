@@ -72,8 +72,9 @@ else
 %     patchContrast = [0.15 .29 .85 1]; % mj
 %     patchContrast = [0.05 .29 .79 1]; % af
 %     patchContrast = [0 .25 .88 1]; % hl
-    patchContrast = [.05 .29 .7 1]; % xw
+%     patchContrast = [.10 .29 .68 1]; % xw
 %     patchContrast = [.29 .79]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
+        patchContrast = [0 0 1 1]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
 %     patchContrast = [.05 .29 .79 1]; % for run 2221
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -140,6 +141,13 @@ if isfield(stimulus, 'soundSeq')
     Fs = 44100;
     reqlatencyclass = 2; % Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
     pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
+    
+    % Play example sounds
+    for iSound = 1:size(stimulus.sounds,1)
+        Screen('Flip',display.windowPtr);
+        playSound(pahandle, stimulus.sounds(iSound,:)*soundAmp);
+        WaitSecs(1)
+    end
 end
 
 % set up target if desired
