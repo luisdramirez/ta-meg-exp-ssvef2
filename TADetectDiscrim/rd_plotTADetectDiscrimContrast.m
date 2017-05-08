@@ -1,9 +1,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'lr';
-runs = 232:240;
-date = '20170503';
+subject = 'rd';
+runs = 211:220;
+date = '';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -66,6 +66,33 @@ for iT = 1:2
         end
     end
 end
+
+%% confusion matrix, target presented vs responded
+responseOptions = unique(b.correctResponse(~isnan(b.correctResponse)));
+responseOptionsM = [0; responseOptions]; % include missed trials
+
+confusion = nan(numel(responseOptions), numel(responseOptionsM));
+for iP = 1:numel(responseOptions) % presented
+    w = b.correctResponse==responseOptions(iP);
+    responses = b.response(w);
+    responses(isnan(responses)) = 0;
+    numel(responses)
+    for iR = 1:numel(responseOptionsM) % responded
+        confusion(iP,iR) = nnz(responses==responseOptionsM(iR))./numel(responses);
+    end
+end
+
+%% confusion matrix, non-target presented vs responded
+confusionNT = nan(numel(responseOptions), numel(responseOptionsM));
+for iP = 1:numel(responseOptions) % presented
+    w = b.swapResponse==responseOptions(iP);
+    responses = b.response(w);
+    responses(isnan(responses)) = 0;
+    numel(responses)
+    for iR = 1:numel(responseOptionsM) % responded
+        confusionNT(iP,iR) = nnz(responses==responseOptionsM(iR))./numel(responses);
+    end
+end
         
 %% plot
 ylims = [0 1];
@@ -106,12 +133,14 @@ end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-figure
+figure('Position',[235 265 915 370])
 for iT = 1:2
     subplot(1,2,iT)
     bar([pAcc(:,:,1,iT) pAcc(:,:,2,iT)]')
-    set(gca,'XTickLabel',{'p1-dec','p1-inc','p2-dec','p2-inc'})
+%     set(gca,'XTickLabel',{'p1-dec','p1-inc','p2-dec','p2-inc'})
+    set(gca,'XTickLabel',responseOptions)
     if iT == 1
+        xlabel('contrast level')
         ylabel('proportion correct')
     end
     ylim(ylims)
@@ -133,3 +162,24 @@ for iT = 1:2
 end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+
+figure('Position',[360 450 690 245])
+subplot(1,2,1)
+imagesc(confusion,[0 1])
+xlabel('responded')
+ylabel('presented')
+title('target')
+set(gca,'XTick',1:numel(responseOptionsM))
+set(gca,'XTickLabel',responseOptionsM)
+set(gca,'YTick',1:numel(responseOptions))
+colorbar
+
+subplot(1,2,2)
+imagesc(confusionNT,[0 1])
+xlabel('responded')
+ylabel('presented')
+title('non-target')
+set(gca,'XTick',1:numel(responseOptionsM))
+set(gca,'XTickLabel',responseOptionsM)
+set(gca,'YTick',1:numel(responseOptions))
+colorbar

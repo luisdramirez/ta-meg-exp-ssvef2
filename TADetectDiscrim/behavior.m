@@ -22,6 +22,15 @@ targetCond = [t1Cond t2Cond];
 response = behav.responseData_all(:,responseIdx);
 correct = behav.responseData_all(:,correctIdx);
 
+if any(strcmp(behav.responseData_labels, 'target pedestal T1'))
+    pedestalOn = true;
+    t1PedIdx = strcmp(behav.responseData_labels,'target pedestal T1');
+    t2PedIdx = strcmp(behav.responseData_labels,'target pedestal T2');
+    pedestal = behav.responseData_all(:,t1PedIdx | t2PedIdx);
+else
+    pedestalOn = false;
+end
+
 %% cue type (valid, invalid)
 cueValidity = zeros(nTrials,1);
 cueValidity(cueCond==2 | cueCond==5) = 1; % '1-1','2-2' valid
@@ -33,24 +42,46 @@ responseTarget(cueCond==2 | cueCond==4) = 1; % '1-1','2-1'
 responseTarget(cueCond==3 | cueCond==5) = 2; % '1-2','2-2'
 
 targetType = nan(nTrials,1);
+nontargetType = nan(nTrials,1);
+targetPedestal = nan(nTrials,1);
+nontargetPedestal = nan(nTrials,1);
 for i = 1:nTrials
     if responseTarget(i)~=0
         targetType(i) = targetCond(i,responseTarget(i));
+        nontargetType(i) = targetCond(i,3-responseTarget(i));
+        if pedestalOn
+            targetPedestal(i) = pedestal(i,responseTarget(i));
+            nontargetPedestal(i) = pedestal(i,3-responseTarget(i));
+        end
     end
 end
 
 % sanity check (compare to response and correct)
-correctResponse = targetType;
-correctResponse(targetType==0) = 3;
+if pedestalOn
+    correctResponse = (targetPedestal-1)*2 + targetType;
+    swapResponse = (nontargetPedestal-1)*2 + nontargetType;
+else
+    correctResponse = targetType;
+    correctResponse(targetType==0) = 3;
+    swapResponse = nontargetType;
+    swapResponse(nontargetType==0) = 3;
+end
 
 %% detection performance
 targetPresent = nan(nTrials,1);
 targetPresent(targetType==1 | targetType==2) = 1;
 targetPresent(targetType==0) = 0;
 
+% determine response options
+responseOptions = unique(response(~isnan(response)));
+
 presentResponse = nan(nTrials,1);
-presentResponse(response==1 | response==2) = 1;
-presentResponse(response==3) = 0;
+if numel(responseOptions)==4
+    presentResponse(response==1 | response==2 | response==3 | response==4) = 1;
+else
+    presentResponse(response==1 | response==2) = 1;
+    presentResponse(response==3) = 0;
+end
 
 detectHit = targetPresent==1 & presentResponse==1;
 detectMiss = targetPresent==1 & presentResponse==0;
@@ -86,6 +117,14 @@ acc(w,:) = NaN;
 behav.cueValidity = cueValidity;
 behav.responseTarget = responseTarget;
 behav.targetType = targetType;
+behav.nontargetType = nontargetType;
+if pedestalOn
+    behav.targetPedestal = targetPedestal;
+    behav.nontargetPedestal = nontargetPedestal;
+end
+behav.correctResponse = correctResponse;
+behav.swapResponse = swapResponse;
+behav.response = response;
 behav.targetPresent = targetPresent;
 behav.presentResponse = presentResponse;
 behav.detectHMFC = detectHMFC;

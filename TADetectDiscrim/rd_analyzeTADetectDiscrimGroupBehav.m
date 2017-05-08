@@ -3,7 +3,8 @@
 %% setup
 exptDir = pathToExpt;
 
-subjects = {'rd','lr','mj','af'};
+subjects = {'rd','lr','mj','af','xw'};
+startRuns = [211, 211, 221, 221, 221];
 
 nSubjects = numel(subjects);
 
@@ -11,7 +12,7 @@ nSubjects = numel(subjects);
 for iSubject = 1:nSubjects
     sessionDir = subjects{iSubject}; 
     behavDir = sprintf('%s/analysis/%s', exptDir, sessionDir);
-    behavFile = dir(sprintf('%s/*.mat', behavDir));
+    behavFile = dir(sprintf('%s/*%d*.mat', behavDir, startRuns(iSubject)));
     b = load(sprintf('%s/%s', behavDir, behavFile.name));
     behav(iSubject) = behavior(b); % update behav with more info
 end
@@ -96,6 +97,22 @@ fa(fa==0) = .01;
 groupData.dprimeDetect = norminv(h) - norminv(fa);
 groupData.critDetect = -.5 * (norminv(h) + norminv(fa));
 
+%% confusion matrix
+responseOptions = unique(behav(end).correctResponse(~isnan(behav(end).correctResponse)));
+responseOptionsM = [0; responseOptions]; % include missed trials
+
+confusion = nan(numel(responseOptions), numel(responseOptionsM), nSubjects);
+for iSubject = 1:nSubjects
+    for iP = 1:numel(responseOptions) % presented
+        w = behav(iSubject).correctResponse==responseOptions(iP);
+        responses = behav(iSubject).response(w);
+        responses(isnan(responses)) = 0;
+        for iR = 1:numel(responseOptionsM) % responded
+            confusion(iP,iR,iSubject) = nnz(responses==responseOptionsM(iR))./numel(responses);
+        end
+    end
+end
+
 %% group summary
 measures = fields(groupData);
 nM = numel(measures);
@@ -141,9 +158,11 @@ for iS = 1:nSubjects
         if mod(iS,2)
             col = iM;
         else
-            col = iM+nM+1;
+%             col = iM+nM+1;
+            col = iM+nM;
         end
-        subplot(ceil(nSubjects/2),nM*2+1,(row-1)*(nM*2+1)+col)
+%         subplot(ceil(nSubjects/2),nM*2+1,(row-1)*(nM*2+1)+col)
+        subplot(ceil(nSubjects/2),nM*2,(row-1)*(nM*2)+col)
         m = indivM{iM};
         p1 = plot(groupData.(m)(:,:,iS)');
         set(p1(2),'color','r')
@@ -164,15 +183,24 @@ for iS = 1:nSubjects
 %             set(gca,'XTickLabel','')
 %             set(gca,'YTickLabel','')
         end
-        if col==1 || col==nM+2
+%         if col==1 || col==nM+2
             ylabel(sprintf('%s',subjects{iS}))
-        end
+%         end
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'})
         box off
     end
 end
 legend('valid','invalid')
+
+figure
+imagesc(mean(confusion,3),[0 1])
+xlabel('responded')
+ylabel('presented')
+set(gca,'XTick',1:numel(responseOptionsM))
+set(gca,'XTickLabel',responseOptionsM)
+set(gca,'YTick',1:numel(responseOptions))
+colorbar
 
 %% stats
 % valid vs. invalid
