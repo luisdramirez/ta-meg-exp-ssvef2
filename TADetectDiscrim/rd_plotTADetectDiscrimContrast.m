@@ -1,9 +1,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'mj';
-runs = 221:230;
-date = '20170421';
+subject = 'lr';
+runs = 241:250;
+date = '20170508';
 plotLevel = 1;
 saveFile = 0;
 saveFigs = 0;
@@ -66,7 +66,22 @@ for iT = 1:2
         end
     end
 end
-        
+
+%% Organize response time by target
+% nT = sum(b.responseTarget == 1);
+% targetRT = nan(nT,2);
+% 
+% % valid and invalid
+% for n = 1:length(b.responseData_all(:,12))
+%     if b.responseTarget(n) == 1
+%         targetRT(n, 1) = b.responseData_all(n, 12);
+%     elseif b.responseTarget(n) == 2
+%         targetRT(n, 2) = b.responseData_all(n, 12);
+%     end
+% end
+% 
+% targetRT_means = nanmean(targetRT);
+% RTmax = max(max(targetRT));
 %% plot
 ylims = [0 1];
 figure
@@ -133,3 +148,16 @@ for iT = 1:2
 end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
+
+% figure
+% for iT = 1:2
+%     subplot(1,2,iT)
+%     bar(targetRT_means(iT))
+%     set(gca, 'XTickLabel',{'Average RT'})
+%     if iT == 1
+%         ylabel('seconds')
+%     end
+%     ylim([0 RTmax])
+%     title(sprintf('T%d',iT))
+% end
+% rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
