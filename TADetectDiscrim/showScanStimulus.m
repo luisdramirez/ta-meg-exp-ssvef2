@@ -71,8 +71,10 @@ else
 %     patchContrast = [.20 .29 .78 .92]; % rd
 %     patchContrast = [0.15 .29 .85 1]; % mj
 %     patchContrast = [0.05 .29 .79 1]; % af
-    patchContrast = [0 .25 .88 1]; % hl
+%     patchContrast = [0 .25 .88 1]; % hl
+%     patchContrast = [.10 .29 .68 1]; % xw
 %     patchContrast = [.29 .79]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
+        patchContrast = [0 0 1 1]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
 %     patchContrast = [.05 .29 .79 1]; % for run 2221
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -139,6 +141,13 @@ if isfield(stimulus, 'soundSeq')
     Fs = 44100;
     reqlatencyclass = 2; % Level 2 means: Take full control over the audio device, even if this causes other sound applications to fail or shutdown.
     pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
+    
+    % Play example sounds
+    for iSound = 1:size(stimulus.sounds,1)
+        Screen('Flip',display.windowPtr);
+        playSound(pahandle, stimulus.sounds(iSound,:)*soundAmp);
+        WaitSecs(1)
+    end
 end
 
 % set up target if desired
@@ -210,7 +219,9 @@ end
 % respose duration
 if isfield(stimulus, 'respDur')
     respDur = stimulus.respDur;
+    nRespFrames = display.frameRate*respDur; % look respDur s back
 end
+startedFeedback = 0;
 
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
@@ -289,10 +300,12 @@ for frame = 1:nFrames
         % sorry some of this is hard-coded for now
         if stimulus.fixSeq(frame)>=8 % feedback period
             % if first frame of feedback period, determine accuracy
-            if stimulus.fixSeq(frame-1)<8 
-                nRespFrames = display.frameRate*respDur; % look respDur s back
+            if stimulus.fixSeq(frame-1)<8 && ~startedFeedback
+                startedFeedback = 1;
                 responseWindow = response.correct(frame-nRespFrames:frame-1);
                 correct = responseWindow(responseWindow~=0);
+            elseif frame==nFrames || stimulus.fixSeq(frame+1)<8 % last feedback frame
+                startedFeedback = 0;
             end
             % change fixation according to accuracy
             if ~isempty(correct) && stimulus.fixSeq(frame)~=9 % keep 9 (catch trial) regardless of response

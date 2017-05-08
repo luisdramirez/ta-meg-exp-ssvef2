@@ -293,7 +293,7 @@ switch plotLevel
         y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
         xlim([0.5 2.5])
         ylim([0 1])
-        set(y,'MarkerSize',20)
+        set(y,'MarkerSize',25)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});
@@ -305,7 +305,7 @@ switch plotLevel
         y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
         xlim([0.5 2.5])
         ylim([0 1])
-        set(y,'MarkerSize',20)
+        set(y,'MarkerSize',25)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});
@@ -316,7 +316,7 @@ switch plotLevel
         y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
         xlim([0.5 2.5])
         ylim([0 1])
-        set(y,'MarkerSize',20)
+        set(y,'MarkerSize',25)
         set(y(2),'Color','r')
         set(gca,'XTick',[1 2])
         set(gca,'XTickLabel',{'T1','T2'});

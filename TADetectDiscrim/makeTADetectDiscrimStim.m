@@ -30,9 +30,9 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-responseOption = 'targetType'; % 'targetType','targetPos','targetContrast4Levels'
-keyNames = {'2@','3#'}; % [contrast2 contrast3]
-% keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
+responseOption = 'targetContrast4Levels'; % 'targetType','targetPos','targetContrast4Levels'
+% keyNames = {'2@','3#'}; % [contrast2 contrast3]
+keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
 keyCodes = KbName(keyNames);
 
 %% timing setup
@@ -75,8 +75,8 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-cueBlockNames = {'no-cue','1-1','2-2'};
+cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+% cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 nBlocks = numel(blockOrder);
@@ -87,7 +87,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 2;
+stimSize = 8;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
@@ -313,7 +313,7 @@ switch target.type
         target.radialCB = radialCB;
         target.nFramesPerTarget = nFramesPerTarget;
         target.positions = 1; % (1:8)';
-        target.nPedestals = 1; % 1 for normal discrimination from baseline
+        target.nPedestals = 2; % 1 for normal discrimination from baseline
         if numel(target.positions)==1
             target.sigma = target.stimSize*2;
         else
