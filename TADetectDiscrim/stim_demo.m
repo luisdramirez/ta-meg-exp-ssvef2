@@ -4,7 +4,7 @@ displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R
 d = loadDisplayParams(displayName);
 
 load stimuli/taDetectDiscrim99.mat
-stimulus.target.contrast = [.1 .29 .79 .9];
+stimulus.target.contrast = [0 .2 .8 .95];
 [bg, m, t] = contrastTarget(d,stimulus.target);
 
 % a = bg{1};
@@ -22,13 +22,13 @@ stimulus.target.pixelsPerDegree = 100;
 [bg1, m1, t1] = contrastTarget(d,stimulus.target);
 
 % Example image
-im = m{1,1,3}(:,:,1); % original
+im = m{1,1,4}(:,:,1); % original
 im1 = m1{1,1,3}(:,:,1); % high resolution
 
 % Display on ptb window
 gray = [127 127 127];
-multisample = 16;
-[win, rect] = Screen('OpenWindow', 1, gray, [], [], [], [], multisample);
+multisample = [];
+[win, rect] = Screen('OpenWindow', 0, gray, [], [], [], [], multisample);
 % [win, rect] = Screen('OpenWindow', 0, gray, [0 1000 800 1600], [], [], [], multisample);
 
 tex = Screen('MakeTexture', win, im*255);
