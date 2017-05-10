@@ -87,7 +87,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 8;
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
@@ -122,8 +122,8 @@ possibleContrasts = [
     0.8235
     0.8557
     0.8892];
-stimContrast = 0.5; % 0.64
-targetContrast = 0.5; % 0.64
+stimContrast = 0.4; % 0.64
+targetContrast = 0.4; % 0.64
 contrasts = [stimContrast targetContrast];
 blurRadius = 0.2;
 backgroundColor = 128/255;
