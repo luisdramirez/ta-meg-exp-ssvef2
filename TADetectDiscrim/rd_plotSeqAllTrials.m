@@ -24,7 +24,7 @@ for i = 1:nBlocks
     a(i,idx) = stimulus.seq(win(idx));
 end
 
-%figure
+figure
 subplot(3,1,1)
 plot(a')
 xlabel('time (frames)')

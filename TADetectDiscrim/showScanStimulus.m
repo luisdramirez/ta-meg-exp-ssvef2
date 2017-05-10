@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % triggers?
-triggersOn = false;
+triggersOn = d.triggersOn;
 
 % staircase? (adjustment between runs)
 staircase = 0; % set to 0 for first run of the day
@@ -143,7 +143,14 @@ if isfield(stimulus, 'soundSeq')
     pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
     
     % Play example sounds
+    Screen('DrawText', display.windowPtr, 'Press any key to hear example tones and start')
     Screen('Flip',display.windowPtr);
+    % Wait for key press
+    if useKbQueue
+        KbQueueWait();
+    else
+        KbWait(-1);
+    end
     WaitSecs(1)
     for iSound = 1:size(stimulus.sounds,1)
         playSound(pahandle, stimulus.sounds(iSound,:)*soundAmp);
