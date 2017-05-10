@@ -38,7 +38,7 @@ PTBTriggerLength = 0.001;
 
 % debug mode?
 % PsychDebugWindowConfiguration
-skipSyncTests = 0;
+skipSyncTests = 1;
 Screen('Preference', 'SkipSyncTests', skipSyncTests);
 
 %% Initialize Eyetracker and do Calibration
