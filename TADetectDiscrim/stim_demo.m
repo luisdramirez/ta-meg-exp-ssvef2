@@ -28,12 +28,13 @@ im1 = m1{1,1,3}(:,:,1); % high resolution
 % Display on ptb window
 gray = [127 127 127];
 multisample = 16;
-[win, rect] = Screen('OpenWindow', 0, gray, [0 1000 800 1600], [], [], [], multisample);
+[win, rect] = Screen('OpenWindow', 1, gray, [], [], [], [], multisample);
+% [win, rect] = Screen('OpenWindow', 0, gray, [0 1000 800 1600], [], [], [], multisample);
 
 tex = Screen('MakeTexture', win, im*255);
 Screen('DrawTexture', win, tex);
 Screen('Flip', win);
 
 tex = Screen('MakeTexture', win, im1*255);
-Screen('DrawTexture', win, tex, [], CenterRect([0 0 201 201], rect));
+Screen('DrawTexture', win, tex, [], CenterRect([0 0 size(im)], rect));
 Screen('Flip', win);

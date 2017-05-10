@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % triggers?
-triggersOn = d.triggersOn;
+triggersOn = 0;
 
 % staircase? (adjustment between runs)
 staircase = 0; % set to 0 for first run of the day

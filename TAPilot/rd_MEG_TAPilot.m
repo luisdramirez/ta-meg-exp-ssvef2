@@ -22,7 +22,6 @@ displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = false;
-triggersOn = false;
 
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
@@ -46,7 +45,6 @@ Screen('Preference', 'SkipSyncTests', skipSyncTests);
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 % d.rect = [0 0 800 600];
 d.multisample = multisample;
-d.triggersOn = triggersOn;
 hz = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
