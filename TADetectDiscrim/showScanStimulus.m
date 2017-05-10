@@ -69,12 +69,12 @@ else
 %     patchContrast = cvals([1 9 19 22]);
 %     patchContrast = [.12 .29 .78 .92]; % lr
 %     patchContrast = [.20 .29 .78 .92]; % rd
+    patchContrast = [0 .2 .8 .95]; % rd-40
 %     patchContrast = [0.15 .29 .85 1]; % mj
 %     patchContrast = [0.05 .29 .79 1]; % af
 %     patchContrast = [0 .25 .88 1]; % hl
 %     patchContrast = [.10 .29 .68 1]; % xw
 %     patchContrast = [.29 .79]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
-        patchContrast = [0 0 1 1]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
 %     patchContrast = [.05 .29 .79 1]; % for run 2221
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -143,8 +143,9 @@ if isfield(stimulus, 'soundSeq')
     pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
     
     % Play example sounds
+    Screen('Flip',display.windowPtr);
+    WaitSecs(1)
     for iSound = 1:size(stimulus.sounds,1)
-        Screen('Flip',display.windowPtr);
         playSound(pahandle, stimulus.sounds(iSound,:)*soundAmp);
         WaitSecs(1)
     end
