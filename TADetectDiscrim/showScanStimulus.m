@@ -143,7 +143,6 @@ if isfield(stimulus, 'soundSeq')
     pahandle = PsychPortAudio('Open', [], [], reqlatencyclass, Fs, 1); % 1 = single-channel
     
     % Play example sounds
-    Screen('DrawText', display.windowPtr, 'Press any key to hear example tones and start')
     Screen('Flip',display.windowPtr);
     % Wait for key press
     if useKbQueue
