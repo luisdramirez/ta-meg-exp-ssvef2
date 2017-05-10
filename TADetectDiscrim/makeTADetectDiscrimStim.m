@@ -16,7 +16,7 @@ vistaStimDir = sprintf('../../%s', vistaStimPath);
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
+displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;
@@ -87,7 +87,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 2;
+stimSize = 8;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
