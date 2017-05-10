@@ -3,7 +3,7 @@
 %% initial analysis
 
 subject = 'lr';
-runs = 241:250;
+runs = 231:240;
 date = '20170508';
 plotLevel = 1;
 saveFile = 0;
