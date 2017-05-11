@@ -18,19 +18,21 @@ commandwindow
 % RD, July 2014
 
 %% Settings
-displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
-useKbQueue = 0;
+useKbQueue = 1;
 use_eyetracker = false;
+
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 1; % #runs for staircase to update
 faWeight = 0.3;
 runGUI = false; % turn GUI ON/OFF
+multisample = 8;
 
 %% Configurations
 % initialize stim tracker for MEG
-%PTBInitStimTracker;
+PTBInitStimTracker;
 global PTBTriggerLength 
 PTBTriggerLength = 0.001;
 
@@ -42,8 +44,8 @@ Screen('Preference', 'SkipSyncTests', skipSyncTests);
 %% Initialize Eyetracker and do Calibration
 d = loadDisplayParams('displayName',displayName,'frameRate',frameRate);
 % d.rect = [0 0 800 600];
-d.multisample = 8;
-hz  = FrameRate(d.screenNumber)
+d.multisample = multisample;
+hz = FrameRate(d.screenNumber)
 if round(hz)~=frameRate
     error('Frame rate not set correctly')
 end

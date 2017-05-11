@@ -40,7 +40,7 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 flip. Ideally the results are the same.
 
 % triggers?
-triggersOn = false;
+triggersOn = 1;
 
 % staircase? (adjustment between runs)
 staircase = 0; % set to 0 for first run of the day
@@ -144,6 +144,12 @@ if isfield(stimulus, 'soundSeq')
     
     % Play example sounds
     Screen('Flip',display.windowPtr);
+    % Wait for key press
+    if useKbQueue
+        KbQueueWait();
+    else
+        KbWait(-1);
+    end
     WaitSecs(1)
     for iSound = 1:size(stimulus.sounds,1)
         playSound(pahandle, stimulus.sounds(iSound,:)*soundAmp);
@@ -419,8 +425,12 @@ for frame = 1:nFrames
         break;
     end;
     
-    %--- update screen
-    VBLTimestamp = Screen('Flip',display.windowPtr);
+    %--- update screen %%%%%%%% rd HACK %%%%%%%%%
+%     if mod(frame,2)==1
+        VBLTimestamp = Screen('Flip',display.windowPtr);
+%     else
+%         VBLTimestamp = GetSecs; %VBLTimestamp + 1/60;
+%     end
 
 %     if target.seq(frame) == 1 || target.seq(frame) == 2
 %         pause(0.8)
