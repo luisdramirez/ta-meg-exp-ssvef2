@@ -14,7 +14,7 @@ baseRect = [0 0 rectDiam rectDiam];
 centeredRect = CenterRectOnPointd(baseRect, display.fixX, display.fixY);
 
 
-fixationColor = [0 0 0]*255;
+frameColor = [0 0 0]*255;
 fixationMaxDiameter = max(baseRect)*1.01;
 
 % make fixation rect
@@ -23,17 +23,17 @@ centeredRect2 = CenterRectOnPointd(frameRect, display.fixX, display.fixY);
 
 %change outer ring color
 if stimulus.fixSeq(frame) == 5
-    frameColor = [1 1 1]*255;
+    fixationColor = [1 1 1]*255;
 elseif stimulus.fixSeq(frame) == 1
-    frameColor = [0.5 0.5 0.5]*255;
+    fixationColor = [0.5 0.5 0.5]*255;
 elseif stimulus.fixSeq(frame) == 6
-    frameColor =  [1 0 0]*255;
+    fixationColor =  [1 0 0]*255;
 elseif stimulus.fixSeq(frame) == 7
-    frameColor = [0 1 0]*255;
+    fixationColor = [0 1 0]*255;
 elseif stimulus.fixSeq(frame) == 8
-    frameColor = [0 0 1]*255;
+    fixationColor = [0 0 1]*255;
 elseif stimulus.fixSeq(frame) == 9
-    frameColor = [0.3 0.3 0.3]*255;
+    fixationColor = [0.3 0.3 0.3]*255;
 end
 
 frameMaxDiameter = max(frameRect)*1.01;
@@ -49,8 +49,8 @@ frameMaxDiameter = max(frameRect)*1.01;
 % Screen('FillRect',w, uint8(gray));
 
 % w = 10;
-Screen('FrameOval', display.windowPtr, frameColor, centeredRect2, frameMaxDiameter)
+Screen('FrameOval', display.windowPtr, fixationColor, centeredRect2, frameMaxDiameter)
 % Screen('FillOval', display.windowPtr, fixationColor, centeredRect, fixationMaxDiameter)
-Screen('FrameOval', display.windowPtr, fixationColor, centeredRect2)
+Screen('FrameOval', display.windowPtr, frameColor, centeredRect2)
 return
 % Screen('Flip', w);
