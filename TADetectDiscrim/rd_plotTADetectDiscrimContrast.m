@@ -1,13 +1,13 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'rd';
-runs = 231:236;
+subject = 'R1187_20170510';
+runs = 21:23;
 date = '';
 plotLevel = 1;
-saveFile = 0;
-saveFigs = 0;
-[acc, ~, responseData_all, responseData_labels] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
+saveFile = 1;
+saveFigs = 1;
+[acc, ~, responseData_all, responseData_labels, io] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 %% update behavior
@@ -96,7 +96,7 @@ end
         
 %% plot
 ylims = [0 1];
-figure
+f(1) = figure;
 subplot(1,2,1)
 hold on
 plot(accvals(1:2,:)')
@@ -114,12 +114,12 @@ xlabel('run')
 title('T2')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-figure
+f(2) = figure;
 plot(acc.targetContrast)
 xlabel('run')
 ylabel('target contrast')
 
-figure
+f(3) = figure;
 for iT = 1:2
     subplot(1,2,iT)
     bar(ttAcc(:,:,iT)')
@@ -133,7 +133,7 @@ end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-figure('Position',[235 265 915 370])
+f(4) = figure('Position',[235 265 915 370]);
 for iT = 1:2
     subplot(1,2,iT)
     bar([pAcc(:,:,1,iT) pAcc(:,:,2,iT)]')
@@ -149,7 +149,7 @@ end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-figure
+f(5) = figure;
 for iT = 1:2
     subplot(1,2,iT)
     bar([typeAcc(:,:,1,iT) typeAcc(:,:,2,iT)]')
@@ -163,7 +163,7 @@ end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-figure('Position',[360 450 690 245])
+f(6) = figure('Position',[360 450 690 245]);
 subplot(1,2,1)
 imagesc(confusion,[0 1])
 xlabel('responded')
@@ -183,3 +183,9 @@ set(gca,'XTick',1:numel(responseOptionsM))
 set(gca,'XTickLabel',responseOptionsM)
 set(gca,'YTick',1:numel(responseOptions))
 colorbar
+
+% save figs
+if saveFigs
+    rd_saveAllFigs(f, {'byRun','contrasts','targetTypeAcc','contrastAcc',...
+        'T1T2PedAcc','confusionMatrix'}, io.analysisFile, io.figDir);
+end
