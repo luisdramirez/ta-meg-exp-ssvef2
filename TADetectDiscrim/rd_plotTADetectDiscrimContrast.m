@@ -1,9 +1,17 @@
+
 % plot performance and contrast by run
 
 %% initial analysis
+<<<<<<< HEAD
 subject = 'R1187_20170510';
 runs = 21:23;
+=======
+
+subject = 'rd';
+runs = 231:236;
+>>>>>>> b967654e6ce080887f77ff2d627cbedbbd423d50
 date = '';
+
 plotLevel = 1;
 saveFile = 1;
 saveFigs = 1;
@@ -66,6 +74,23 @@ for iT = 1:2
         end
     end
 end
+
+
+%% Organize response time by target
+% nT = sum(b.responseTarget == 1);
+% targetRT = nan(nT,2);
+% 
+% % valid and invalid
+% for n = 1:length(b.responseData_all(:,12))
+%     if b.responseTarget(n) == 1
+%         targetRT(n, 1) = b.responseData_all(n, 12);
+%     elseif b.responseTarget(n) == 2
+%         targetRT(n, 2) = b.responseData_all(n, 12);
+%     end
+% end
+% 
+% targetRT_means = nanmean(targetRT);
+% RTmax = max(max(targetRT));
 
 %% confusion matrix, target presented vs responded
 responseOptions = unique(b.correctResponse(~isnan(b.correctResponse)));
@@ -173,7 +198,6 @@ set(gca,'XTick',1:numel(responseOptionsM))
 set(gca,'XTickLabel',responseOptionsM)
 set(gca,'YTick',1:numel(responseOptions))
 colorbar
-
 subplot(1,2,2)
 imagesc(confusionNT,[0 1])
 xlabel('responded')
@@ -183,6 +207,19 @@ set(gca,'XTick',1:numel(responseOptionsM))
 set(gca,'XTickLabel',responseOptionsM)
 set(gca,'YTick',1:numel(responseOptions))
 colorbar
+
+% figure
+% for iT = 1:2
+%     subplot(1,2,iT)
+%     bar(targetRT_means(iT))
+%     set(gca, 'XTickLabel',{'Average RT'})
+%     if iT == 1
+%         ylabel('seconds')
+%     end
+%     ylim([0 RTmax])
+%     title(sprintf('T%d',iT))
+% end
+% rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 % save figs
 if saveFigs
