@@ -2,15 +2,9 @@
 % plot performance and contrast by run
 
 %% initial analysis
-<<<<<<< HEAD
-subject = 'R1187_20170510';
-runs = 21:23;
-=======
-
-subject = 'rd';
-runs = 231:236;
->>>>>>> b967654e6ce080887f77ff2d627cbedbbd423d50
-date = '';
+subject = 'lr';
+runs = 92500:92509;
+date = '20170612';
 
 plotLevel = 1;
 saveFile = 1;
