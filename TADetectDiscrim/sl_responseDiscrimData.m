@@ -39,8 +39,8 @@ blockStarts = [0 cumsum(blockLengths)];
 for trialNum = 1 : trialCount
     % Defining search range
     blockStart = blockStarts(trialNum);
-    begSearchIdx = blockStart + jitSeq(trialNum) * refreshRate + respTime + 1;
-    endSearchIdx = begSearchIdx + (respSecs) * refreshRate - 1 ;
+    begSearchIdx = round( blockStart + jitSeq(trialNum) * refreshRate + respTime + 1 );
+    endSearchIdx = round( begSearchIdx + (respSecs) * refreshRate - 1 );
     
     % Find the index for ALL non-zero elements (key-codes) within search
     % range
