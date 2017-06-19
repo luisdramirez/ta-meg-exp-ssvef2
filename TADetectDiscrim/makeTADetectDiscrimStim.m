@@ -16,7 +16,7 @@ vistaStimDir = sprintf('../../%s', vistaStimPath);
 stimFile = sprintf('taDetectDiscrim%d', run);
 
 %% screen setup
-displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
+displayName = 'Carrasco_L1'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;
@@ -37,10 +37,10 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 8;
+nFramesPerTarget = 6; % 8
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 16/60; %16/60; %0.6; % (s) % SOA between targets (- difference from .8)
+targetSOA = 15/60; %18/60 = .300; 15/60 = .250; 16/60 = .267; %0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.6; %1.2; % (s) % if unlimited response window, then 1 frame (see showScanStimulus)
@@ -55,7 +55,7 @@ if refrate==60
     switch flickerType
         case 'counterphase'
             fastUnit = [1 2 2]; % gives the phase (1 or 2) of each frame
-            slowUnit = [1 1 2 2];
+            slowUnit = [1 1 1 2 2 2]; % [1 1 2 2] = 30 Hz;
         case 'onoff'
             fastUnit = [1 1 0];
             slowUnit = [1 0 1 0];
@@ -550,10 +550,13 @@ for iFrame = 1:numel(seqtiming)
             otherwise
                 error('targetBlockName not viable')
         end
+        
         posRow = posRowCount(posCol);
         posSeq(iFrame,1) = posShuffled(posRow,posCol);
         pedestalSeq(iFrame,1) = pedestalShuffled(posRow,posCol);
-        if posSeq(iFrame-nFramesPerTarget+1)>0
+
+%         if posSeq(iFrame-nFramesPerTarget+1)>0 %%% rd check w/ 9 frames
+        if posSeq(iFrame-nFramesPerTarget+1)>0 && posRowCount(posCol) <= size(posShuffled,1)
             posRowCount(posCol) = posRowCount(posCol)+1;
         end
     else
