@@ -79,6 +79,15 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 % cueBlockNames = {'no-cue','1-1','2-2'};
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
+
+%%% debugging %%%
+blockOrder = blockOrder(1:6);
+attBlockOrder = attBlockOrder(1:6);
+targetBlockOrder = targetBlockOrder(1:6);
+cueBlockOrder = cueBlockOrder(1:6);
+targetTypeBlockOrder = targetTypeBlockOrder(:,1:6);
+%%%%%
+
 nBlocks = numel(blockOrder);
 
 if target.catchTrials
