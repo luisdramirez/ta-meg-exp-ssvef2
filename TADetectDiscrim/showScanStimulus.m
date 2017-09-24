@@ -39,6 +39,9 @@ function [response, timing, quitProg] = showScanStimulus(display,...
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
+% flip every n frames
+nFramesPerFlip = 3;
+
 % triggers?
 triggersOn = 1;
 
@@ -237,7 +240,7 @@ fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
 % If we are doing ECoG, then start with black photodiode
 if isfield(stimulus, 'diodeSeq'), drawTrig(display,0); end
 
-for frame = 1:nFrames
+for frame = 1:nFramesPerFlip:nFrames
     
     %--- update display
     % If the sequence number is positive, draw the stimulus and the
@@ -308,9 +311,9 @@ for frame = 1:nFrames
         % sorry some of this is hard-coded for now
         if stimulus.fixSeq(frame)>=8 % feedback period
             % if first frame of feedback period, determine accuracy
-            if stimulus.fixSeq(frame-1)<8 && ~startedFeedback
+            if stimulus.fixSeq(frame-nFramesPerFlip)<8 && ~startedFeedback
                 startedFeedback = 1;
-                responseWindow = response.correct(frame-nRespFrames:frame-1);
+                responseWindow = response.correct(frame-nRespFrames:frame-nFramesPerFlip);
                 correct = responseWindow(responseWindow~=0);
             elseif frame==nFrames || stimulus.fixSeq(frame+1)<8 % last feedback frame
                 startedFeedback = 0;
@@ -352,7 +355,7 @@ for frame = 1:nFrames
     end;
     
     %--- timing
-    waitTime = getWaitTime(stimulus, response, frame,  t0, timeFromT0);
+    waitTime = getWaitTime(stimulus, response, frame,  t0, timeFromT0, nFramesPerFlip);
     
     %--- get inputs (subject or experimentor)
     % check if this is the last frame of the response window
@@ -416,7 +419,7 @@ for frame = 1:nFrames
         
         
         % timing
-        waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0);
+        waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip);
         
     end;
     
@@ -426,22 +429,14 @@ for frame = 1:nFrames
         break;
     end;
     
-    %--- update screen %%%%%%%% rd HACK %%%%%%%%%
-%     if mod(frame,2)==1
-        VBLTimestamp = Screen('Flip',display.windowPtr);
-%     else
-%         VBLTimestamp = GetSecs; %VBLTimestamp + 1/60;
-%     end
-
-%     if target.seq(frame) == 1 || target.seq(frame) == 2
-%         pause(0.8)
-%     end
+    %--- update screen
+    VBLTimestamp = Screen('Flip',display.windowPtr);
 
     % send trigger for MEG, if requested, and record the color of the PD
     % cue
     if isfield(stimulus, 'trigSeq') && stimulus.trigSeq(frame) > 0 && triggersOn
         PTBSendTrigger(stimulus.trigSeq(frame), 0);
-        fprintf('Trigger sent, %s\n%d', datestr(now), stimulus.trigSeq(frame)); drawnow
+%         fprintf('Trigger %d\n', stimulus.trigSeq(frame)); drawnow
         response.trig(frame) = stimulus.trigSeq(frame);
     end
      
@@ -472,8 +467,8 @@ fprintf('[%s]:Stimulus run time: %f seconds [should be: %f].\n',mfilename,timing
 return;
 
 
-function waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0)
-% waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0)
+function waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip)
+% waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip)
 %
 % If timeFromT0 we wait until the current time minus the initial time is
 % equal to the desired presentation time, and then flip the screen.
@@ -484,9 +479,9 @@ function waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0)
 if timeFromT0
     waitTime = (GetSecs-t0)-stimulus.seqtiming(frame);
 else
-    if frame > 1
-        lastFlip = response.flip(frame-1);
-        desiredWaitTime = stimulus.seqtiming(frame) - stimulus.seqtiming(frame-1);
+    if frame > nFramesPerFlip
+        lastFlip = response.flip(frame-nFramesPerFlip);
+        desiredWaitTime = stimulus.seqtiming(frame) - stimulus.seqtiming(frame-nFramesPerFlip);
     else
         lastFlip = t0;
         desiredWaitTime = stimulus.seqtiming(frame);

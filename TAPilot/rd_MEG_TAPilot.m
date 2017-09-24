@@ -128,12 +128,13 @@ figure(101); clf
 plot(diff(stimulus.seqtiming));
 
 % measured inter-stimulus duration
+flip = response.flip(response.flip~=0); % if skipping frames
 hold on
-plot(diff(response.flip), 'r-'); 
-ylim(median(diff(response.flip)) + [-.01 .01])
+plot(diff(flip), 'r-'); 
+ylim(median(diff(flip)) + [-.01 .01])
 
 % frames between stimuli
-frames = round(diff(response.flip) / (1/frameRate)); 
+frames = round(diff(flip) / (1/frameRate)); 
 
 % how many interstimulus frames differed from the median?
 disp(sum(frames ~= median(frames)))
