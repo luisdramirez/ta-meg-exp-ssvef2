@@ -420,7 +420,6 @@ for frame = 1:nFramesPerFlip:nFrames
         
         % timing
         [waitTime, requestedFlipTime] = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip);
-        
     end;
     
     %--- stop?
