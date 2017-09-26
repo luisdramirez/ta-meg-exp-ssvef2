@@ -355,7 +355,7 @@ for frame = 1:nFramesPerFlip:nFrames
     end;
     
     %--- timing
-    waitTime = getWaitTime(stimulus, response, frame,  t0, timeFromT0, nFramesPerFlip);
+    [waitTime, requestedFlipTime] = getWaitTime(stimulus, response, frame,  t0, timeFromT0, nFramesPerFlip);
     
     %--- get inputs (subject or experimentor)
     % check if this is the last frame of the response window
@@ -419,7 +419,7 @@ for frame = 1:nFramesPerFlip:nFrames
         
         
         % timing
-        waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip);
+        [waitTime, requestedFlipTime] = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip);
         
     end;
     
@@ -430,7 +430,7 @@ for frame = 1:nFramesPerFlip:nFrames
     end;
     
     %--- update screen
-    VBLTimestamp = Screen('Flip',display.windowPtr);
+    VBLTimestamp = Screen('Flip', display.windowPtr, requestedFlipTime);
 
     % send trigger for MEG, if requested, and record the color of the PD
     % cue
@@ -467,8 +467,8 @@ fprintf('[%s]:Stimulus run time: %f seconds [should be: %f].\n',mfilename,timing
 return;
 
 
-function waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip)
-% waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip)
+function [waitTime, requestedFlipTime] = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip)
+% [waitTime, requestedFlipTime] = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFramesPerFlip)
 %
 % If timeFromT0 we wait until the current time minus the initial time is
 % equal to the desired presentation time, and then flip the screen.
@@ -478,6 +478,7 @@ function waitTime = getWaitTime(stimulus, response, frame, t0, timeFromT0, nFram
 
 if timeFromT0
     waitTime = (GetSecs-t0)-stimulus.seqtiming(frame);
+    requestedFlipTime = t0 + stimulus.seqtiming(frame);
 else
     if frame > nFramesPerFlip
         lastFlip = response.flip(frame-nFramesPerFlip);
@@ -492,5 +493,6 @@ else
     % monitor is greater than 100 Hz, this might make you a frame
     % early. [So consider going to down to 5 ms? What is the minimum we
     % need to ensure that we are not a frame late?]
-    waitTime = (GetSecs-lastFlip)-desiredWaitTime + .010;
+    waitTime = (GetSecs-lastFlip)-desiredWaitTime + .030;
+    requestedFlipTime = lastFlip + desiredWaitTime - 0.008;
 end
