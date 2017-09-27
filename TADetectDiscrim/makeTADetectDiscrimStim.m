@@ -40,14 +40,14 @@ refrate = 60; % (Hz)
 nFramesPerTarget = 6; % 8
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
-targetSOA = 15/60; %18/60 = .300; 15/60 = .250; 16/60 = .267; %0.6; % (s) % SOA between targets (- difference from .8)
+targetSOA = 18/60; %18/60 = .300; 15/60 = .250; 16/60 = .267; %0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
 respDur = 1.6; %1.2; % (s) % if unlimited response window, then 1 frame (see showScanStimulus)
 feedbackDur = 0.3; % (s)
 cueDur = 0.1; % (s)
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
-iti = 1; % (s)
+iti = 2; % (s)
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
 flickerType = 'counterphase'; % 'counterphase','onoff'
 if refrate==60
@@ -496,8 +496,10 @@ for iFrame = 1:numel(seqtiming)
         cueBlockName = cueBlockNames{cueBlockOrder(blockIdx)};
         if mod(cueIdx,2) % odd cues are pre-cues
             cueType = str2double(cueBlockName(1));
+            prePostCueSeq(iFrame,1) = 1;
         else % even cues are response cues
             cueType = str2double(cueBlockName(end));
+            prePostCueSeq(iFrame,1) = 2;
         end
         if isnan(cueType)
             error('cues should not be presented during no-cue blocks. check code.')
@@ -506,6 +508,7 @@ for iFrame = 1:numel(seqtiming)
         cueIdx = cueIdx + 1;
     else
         cueSeq(iFrame,1) = 0;
+        prePostCueSeq(iFrame,1) = 0;
     end
     
     % determine if target is on
@@ -816,12 +819,17 @@ for iFrame = 1:numel(seqtiming)
                 if targetAbsOnSeq(iFrame)==1 && targetAbsOnSeq(iFrame-1)==0
                     trig = NaN; % target on left % never happens, so don't use up the trigger
                 elseif targetAbsOnSeq(iFrame)==2 && targetAbsOnSeq(iFrame-1)==0
-                    trig = 5; % target on right
+                    trig = NaN; % 5; target on right; used to be 5 - now never happens 
                 else
                     trig = NaN;
                 end
             elseif cueSeq(iFrame)~=0
-                trig = 8; % pre- or post-cue
+%                 trig = 8; % pre- or post-cue
+                if prePostCueSeq(iFrame) == 1
+                    trig = 8; % pre-cue
+                else
+                    trig = 5; % post-cue
+                end
             else
                 trig = NaN;
             end
@@ -851,7 +859,7 @@ end
 cmap = repmat((0:255)',1,3);
 srcRect = [0 0 size(images,2) size(images,1)];
 destRect = CenterRectOnPoint(srcRect, cx, cy); %(cy+stimPos(2)*pixelsPerDegree)
-diodeSeq = repmat([0 0 1 1], 1, ceil(length(seq)/4))';
+diodeSeq = repmat(slowUnit-1, 1, ceil(length(seq)/length(slowUnit)))';
 target.seq = targetTypeSeq;
 target.posSeq = posSeq;
 target.pedestalSeq = pedestalSeq;
@@ -867,7 +875,7 @@ stimulus.fixSeq = fixSeq;
 stimulus.srcRect = srcRect;
 stimulus.destRect = destRect;
 stimulus.trigSeq = trigSeq;
-% stimulus.diodeSeq = diodeSeq;
+stimulus.diodeSeq = diodeSeq;
 stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 stimulus.target = target;
