@@ -79,7 +79,7 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 % cueBlockNames = {'no-cue','1-1','2-2'};
 % [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
 %     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
-[blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
+[blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder, targetPedestalBlockOrder] ...
     = block_gen2(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
 
 %%% debugging %%%
@@ -98,7 +98,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 8;
+stimSize = 2;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [
@@ -551,8 +551,13 @@ for iFrame = 1:numel(seqtiming)
             targetType = targetTypeBlockOrder(whichTarget, blockIdx);
             targetTypeSeq(iFrame,1) = targetType;
             targetTypes(targetIdx) = targetType;
+            
+            targetPedestal = targetPedestalBlockOrder(whichTarget, blockIdx);
+            pedestalSeq(iFrame,1) = targetPedestal;
+            targetPedestals(targetIdx) = targetPedestal;
         else
             targetTypeSeq(iFrame,1) = targetTypeSeq(iFrame-1);
+            pedestalSeq(iFrame,1) = pedestalSeq(iFrame-1);
         end
         switch targetBlockName
             case 'pres-pres'
@@ -567,7 +572,7 @@ for iFrame = 1:numel(seqtiming)
         
         posRow = posRowCount(posCol);
         posSeq(iFrame,1) = posShuffled(posRow,posCol);
-        pedestalSeq(iFrame,1) = pedestalShuffled(posRow,posCol);
+%         pedestalSeq(iFrame,1) = pedestalShuffled(posRow,posCol);
 
 %         if posSeq(iFrame-nFramesPerTarget+1)>0 %%% rd check w/ 9 frames
         if posSeq(iFrame-nFramesPerTarget+1)>0 && posRowCount(posCol) <= size(posShuffled,1)
@@ -913,7 +918,8 @@ order.targetTypeBlockOrder = targetTypeBlockOrder;
 if strcmp(target.type, 'contrast')
     order.posShuffled = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
     order.posBlockOrder = posBlockOrder;
-    order.pedestalShuffled = pedestalShuffled;
+%     order.pedestalShuffled = pedestalShuffled;
+    order.targetPedestals = targetPedestals;
     order.pedestalBlockOrder = pedestalBlockOrder;
 end
 order.targetTypes = targetTypes;
