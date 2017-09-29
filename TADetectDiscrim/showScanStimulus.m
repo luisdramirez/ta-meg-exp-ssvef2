@@ -85,7 +85,7 @@ else
     shifts = [0 0]; % phase shifts
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
 end
-soundAmp = 1; % 0.10 for MEG
+soundAmp = 0.10; % 0.10 for MEG
 
 % input checks
 if nargin < 2
