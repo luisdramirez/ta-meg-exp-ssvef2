@@ -43,11 +43,11 @@ targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 18/60; %18/60 = .300; 15/60 = .250; 16/60 = .267; %0.6; % (s) % SOA between targets (- difference from .8)
 cueTargetSOA = 1; % (s) % SOA between cues and targets, same for pre- and post-cues
 attCueLeadTime = 0.5; % (s)
-respDur = 1.6; %1.2; % (s) % if unlimited response window, then 1 frame (see showScanStimulus)
+respDur = 1.7; %1.2; % (s) % if unlimited response window, then 1 frame (see showScanStimulus)
 feedbackDur = 0.3; % (s)
 cueDur = 0.1; % (s)
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
-iti = 2; % (s)
+iti = 1.5; % (s)
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
 flickerType = 'counterphase'; % 'counterphase','onoff'
 if refrate==60
@@ -77,8 +77,10 @@ targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 % cueBlockNames = {'no-cue','1-1','2-2'};
+% [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
+%     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
-    = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
+    = block_gen2(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
 
 %%% debugging %%%
 % blockOrder = blockOrder(1:6);
@@ -375,7 +377,7 @@ switch jitter
     case 'blockPrecueInterval'
         itiSeq = ones(1,nBlocks)*iti;
         blockDur = blockDur + iti;
-        jit = 0:0.2:1; % recall there is always 0.5 s before cue
+        jit = (0:0.2:1) + 0.5; % recall there is always 0.5 s before cue
         jitSeq = Shuffle(repmat(jit,1,ceil(nBlocks/numel(jit))));
         jitSeq = jitSeq(1:nBlocks);
         runDur = blockDur*nBlocks + sum(jitSeq);
