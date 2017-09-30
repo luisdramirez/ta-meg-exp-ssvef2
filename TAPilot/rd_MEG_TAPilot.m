@@ -21,9 +21,9 @@ commandwindow
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 1;
-use_eyetracker = false;
+use_eyetracker = true;
 
-eyeFile = sprintf('T%02d%s', run, datestr(now, 'dd')); % 8 characters max
+eyeFile = sprintf('T%02dD%s', run, datestr(now, 'dd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 1; % #runs for staircase to update
 faWeight = 0.3;
