@@ -20,7 +20,7 @@ commandwindow
 %% Settings
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
-useKbQueue = 1;
+useKbQueue = 0;
 use_eyetracker = false;
 
 eyeFile = sprintf('T%02d%s', run, datestr(now, 'dd')); % 8 characters max
