@@ -23,7 +23,7 @@ frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = false;
 
-eyeFile = sprintf('T%02d%s', run, datestr(now, 'dd')); % 8 characters max
+eyeFile = sprintf('T%02dD%s', run, datestr(now, 'dd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 1; % #runs for staircase to update
 faWeight = 0.3;
