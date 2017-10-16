@@ -1,19 +1,27 @@
+% codetest.m
 
+subjectID = 'test';
 
+stimDir = sprintf('stimuli/%s', subjectID);
 
 blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
-% targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
 cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
-% cueBlockNames = {'no-cue','1-1','2-2'};
-% [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
-%     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 
 s = [];
 for run = 1:4
-    [s(run).blockOrder, s(run).attBlockOrder, s(run).targetBlockOrder, s(run).cueBlockOrder, s(run).targetTypeBlockOrder, s(run).targetPedestalBlockOrder] ...
-        = block_gen2(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
+    fileName = sprintf('%s/%s_blockgen_run%d.mat', stimDir, subjectID, run);
+    load(fileName);
+    s(run).blockOrder = blockOrder;
+    s(run).attBlockOrder = attBlockOrder;
+    s(run).targetBlockOrder = targetBlockOrder;
+    s(run).cueBlockOrder = cueBlockOrder;
+    s(run).targetTypeBlockOrder = targetTypeBlockOrder;
+    s(run).targetPedestalBlockOrder = targetPedestalBlockOrder;
+    
+%     [s(run).blockOrder, s(run).attBlockOrder, s(run).targetBlockOrder, s(run).cueBlockOrder, s(run).targetTypeBlockOrder, s(run).targetPedestalBlockOrder] ...
+%         = block_gen3(subjectID, run, stimDir);
 end
 
 
@@ -60,6 +68,14 @@ cueValidity = double(cueTarget==responseTarget);
 cueValidity(isnan(cueTarget)) = NaN;
 
 t = [cueValidity responseTarget targetContrast];
+
+%%%%%
+% cueValidity = a(:,3);
+% cueValidity(cueValidity==2) = 0;
+% responseTarget = a(:,4);
+% targetContrast(a(:,4)==1,1) = a(a(:,4)==1,1);
+% targetContrast(a(:,4)==2,1) = a(a(:,4)==2,2);
+%%%%%
 
 count = [];
 vs = [0 1];

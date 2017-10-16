@@ -11,6 +11,7 @@ function [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetType
 if nargin==0
     subjectID = 'test';
     run = 1;
+    stimDir = 'stimuli';
 end
 
 %% file i/o
@@ -51,6 +52,7 @@ if generateRuns
     
     %% randomize trial sequence
     idx = randperm(size(a,1));
+%     idx = 1:size(a,1);
     b = a(idx,:);
     
     %% add blank trials
