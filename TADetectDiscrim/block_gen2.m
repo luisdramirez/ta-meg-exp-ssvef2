@@ -19,7 +19,7 @@ m = mod(run,4)-1;
 b = [0 0 0 1];
 bb = [];
 for i = 1:length(b)
-    bb = [bb circshift(b,i+m)];
+    bb = [bb circshift(b,[i+m,0])];
 end
 
 cueBlockOrder = [bb + 2, bb + 4];
