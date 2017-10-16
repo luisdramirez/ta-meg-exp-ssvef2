@@ -1,5 +1,7 @@
-function rd_MEG_TAPilot(run, stimfile)
+function rd_MEG_TAPilot(subjectID, run)
 commandwindow
+% rd_MEG_TAPilot(subjectID, run) % new input
+%
 % rd_MEG_TAPilot(run, stimfile)
 % rd_MEG_TAPilot(3, 'taDetectDiscrim')
 
@@ -18,12 +20,13 @@ commandwindow
 % RD, July 2014
 
 %% Settings
+stimfile = sprintf('%s_taDetectDiscrim', subjectID);
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = false;
 
-eyeFile = sprintf('T%02dD%s', run, datestr(now, 'dd')); % 8 characters max
+eyeFile = sprintf('%s%02d%s', subjectID(1:2), run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
 nStaircaseRuns = 1; % #runs for staircase to update
 faWeight = 0.3;
@@ -160,13 +163,13 @@ newFileName = sprintf('%s_%s%d.mat', fileName(1:end-4), stimfile, run);
 movefile(fileName, newFileName)
 
 %% Extra analyses if requested
-if strcmp(stimfile, 'taDetectDiscrim')
+if strfind(stimfile, 'taDetectDiscrim')
     %% Analyze data from this run
     dataDir = '~/Desktop';
     vistaStimPath = 'vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
     stimDir = sprintf('../../%s', vistaStimPath);
     plotLevel = 3; % 3 = fewest plots
-    [acc, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel);
+    [acc, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, stimfile, run, plotLevel);
 
     %% Check for catch trials
     if isfield(stim.stimulus.target,'catchTrials')
@@ -202,7 +205,7 @@ if strcmp(stimfile, 'taDetectDiscrim')
             % staircase based on 2 runs
             if nStaircaseRuns==2 && mod(run,2)==0
                 % analyze previous run
-                [acc(2), stim(2)] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run-1, 0);
+                [acc(2), stim(2)] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, stimfile, run-1, 0);
             end
             % update staircase
             if nStaircaseRuns==1 || (nStaircaseRuns==2 && mod(run,2)==0)

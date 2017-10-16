@@ -1,8 +1,8 @@
-function [accuracy, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, run, plotLevel)
+function [accuracy, stim] = rd_analyzeTADetectDiscrimOneRun(dataDir, stimDir, stimfile, run, plotLevel)
 
-dataFile = dir(sprintf('%s/*taDetectDiscrim%d.mat', dataDir, run));
+dataFile = dir(sprintf('%s/*%s%d.mat', dataDir, stimfile, run));
 dd = load(sprintf('%s/%s', dataDir, dataFile(end).name));
-stim = load(sprintf('%s/taDetectDiscrim%d.mat', stimDir, run));
+stim = load(sprintf('%s/%s%d.mat', stimDir, stimfile, run));
 
 trialCount = length(stim.p.blockOrder);  
 respSecs = stim.p.respDur;

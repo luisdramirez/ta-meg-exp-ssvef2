@@ -1,4 +1,4 @@
-function makeTADetectDiscrimStim(run)
+function makeTADetectDiscrimStim(subjectID, run)
 
 %% run setup
 %run = 7;
@@ -13,7 +13,7 @@ addpath('../TAPilot')
 stimDir = 'stimuli';
 vistaStimPath = 'vistadisp/Applications2/Retinotopy/standard/storedImagesMatrices';
 vistaStimDir = sprintf('../../%s', vistaStimPath);
-stimFile = sprintf('taDetectDiscrim%d', run);
+stimFile = sprintf('%s_taDetectDiscrim%d', subjectID, run);
 
 %% screen setup
 displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
@@ -79,8 +79,8 @@ cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 % cueBlockNames = {'no-cue','1-1','2-2'};
 % [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
 %     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
-[blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder, targetPedestalBlockOrder] ...
-    = block_gen2(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run);
+[blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder, targetPedestalBlockOrder] = ...
+    block_gen3(subjectID, run, stimDir);
 
 %%% debugging %%%
 % blockOrder = blockOrder(1:6);
