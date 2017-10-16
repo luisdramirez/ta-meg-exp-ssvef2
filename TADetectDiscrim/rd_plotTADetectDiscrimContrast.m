@@ -1,10 +1,11 @@
+% rd_plotTADetectDiscrimContrast.m
 
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'R0817_20170929';
-runs = 1001:1012;
-date = '20170929';
+subject = 'mj';
+runs = 1:4;
+date = '';
 
 plotLevel = 1;
 saveFile = 0;

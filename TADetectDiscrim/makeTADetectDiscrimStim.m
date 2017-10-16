@@ -98,7 +98,7 @@ end
 
 %% stim setup  
 stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
-stimSize = 2;
+stimSize = 4;
 spatialFreq = 3;
 orientation = 0;
 possibleContrasts = [

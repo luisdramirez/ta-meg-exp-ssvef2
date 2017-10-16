@@ -29,6 +29,9 @@ if ischar(dates)
     dates{1} = dateStr;
 end
 
+subjectStr = sprintf('%s_taDetectDiscrim', subject);
+% subjectStr = 'taDetectDiscrim';
+
 %% exp setup (now read from stim file, below)
 % trialCount = 41;
 % respSecs = 1.4;
@@ -94,7 +97,7 @@ end
 %% load exp params from a sample run
 % assumes all runs have identical params
 expNum = regexp(df(1).name, '_taDetectDiscrim(\d*).mat','tokens');
-stim = load(sprintf('%s/taDetectDiscrim%s.mat', stimDir, expNum{1}{1}));
+stim = load(sprintf('%s/%s%s.mat', stimDir, subjectStr, expNum{1}{1}));
 
 trialCount = length(stim.p.blockOrder);
 respSecs = stim.p.respDur;
@@ -114,7 +117,7 @@ for n = 1:length(df)
     name = df(n).name;
     dd = load(sprintf('%s/%s',dataDir,name));
     expNum = regexp(name,'_taDetectDiscrim(\d*).mat','tokens');
-    stim = load(sprintf('%s/taDetectDiscrim%s.mat', stimDir, expNum{1}{1}));
+    stim = load(sprintf('%s/%s%s.mat', stimDir, subjectStr, expNum{1}{1}));
     if isfield(stim.stimulus,'itiSeq')
         itiSeq = stim.stimulus.itiSeq;
     else
