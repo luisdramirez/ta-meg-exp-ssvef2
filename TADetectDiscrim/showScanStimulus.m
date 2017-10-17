@@ -129,6 +129,7 @@ nGamma = size(stimulus.cmap,3);
 nImages = length(stimulus.textures);
 response.keyCode = zeros(length(stimulus.seq),1); % get 1 buttons max
 response.secs = zeros(size(stimulus.seq));        % timing
+response.RT = zeros(size(stimulus.seq));
 quitProg = 0;
 response.flip = [];
 
@@ -343,6 +344,7 @@ for frame = 1:nFramesPerFlip:nFrames
         if isfield(stimulus, 'soundSeq')
             if stimulus.soundSeq(frame)~=0
                 playSound(pahandle, stimulus.sounds(stimulus.soundSeq(frame),:)*soundAmp);
+                lastSoundTime = GetSecs;
             end
         end
         
@@ -371,6 +373,7 @@ for frame = 1:nFramesPerFlip:nFrames
                 ssKeyCode = firstPress==secs;
                 response.keyCode(frame) = find(ssKeyCode);
                 response.secs(frame) = secs - t0;
+                response.RT(frame) = secs - lastSoundTime;
                 
                 if response.keyCode(frame)==stimulus.keyCodeSeq(frame)
                     response.correct(frame) = 1;
@@ -400,6 +403,7 @@ for frame = 1:nFramesPerFlip:nFrames
                 response.keyCode(frame) = kc(1);
                 % response.keyCode(frame) = 1; % binary response for now
                 response.secs(frame)    = ssSecs - t0;
+                response.RT(frame) = ssSecs - lastSoundTime;
                 
                 if response.keyCode(frame)==stimulus.keyCodeSeq(frame)
                     response.correct(frame) = 1;

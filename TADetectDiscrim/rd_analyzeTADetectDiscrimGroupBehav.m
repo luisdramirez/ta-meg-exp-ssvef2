@@ -3,8 +3,11 @@
 %% setup
 exptDir = pathToExpt;
 
-subjects = {'rd','lr','mj','af','xw'};
-startRuns = [211, 211, 221, 221, 221];
+% subjects = {'rd','lr','mj','af','xw'};
+% startRuns = [211, 211, 221, 221, 221];
+
+subjects = {'mj'};
+startRuns = 1;
 
 nSubjects = numel(subjects);
 
@@ -67,6 +70,7 @@ for iS = 1:nSubjects
             groupDataAll(iS).detectHMFC{iV,iT} = behav(iS).detectHMFC(w,:);
             groupDataAll(iS).discrimCI{iV,iT} = behav(iS).discrimCI(w,:);
             groupDataAll(iS).acc{iV,iT} = behav(iS).acc(w,:);
+            groupDataAll(iS).rt{iV,iT} = behav(iS).rt(w,:);
         end
     end
 end
@@ -75,6 +79,7 @@ for iS = 1:nSubjects
     detect = groupDataAll(iS).detectHMFC;
     discrim = groupDataAll(iS).discrimCI;
     acc = groupDataAll(iS).acc;
+    rt = groupDataAll(iS).rt;
     for iT = 1:numel(targets)
         for iV = 1:numel(cueValidities)
             presentResponse = any(discrim{iV,iT},2);
@@ -85,6 +90,7 @@ for iS = 1:nSubjects
             groupData.fa(iV,iT,iS) = nanmean(detect{iV,iT}(:,3));
             groupData.cr(iV,iT,iS) = nanmean(detect{iV,iT}(:,4));
             groupData.overallAcc(iV,iT,iS) = nanmean(acc{iV,iT});
+            groupData.rt(iV,iT,iS) = nanmean(rt{iV,iT});
         end
     end
 end
@@ -122,8 +128,8 @@ for iM = 1:nM
     groupSte.(m) = std(groupData.(m),0,3)./sqrt(nSubjects);
 end
 
-%% plot
-measures = {'discrim1'};
+%% plot group data
+measures = {'overallAcc','rt'};
 nM = numel(measures);
 figure('color','w')
 for iM = 1:nM
@@ -139,6 +145,8 @@ for iM = 1:nM
             ylim([-1 1])
             hold on
             plot([.5 2.5],[0 0],'--k')
+        case 'rt'
+            ylim([0 1.6])
         otherwise
             ylim([0 1])
     end
@@ -149,7 +157,17 @@ for iM = 1:nM
 end
 legend('valid','invalid')
 
-indivM = {'discrim1'};
+figure
+imagesc(mean(confusion,3),[0 1])
+xlabel('responded')
+ylabel('presented')
+set(gca,'XTick',1:numel(responseOptionsM))
+set(gca,'XTickLabel',responseOptionsM)
+set(gca,'YTick',1:numel(responseOptions))
+colorbar
+
+%% plot individual data
+indivM = {'overallAcc'};
 nM = numel(indivM);
 figure('Color','w','Position',[0 0 1200 800])
 for iS = 1:nSubjects
@@ -174,6 +192,8 @@ for iS = 1:nSubjects
                 ylim([-1 1])
                 hold on
                 plot([.5 2.5],[0 0],'--k')
+            case 'rt'
+                ylim([0 1.6])
             otherwise
                 ylim([0 1])
         end
@@ -193,14 +213,6 @@ for iS = 1:nSubjects
 end
 legend('valid','invalid')
 
-figure
-imagesc(mean(confusion,3),[0 1])
-xlabel('responded')
-ylabel('presented')
-set(gca,'XTick',1:numel(responseOptionsM))
-set(gca,'XTickLabel',responseOptionsM)
-set(gca,'YTick',1:numel(responseOptions))
-colorbar
 
 %% stats
 % valid vs. invalid

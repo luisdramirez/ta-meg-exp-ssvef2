@@ -14,6 +14,7 @@ t1CondIdx = strcmp(behav.responseData_labels,'target type T1');
 t2CondIdx = strcmp(behav.responseData_labels,'target type T2');
 responseIdx = strcmp(behav.responseData_labels,'response');
 correctIdx = strcmp(behav.responseData_labels,'correct');
+rtIdx = strcmp(behav.responseData_labels,'RT');
 
 cueCond = behav.responseData_all(:,cueCondIdx);
 t1Cond = behav.responseData_all(:,t1CondIdx);
@@ -21,6 +22,7 @@ t2Cond = behav.responseData_all(:,t2CondIdx);
 targetCond = [t1Cond t2Cond];
 response = behav.responseData_all(:,responseIdx);
 correct = behav.responseData_all(:,correctIdx);
+rt = behav.responseData_all(:,rtIdx);
 
 if any(strcmp(behav.responseData_labels, 'target pedestal T1'))
     pedestalOn = true;
@@ -112,6 +114,7 @@ w = wWrongButton | ~wNotMissed;
 detectHMFC(w,:) = NaN;
 discrimCI(w,:) = NaN;
 acc(w,:) = NaN;
+rt(w,:) = NaN;
 
 %% store
 behav.cueValidity = cueValidity;
@@ -130,4 +133,5 @@ behav.presentResponse = presentResponse;
 behav.detectHMFC = detectHMFC;
 behav.discrimCI = discrimCI;
 behav.acc = acc;
+behav.rt = rt;
 

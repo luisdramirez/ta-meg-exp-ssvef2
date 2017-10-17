@@ -69,7 +69,12 @@ for trialNum = 1 : trialCount
     sprintf('Trial %d: KeyCode %d found at Idx = %d', trialNum, keyVal, fidx);
    
     % Stores key code found in data matrix
-    rData.RT(trialNum,:) = (fidx - blockLength * (trialNum - 1) - respTime)/refreshRate;
+    if isfield(response,'RT')
+        rData.RT(trialNum,:) = response.RT(fidx);
+    else
+        rData.RT(trialNum,:) = (fidx - begSearchIdx)/refreshRate;
+    end
+%     rData.RT(trialNum,:) = (fidx - blockLength * (trialNum - 1) - respTime)/refreshRate;
 %    rData.RTold(trialNum,:) = response.secs(fidx) - ((blockLength * (trialNum - 1) + respTime)/refreshRate); 
     rData.keyCode(trialNum,:) = keyVal; 
     rData.correct(trialNum,:) = RespVal;

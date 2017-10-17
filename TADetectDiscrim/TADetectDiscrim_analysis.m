@@ -49,11 +49,11 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
-rootDir = pathToExpt;
+% rootDir = pathToExpt;
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';
-% rootDir = pwd;
+rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
@@ -155,6 +155,7 @@ targetTypeT1 = responseData_all(:,7);
 targetTypeT2 = responseData_all(:,8);
 response_all = responseData_all(:,10);
 response_correct = responseData_all(:,11);
+response_rt = responseData_all(:,12);
 targetAxis = responseData_all(:,13:14);
 targetPedestal = responseData_all(:,15:16);
 
