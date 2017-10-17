@@ -49,7 +49,7 @@ respDur = 1.6; %1.2; % (s) % if unlimited response window, then 1 frame (see sho
 feedbackDur = 0.3; % (s)
 cueDur = 0.1; % (s)
 blockDur = targetLeadTime + targetSOA + cueTargetSOA + respDur + feedbackDur; % (s)
-iti = 2; % (s)
+iti = 1.5; %2; % (s)
 jitter = 'blockPrecueInterval'; % 'blockPrecueInterval', 'ITI', 'none' % add jittered interval between trials
 flickerType = 'counterphase'; % 'counterphase','onoff'
 if refrate==60
