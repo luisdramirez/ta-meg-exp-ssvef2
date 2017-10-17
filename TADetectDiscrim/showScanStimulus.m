@@ -76,7 +76,7 @@ else
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
 %     patchContrast = [0 .2 .75 .95]; % lr-40 piloting
 %     patchContrast = [0.15 .29 .85 1]; % mj
-    patchContrast = [.05 .2 .8 .95]; % mj-40
+    patchContrast = [.1 .2 .8 .95]; % mj-40
 %     patchContrast = [0.05 .29 .79 1]; % af
 %     patchContrast = [0 .25 .88 1]; % hl
 %     patchContrast = [.10 .29 .68 1]; % xw

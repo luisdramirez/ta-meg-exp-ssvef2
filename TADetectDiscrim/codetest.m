@@ -77,8 +77,14 @@ t = [cueValidity responseTarget targetContrast];
 % targetContrast(a(:,4)==2,1) = a(a(:,4)==2,2);
 %%%%%
 
+%%%%%
+cueValidity = b.cueValidity;
+responseTarget = b.responseTarget;
+targetContrast = (b.targetPedestal-1)*2 + b.targetType;
+%%%%%
+
 count = [];
-vs = [0 1];
+vs = [1 -1]; %[0 1];
 ts = [1 2];
 cs = 1:4;
 for iT = 1:2

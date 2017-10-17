@@ -4,7 +4,7 @@
 
 %% initial analysis
 subject = 'mj';
-runs = 1:4;
+runs = 5:8;
 date = '';
 
 plotLevel = 1;
@@ -42,12 +42,11 @@ for iT = 1:2
 end
 %% accuracy as a function of pedestal & trial type
 %pedestalSeq (below(1)/above(2) baseline), targetTypeBlockOrder (darker(1)/brighter(2)), pedestalBlockOrder
-b.targetPedestal = b.responseData_all(:,end-1:end);
 for iT = 1:2
     for iP = 1:2
         for iTT = 1:2
             for iV = 1:2
-                w = b.responseTarget==iT & b.targetType==iTT & b.targetPedestal(:,iT)==iP & b.cueValidity==cvs(iV);
+                w = b.responseTarget==iT & b.targetType==iTT & b.targetPedestal==iP & b.cueValidity==cvs(iV);
                 pAll{iV,iTT,iP,iT} = [b.responseTarget(w) b.targetType(w) b.targetPedestal(w) b.cueValidity(w) b.acc(w)];
                 pAcc(iV,iTT,iP,iT) = nanmean(b.acc(w)); % row = validity, col = pedestal, page = targettype, vol = target
             end
@@ -62,8 +61,8 @@ for iT = 1:2
         for iNP = 1:2
             for iV = 1:2
                 iNT = 3 - iT;
-                w = b.responseTarget==iT & b.targetPedestal(:,iT)==iP & b.targetPedestal(:,iNT)==iNP & b.cueValidity==cvs(iV);
-                typeAll{iV,iNP,iP,iT} = [b.responseTarget(w) b.targetPedestal(w) b.cueValidity(w) b.acc(w)];
+                w = b.responseTarget==iT & b.targetPedestal==iP & b.nontargetPedestal==iNP & b.cueValidity==cvs(iV);
+                typeAll{iV,iNP,iP,iT} = [b.responseTarget(w) b.targetPedestal(w) b.nontargetPedestal(w) b.cueValidity(w) b.acc(w)];
                 typeAcc(iV,iNP,iP,iT) = nanmean(b.acc(w));
             end
         end
@@ -145,6 +144,7 @@ for iT = 1:2
     bar(ttAcc(:,:,iT)')
     set(gca,'XTickLabel',{'dec','inc'})
     if iT==1
+        xlabel('target type')
         ylabel('proportion correct')
     end
     ylim(ylims)
