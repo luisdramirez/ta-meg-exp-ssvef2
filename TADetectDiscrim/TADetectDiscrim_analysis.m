@@ -49,11 +49,11 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
-% rootDir = pathToExpt;
+rootDir = pathToExpt;
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';
-rootDir = pwd;
+% rootDir = pwd;
 dataDir = sprintf('%s/data/%s', rootDir, subject);
 stimDir = sprintf('%s/stimuli', rootDir);
 analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
@@ -257,6 +257,8 @@ for n = 1:length(df)
         end
         accuracy.dprime(k,n) = norminv(accuracy.Hit_alltemp(k,n)) - norminv(accuracy.FA_alltemp(k,n));
         
+        accuracy.RT(k,n) = nanmean(response_rt(condition_Indx));
+        
         accuracy.missedTrials(n) = accuracy.missedTrials(n) + sum(isnan(response_all(condition_Indx)) );
     end
 end
@@ -272,6 +274,7 @@ accuracy.FA_means = nanmean(accuracy.FA_all,2);
 accuracy.Miss_means = nanmean(accuracy.Miss_all,2);
 accuracy.CR_means = nanmean(accuracy.CR_all,2);
 accuracy.dprime_means = nanmean(accuracy.dprime,2);
+accuracy.RT_means = nanmean(accuracy.RT,2);
 all_means = [accuracy.Hit_means,accuracy.FA_means,accuracy.Miss_means,accuracy.CR_means ]; % rows: '1-1','2-1','2-2','1-2'
 % columns: Hit,FA, Miss, CR
 accuracy.Discrim_stes = nanstd(accuracy.Discrim_all,0,2)./sqrt(length(df));
@@ -283,6 +286,7 @@ accuracy.FA_stes = nanstd(accuracy.FA_all,0,2)./ sqrt(length(df));
 accuracy.Miss_stes = nanstd(accuracy.Miss_all,0,2)./ sqrt(length(df));
 accuracy.CR_stes = nanstd(accuracy.CR_all,0,2)./ sqrt(length(df));
 accuracy.dprime_stes = nanstd(accuracy.dprime,0,2) ./ sqrt(length(df));
+accuracy.RT_stes = nanstd(accuracy.RT,0,2) ./ sqrt(length(df));
 all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_stes];
 
 if exist('targetContrast','var')
@@ -295,7 +299,7 @@ switch plotLevel
         scrsz=get(0,'ScreenSize');
         f(1) = figure('Position', [1 scrsz(4) scrsz(3)*(3/5) scrsz(4)/2]);
         
-        subplot(1,3,1)
+        subplot(1,4,1)
         y = errorbar([ (accuracy.Detect_means(1:2)');(accuracy.Detect_means(3:4)')],[(accuracy.Detect_stes(1:2)');(accuracy.Detect_stes(3:4)')],'.');
         xlim([0.5 2.5])
         ylim([0 1])
@@ -307,7 +311,7 @@ switch plotLevel
         ylabel('accuracy')
         title('detection')
         
-        subplot(1,3,2)
+        subplot(1,4,2)
         y = errorbar([ (accuracy.Discrim1_means(1:2)'); (accuracy.Discrim1_means(3:4)')],[(accuracy.Discrim1_stes(1:2)');(accuracy.Discrim1_stes(3:4)')],'.');
         xlim([0.5 2.5])
         ylim([0 1])
@@ -318,7 +322,7 @@ switch plotLevel
         ylabel('accuracy')
         title('discrimination(total correct/total detected)')
         
-        subplot(1,3,3)
+        subplot(1,4,3)
         y = errorbar([ (accuracy.Overall_means(1:2)');(accuracy.Overall_means(3:4)')],[(accuracy.Overall_stes(1:2)');(accuracy.Overall_stes(3:4)')],'.');
         xlim([0.5 2.5])
         ylim([0 1])
@@ -328,6 +332,18 @@ switch plotLevel
         set(gca,'XTickLabel',{'T1','T2'});
         ylabel('accuracy')
         title('overall')
+        
+        subplot(1,4,4)
+        y = errorbar([ (accuracy.RT_means(1:2)');(accuracy.RT_means(3:4)')],[(accuracy.RT_stes(1:2)');(accuracy.RT_stes(3:4)')],'.');
+        xlim([0.5 2.5])
+        ylim([0 1.6])
+        set(y,'MarkerSize',25)
+        set(y(2),'Color','r')
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'});
+        ylabel('RT')
+        title('overall')
+        legend('valid','invalid')
         
     case 3
         scrsz=get(0,'ScreenSize');
