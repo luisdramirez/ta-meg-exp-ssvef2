@@ -25,6 +25,7 @@ displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 0;
 use_eyetracker = true;
+pregeneratedStimuli = true;
 
 eyeFile = sprintf('%s%02d%s', subjectID(1:2), run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
@@ -73,6 +74,11 @@ if use_eyetracker
 end
 
 Screen('CloseAll');
+
+%% Make stimuli
+if ~pregeneratedStimuli
+    makeTADetectDiscrimStim(subjectID, run, displayName);
+end
 
 %% Default parameters
 params = retCreateDefaultGUIParams;

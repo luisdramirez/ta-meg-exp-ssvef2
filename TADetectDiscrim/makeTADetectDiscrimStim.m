@@ -1,4 +1,4 @@
-function makeTADetectDiscrimStim(subjectID, run)
+function makeTADetectDiscrimStim(subjectID, run, displayName)
 
 %% run setup
 %run = 7;
@@ -16,7 +16,9 @@ vistaStimDir = sprintf('../../%s', vistaStimPath);
 stimFile = sprintf('%s_taDetectDiscrim%d', subjectID, run);
 
 %% screen setup
-displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
+if nargin < 3
+    displayName = 'meg_lcd'; % 'meg_lcd','Carrasco_L2','Carrasco_L1','Carrasco_R1'
+end
 d = loadDisplayParams(displayName);
 
 % pixelsPerDegree = 1/d.pixelSize;
