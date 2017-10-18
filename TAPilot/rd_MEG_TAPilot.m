@@ -23,8 +23,8 @@ commandwindow
 stimfile = sprintf('%s_taDetectDiscrim', subjectID);
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
-useKbQueue = 0;
-use_eyetracker = true;
+useKbQueue = 1;
+use_eyetracker = false;
 pregeneratedStimuli = true;
 
 eyeFile = sprintf('%s%02d%s', subjectID(1:2), run, datestr(now, 'mmdd')); % 8 characters max

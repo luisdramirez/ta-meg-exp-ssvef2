@@ -132,6 +132,7 @@ response.secs = zeros(size(stimulus.seq));        % timing
 response.RT = zeros(size(stimulus.seq));
 quitProg = 0;
 response.flip = [];
+lastSoundTime = NaN;
 
 % set up KbQueue if desired
 if useKbQueue
