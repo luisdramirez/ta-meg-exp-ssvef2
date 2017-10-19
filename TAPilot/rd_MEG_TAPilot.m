@@ -24,7 +24,7 @@ stimfile = sprintf('%s_taDetectDiscrim', subjectID);
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
 useKbQueue = 1;
-use_eyetracker = false;
+use_eyetracker = true;
 pregeneratedStimuli = true;
 
 eyeFile = sprintf('%s%02d%s', subjectID(1:2), run, datestr(now, 'mmdd')); % 8 characters max
