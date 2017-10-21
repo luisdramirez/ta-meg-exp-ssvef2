@@ -72,11 +72,11 @@ else
 %     patchContrast = cvals([1 9 19 22]);
 %     patchContrast = [.12 .29 .78 .92]; % lr
 %     patchContrast = [.20 .29 .78 .92]; % rd
-%     patchContrast = [.1 .2 .85 .95]; % rd-40
+    patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
 %     patchContrast = [0 .2 .75 .95]; % lr-40 piloting
 %     patchContrast = [0.15 .29 .85 1]; % mj
-    patchContrast = [.1 .2 .8 .95]; % mj-40
+%     patchContrast = [.1 .2 .8 .95]; % mj-40
 %     patchContrast = [0.05 .29 .79 1]; % af
 %     patchContrast = [0 .25 .88 1]; % hl
 %     patchContrast = [.10 .29 .68 1]; % xw
@@ -132,6 +132,7 @@ response.secs = zeros(size(stimulus.seq));        % timing
 response.RT = zeros(size(stimulus.seq));
 quitProg = 0;
 response.flip = [];
+lastSoundTime = NaN;
 
 % set up KbQueue if desired
 if useKbQueue

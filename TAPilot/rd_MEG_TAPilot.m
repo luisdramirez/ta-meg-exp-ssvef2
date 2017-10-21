@@ -23,7 +23,7 @@ commandwindow
 stimfile = sprintf('%s_taDetectDiscrim', subjectID);
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
-useKbQueue = 0;
+useKbQueue = 1;
 use_eyetracker = true;
 pregeneratedStimuli = true;
 
