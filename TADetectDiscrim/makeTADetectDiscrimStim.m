@@ -32,9 +32,10 @@ cx = round(screenWidth/2);
 cy = round(screenHeight/2);
 
 %% keys setup
-responseOption = 'targetContrast4Levels'; % 'targetType','targetPos','targetContrast4Levels'
+responseOption = 'targetType'; % 'targetType','targetPos','targetContrast4Levels'
 % keyNames = {'2@','3#'}; % [contrast2 contrast3]
-keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
+% keyNames = {'1!','2@','3#','4$'}; % [target1 target2 absent] or [contrast1 contrast2 contrast3 contrast4]
+keyNames = {'1!','2@'};
 keyCodes = KbName(keyNames);
 
 %% timing setup
@@ -69,7 +70,7 @@ else
 end
 
 %% target setup
-target.type = 'contrast'; % 'dot','lines','grating','cb','contrast'
+target.type = 'cb'; % 'dot','lines','grating','cb','contrast'
 target.catchTrials = false;
 
 %% blocks setup (one run)
@@ -99,7 +100,7 @@ if target.catchTrials
 end
 
 %% stim setup  
-stimType = 'radialcb'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad'
+stimType = 'noise'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad' 'noise' 
 stimSize = 4;
 spatialFreq = 3;
 orientation = 0;
@@ -135,9 +136,10 @@ possibleContrasts = [
     0.8235
     0.8557
     0.8892];
-stimContrast = 0.4; % 0.64
-targetContrast = 0.4; % 0.64
-contrasts = [stimContrast targetContrast];
+stimContrast = 0.6; % 0.64
+targetContrast = 0.6; % 0.64
+% contrasts = [stimContrast targetContrast];
+contrasts = stimContrast;
 blurRadius = 0.2;
 backgroundColor = 128/255;
 phases = [0 pi];
@@ -153,6 +155,9 @@ switch stimType
         radialCB.E = 0.1;
 end
 radialCB.gradientAngles = [-135 -45 135 45]; % top left higher contrast, top right, bottom left, bottom right
+
+noise.orientationBandwidth = 10;
+noise.spatialFreqBandwidthFactor = 2;
 
 % fixation
 fixDiam = 0.15;
@@ -183,7 +188,7 @@ p = v2struct(...
     blockNames, blockOrder, attBlockNames, attBlockOrder, targetBlockNames, targetBlockOrder, ...
     cueBlockNames, cueBlockOrder, targetTypeBlockOrder, ...
     stimSize, stimPos, spatialFreq, orientation, stimContrast, targetContrast, ...
-    contrasts, blurRadius, backgroundColor, phases, radialCB, triggerOption, jitter, flickerType);
+    contrasts, blurRadius, backgroundColor, phases, radialCB, noise, triggerOption, jitter, flickerType);
 
 %% Make the stimuli
 for iPhase = 1:numel(phases)
@@ -218,13 +223,30 @@ for iPhase = 1:numel(phases)
             case 'spiralcb'
                 s{iPhase, iContrast} = makeSpiralCheckerboard(pixelsPerDegree, stimSize, phase, contrast, ...
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
+            case 'noise'
+                for iTrial = 1:length(blockOrder)
+                    im1 = makeFilteredNoise2(stimSize, contrast/2, orientation, ...
+                        noise.orientationBandwidth, spatialFreq/noise.spatialFreqBandwidthFactor, ...
+                        spatialFreq*noise.spatialFreqBandwidthFactor, pixelsPerDegree, 0);
+                    im2 = makeFilteredNoise2(stimSize, contrast/2, orientation+90, ...
+                        noise.orientationBandwidth, spatialFreq/noise.spatialFreqBandwidthFactor, ...
+                        spatialFreq*noise.spatialFreqBandwidthFactor, pixelsPerDegree, 0);
+                    im = (im1 - 0.5) + (im2 - 0.5) + 0.5;
+                    if iPhase==1
+                        s{iPhase, iContrast, iTrial} = im;   
+                    elseif iPhase==2
+                        s{iPhase, iContrast, iTrial} = 1 - s{1, iContrast, iTrial};
+                    end
+                end
             otherwise
                 error('stimType not recognized')
         end
         
-        stim{iPhase, iContrast} = maskWithAnnulus(s{iPhase,iContrast}, ...
-            length(s{iPhase,iContrast}), ...
-            0, blurRadius, backgroundColor); %stimulus image generated here
+        for iStimSet = 1:size(s,3)
+            stim{iPhase, iContrast, iStimSet} = maskWithAnnulus(s{iPhase,iContrast,iStimSet}, ...
+                length(s{iPhase,iContrast,iStimSet}), ...
+                0, blurRadius, backgroundColor); %stimulus image generated here
+        end
     end
 end
 
@@ -238,16 +260,18 @@ for iP1 = 1:numel(phases)
     for iC1 = 1:numel(contrasts)
         for iP2 = 1:numel(phases)
             for iC2 = 1:numel(contrasts)
-                
-%                 stimMatrix{iP1,iC1,iP2,iC2} = ...
-%                     [stim{iP1,iC1} spacer stim{iP2,iC2}];
-                stimMatrix{iP2,iC2} = ... %iP1,iC1,
-                    [stim{iP2,iC2}]; %stim{iP1,iC1} 
-                
-%                 stimIDs(iP1,iC1,iP2,iC2) = ...
-%                     iP1*1000 + iC1*100 + iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right]
-                stimIDs(iP2,iC2) = ... %iP1,iC1,
-                    iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right] iP1*1000 + iC1*100 +
+                for iS = 1:size(stim,3) % if unique stim for each trial
+                    
+                    %                 stimMatrix{iP1,iC1,iP2,iC2} = ...
+                    %                     [stim{iP1,iC1} spacer stim{iP2,iC2}];
+                    stimMatrix{iP2,iC2,iS} = ... %iP1,iC1,
+                        [stim{iP2,iC2,iS}]; %stim{iP1,iC1}
+                    
+                    %                 stimIDs(iP1,iC1,iP2,iC2) = ...
+                    %                     iP1*1000 + iC1*100 + iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right]
+                    stimIDs(iP2,iC2,iS) = ... %iP1,iC1,
+                        (iS-1)*100 + iP2*10 + iC2; % [phase left, contrast left, phase right, contrast right] iP1*1000 + iC1*100 +
+                end
             end
         end
     end
@@ -258,7 +282,7 @@ for iIm = 1:numel(stimMatrix)
     images(:,:,iIm) = stimMatrix{iIm};
     imageIDs(iIm,1) = stimIDs(iIm);
 end
-imageIDHeaders = {'right-phase', 'right-contrast'}; %'left-phase', 'left-contrast', 
+imageIDHeaders = {'stim', 'right-phase', 'right-contrast'}; %'left-phase', 'left-contrast', 
 
 % add blank stimulus
 images(:,:,end+1) = ones(size(images(:,:,1)))*backgroundColor;
@@ -474,7 +498,11 @@ targetOn = 0;
 targetAbsIdx = 1; % target absent
 targetAbsOn = 0;
 cueIdx = 1;
+if ~exist('posShuffled','var')
+    posShuffled = nan(100,2); % hack
+end
 posRowCount = ones(1,size(posShuffled,2));
+
 
 for iFrame = 1:numel(seqtiming)
     time = seqtiming(iFrame);
@@ -526,12 +554,14 @@ for iFrame = 1:numel(seqtiming)
     end
     if targetOn
         if targetSides(targetIdx)==1
-            c1 = 2;
+%             c1 = 2; % removes functionality for contrast target here
+            c1 = 1;
             c2 = 1;
             targetOnSeq(iFrame,1) = 1;
         elseif targetSides(targetIdx)==2
             c1 = 1;
-            c2 = 2;
+%             c2 = 2;
+            c2 = 1;
             targetOnSeq(iFrame,1) = 2;
         end
     else
@@ -609,23 +639,33 @@ for iFrame = 1:numel(seqtiming)
     % determine image
     switch blockName
         case 'blank'
-            p1 = 0; p2 = 0; c1 = 0; c2 = 0;
+            p1 = 0; p2 = 0; c1 = 0; c2 = 0; s = 1;
         case 'fast-left'
             % if in iti
             if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < itiSeq(blockIdx) - 0.00001)
-                p1 = 0; p2 = 0;  c1 = 0; c2 = 0;
+                p1 = 0; p2 = 0;  c1 = 0; c2 = 0; s = 1;
             else
                 p1 = fastPhaseSeq(phaseSeqIdx); % left
                 p2 = slowPhaseSeq(phaseSeqIdx); % right
                 %             c1 = 1; c2 = 1;
+                if size(stimMatrix,3)>1
+                    s = blockIdx;
+                else
+                    s = 1;
+                end
             end
         case 'slow-left'
             if blockIdx < nBlocks && (blockStartTimes(blockIdx+1)-time < itiSeq(blockIdx) - 0.00001)
-                p1 = 0; p2 = 0;  c1 = 0; c2 = 0;
+                p1 = 0; p2 = 0;  c1 = 0; c2 = 0; s = 1;
             else
                 p1 = slowPhaseSeq(phaseSeqIdx); % left
                 p2 = fastPhaseSeq(phaseSeqIdx); % right
                 %             c1 = 1; c2 = 1;
+                if size(stimMatrix,3)>1
+                    s = blockIdx;
+                else
+                    s = 1;
+                end
             end
         otherwise
             error('blockName not recognized')
@@ -633,8 +673,8 @@ for iFrame = 1:numel(seqtiming)
     if p1==0, c1 = 0; end
     if p2==0, c2 = 0; end
     phaseSeqIdx = phaseSeqIdx + 1;
-    imageID = 10*p2 + c2; %(1000*p1 + 100*c1 + ) removed from front
-    
+    imageID = 100*(s-1) + 10*p2 + c2; %(1000*p1 + 100*c1 + ) removed from front
+   
     seq(iFrame,1) = find(imageIDs==imageID);
     
     if strcmp(target.type,'grating')
