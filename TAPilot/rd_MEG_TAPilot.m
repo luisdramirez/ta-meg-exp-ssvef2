@@ -23,9 +23,10 @@ commandwindow
 stimfile = sprintf('%s_taDetectDiscrim', subjectID);
 displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 frameRate = 60;
-useKbQueue = 1;
-use_eyetracker = true;
+useKbQueue = 0;
+use_eyetracker = false;
 pregeneratedStimuli = true;
+removeImages = false; % remove images from stimulus structure? default is true, use false for noise stimType
 
 eyeFile = sprintf('%s%02d%s', subjectID(1:2), run, datestr(now, 'mmdd')); % 8 characters max
 eyeDir = 'eyedata';
@@ -123,6 +124,9 @@ end
 
 % also make sure params.devices is set the same
 params.devices = params.display.devices;
+
+% remove images?
+params.removeImages = removeImages;
 
 % go
 doRetinotopyScan(params);

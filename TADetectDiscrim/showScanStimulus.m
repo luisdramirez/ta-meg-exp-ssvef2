@@ -65,8 +65,8 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-    
-    patchContrast = [.1 .2 .85 .95]; % rd-40
+    patchContrast = 0.4;
+%     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
@@ -192,7 +192,6 @@ if isfield(stimulus, 'target')
             target.tilts = tilts; % store settings
             target.contrast = patchContrast;
             % target.size = patchSize;
-            
             if strcmp(target.stimType,'noise')
                 % add to background, no transparency
                 tt = target.targetTypes;
@@ -200,14 +199,14 @@ if isfield(stimulus, 'target')
                 ntrials = length(stimulus.itiSeq);
                 blankidx = 1:5:ntrials;
                 targidx = setdiff(1:ntrials, blankidx);
-                
                 for iT = 1:numel(tt)
+                    trialNum = ceil(iT/2);
                     tilt = (tp(iT)-1)*90 + tilts(tt(iT));
                     for iPhase = 1:2
                         phase = target.phases(iPhase);
                         targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
-                            target.spatialFreq, tilt, phase, patchContrast, 0, 'bw');
-                        bgim = stimulus.images(:,:,targidx(iT)*2-1+iPhase-1);
+                            target.spatialFreq, tilt, phase, target.contrast, 0, 'bw');
+                        bgim = stimulus.images(:,:,targidx(trialNum)*2-1+iPhase-1);
                         if size(bgim,1)~=size(targ0,1)
                             targ0 = targ0(2:end-1,2:end-1);
                         end
@@ -217,7 +216,6 @@ if isfield(stimulus, 'target')
                         target.textures(iT,iPhase) = Screen('MakeTexture', display.windowPtr, targ.*255);
                     end
                 end
-                
             else
                 % use transparency
                 Screen('BlendFunction', display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -251,6 +249,7 @@ if isfield(stimulus, 'respDur')
     nRespFrames = display.frameRate*respDur; % look respDur s back
 end
 startedFeedback = 0;
+targetCounter = 0;
 
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
@@ -294,13 +293,22 @@ for frame = 1:nFramesPerFlip:nFrames
                         Screen('DrawTexture', display.windowPtr, target.textures(ph(1),ph(2),sh), ...
                             stimulus.srcRect, stimulus.destRect);
                     case 'cb'
-                        if target.seq(frame-1)==0 % update only for new targets
-                            baseOrient = round(rand)*90; % 0 or 90
-                            target.baseOrients = [target.baseOrients baseOrient]; % store
+                        if strcmp(target.stimType,'noise')
+                             if target.seq(frame-1)==0 % update counter for new targets
+                                targetCounter = targetCounter+1;
+                             end
+                             phaseIdx = 2-mod(stimulus.seq(frame),2);
+                             Screen('DrawTexture', display.windowPtr, target.textures(targetCounter,phaseIdx), ...
+                                 [], target.destRect);
+                        else
+                            if target.seq(frame-1)==0 % update only for new targets
+                                baseOrient = round(rand)*90; % 0 or 90
+                                target.baseOrients = [target.baseOrients baseOrient]; % store
+                            end
+                            rot  = baseOrient + tilts(target.seq(frame));
+                            Screen('DrawTexture', display.windowPtr, target.textures(1), ...
+                                [], target.destRect, rot);
                         end
-                        rot  = baseOrient + tilts(target.seq(frame));
-                        Screen('DrawTexture', display.windowPtr, target.textures(1), ...
-                            [], target.destRect, rot);
                     case 'contrast'
                         % DRAW TARGET HERE   
                         if isfield(target,'pedestalSeq')
