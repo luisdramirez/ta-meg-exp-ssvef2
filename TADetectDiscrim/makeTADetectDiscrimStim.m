@@ -327,12 +327,15 @@ switch target.type
         target.spacer = spacer;
         target.stim = stim;
     case 'cb'
+        target.stimType = stimType;
         target.pixelsPerDegree = pixelsPerDegree;
         target.imSize = stimSize; % whole grating square
         target.stimSize = stimSize;
         target.size = 1.5; % 0.5 % sigma of gaussian aperture
         target.spatialFreq = 4;
         target.center = targetCenter;
+        target.blurRadius = blurRadius;
+        target.backgroundColor = backgroundColor;
     case 'contrast'
         % SPECIFY TARGET PARAMETERS HERE
         target.phases = phases;
@@ -956,16 +959,20 @@ order.attBlockOrder = attBlockOrder;
 order.targetBlockOrder = targetBlockOrder;
 order.cueBlockOrder = cueBlockOrder; 
 order.targetTypeBlockOrder = targetTypeBlockOrder;
+order.targetPedestalBlockOrder = targetPedestalBlockOrder;
 
 if strcmp(target.type, 'contrast')
     order.posShuffled = posShuffled; %8 positions for each condition (pres-pres, pres-abs, abs-pres)
     order.posBlockOrder = posBlockOrder;
-%     order.pedestalShuffled = pedestalShuffled;
-    order.targetPedestals = targetPedestals;
-    order.pedestalBlockOrder = pedestalBlockOrder;
 end
 order.targetTypes = targetTypes;
+order.targetPedestals = targetPedestals;
 order.trialsPresented = trialsPresented;
+
+% store these in target also
+stimulus.target.targetTypes = targetTypes;
+stimulus.target.targetPedestals = targetPedestals;
+stimulus.target.phases = phases;
 
 % save stimulus
 if saveStim

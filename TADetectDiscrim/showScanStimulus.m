@@ -65,23 +65,9 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
-%     patchContrast = [0.38 0.65]; % starting settings: 1 [for cb target (range is 0-1)] [0.34 0.73] 
-%     cvals = logspace(-.601,-.001,31); % -.301 for 0.5
-%     patchContrast = cvals([-15 -10 10 15]+16);
-%     cvals = logspace(-.861,-.021,22);
-%     patchContrast = cvals([1 9 19 22]);
-%     patchContrast = [.12 .29 .78 .92]; % lr
-%     patchContrast = [.20 .29 .78 .92]; % rd
+    
     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
-%     patchContrast = [0 .2 .75 .95]; % lr-40 piloting
-%     patchContrast = [0.15 .29 .85 1]; % mj
-%     patchContrast = [.1 .2 .8 .95]; % mj-40
-%     patchContrast = [0.05 .29 .79 1]; % af
-%     patchContrast = [0 .25 .88 1]; % hl
-%     patchContrast = [.10 .29 .68 1]; % xw
-%     patchContrast = [.29 .79]; %[.18 .88]; %[.29 .79]; %for run 1221=1222
-%     patchContrast = [.05 .29 .79 1]; % for run 2221
     dotSize = 0.3; % in degrees
     shifts = [0 0]; % phase shifts
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
@@ -205,16 +191,44 @@ if isfield(stimulus, 'target')
             fprintf('\n[showScanStimulus] cb tilt = [%1.1f %1.1f], contrast = %1.2f\n\n', tilts(1), tilts(2), patchContrast)
             target.tilts = tilts; % store settings
             target.contrast = patchContrast;
-%             target.size = patchSize;
-            Screen('BlendFunction', display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            % target.size = patchSize;
             
-            targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
-                target.spatialFreq, 0, 0, 1, 0, 'bw');
-            alphaLayer = make2DGaussianCentered(size(targ0,1), size(targ0,2), 0, 0, target.size*target.pixelsPerDegree, 1).*patchContrast; % black is transparent, white is opaque
-            targ = cat(3, targ0, alphaLayer);
-            
-            target.textures = Screen('MakeTexture', display.windowPtr, targ.*255);
-            
+            if strcmp(target.stimType,'noise')
+                % add to background, no transparency
+                tt = target.targetTypes;
+                tp = target.targetPedestals;
+                ntrials = length(stimulus.itiSeq);
+                blankidx = 1:5:ntrials;
+                targidx = setdiff(1:ntrials, blankidx);
+                
+                for iT = 1:numel(tt)
+                    tilt = (tp(iT)-1)*90 + tilts(tt(iT));
+                    for iPhase = 1:2
+                        phase = target.phases(iPhase);
+                        targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
+                            target.spatialFreq, tilt, phase, patchContrast, 0, 'bw');
+                        bgim = stimulus.images(:,:,targidx(iT)*2-1+iPhase-1);
+                        if size(bgim,1)~=size(targ0,1)
+                            targ0 = targ0(2:end-1,2:end-1);
+                        end
+                        targ1 = (targ0-.5) + (bgim/255-.5) + .5;
+                        targ = maskWithAnnulus(targ1, size(bgim,1), 0, ...
+                            target.blurRadius, target.backgroundColor);
+                        target.textures(iT,iPhase) = Screen('MakeTexture', display.windowPtr, targ.*255);
+                    end
+                end
+                
+            else
+                % use transparency
+                Screen('BlendFunction', display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                
+                targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
+                    target.spatialFreq, 0, 0, 1, 0, 'bw');
+                alphaLayer = make2DGaussianCentered(size(targ0,1), size(targ0,2), 0, 0, target.size*target.pixelsPerDegree, 1).*patchContrast; % black is transparent, white is opaque
+                targ = cat(3, targ0, alphaLayer);
+                
+                target.textures = Screen('MakeTexture', display.windowPtr, targ.*255);
+            end
             targetSizePx = size(targ0);
             target.destRect(1:2) = target.center - targetSizePx/2;
             target.destRect(3:4) = target.destRect(1:2) + targetSizePx;
