@@ -208,7 +208,11 @@ if isfield(stimulus, 'target')
                             target.spatialFreq, tilt, phase, target.contrast, 0, 'bw');
                         bgim = stimulus.images(:,:,targidx(trialNum)*2-1+iPhase-1);
                         if size(bgim,1)~=size(targ0,1)
-                            targ0 = targ0(2:end-1,2:end-1);
+                            if size(targ0,1)==size(bgim,1)+2
+                                targ0 = targ0(2:end-1,2:end-1);
+                            else 
+                                targ0 = targ0(2:end,2:end);
+                            end
                         end
                         targ1 = (targ0-.5) + (bgim/255-.5) + .5;
                         targ = maskWithAnnulus(targ1, size(bgim,1), 0, ...
@@ -296,6 +300,8 @@ for frame = 1:nFramesPerFlip:nFrames
                         if strcmp(target.stimType,'noise')
                              if target.seq(frame-1)==0 % update counter for new targets
                                 targetCounter = targetCounter+1;
+                                baseOrient = (target.targetPedestals(targetCounter)-1)*90;
+                                target.baseOrients = [target.baseOrients baseOrient]; % store a copy
                              end
                              phaseIdx = 2-mod(stimulus.seq(frame),2);
                              Screen('DrawTexture', display.windowPtr, target.textures(targetCounter,phaseIdx), ...

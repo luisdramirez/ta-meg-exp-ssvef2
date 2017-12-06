@@ -102,6 +102,8 @@ targetPresented = order.targetTypeBlockOrder';
 
 if isfield(order,'pedestalBlockOrder')
     pedestalBlockOrder = order.pedestalBlockOrder';
+elseif isfield(order,'targetPedestalBlockOrder')
+    pedestalBlockOrder = order.targetPedestalBlockOrder';
 else
     pedestalBlockOrder = [];
 end
