@@ -102,7 +102,7 @@ end
 %% stim setup  
 stimType = 'noise'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad' 'noise' 
 stimSize = 4;
-spatialFreq = 3;
+spatialFreq = 1.5; %3;
 orientation = 0;
 possibleContrasts = [
     0.2812
@@ -338,7 +338,7 @@ switch target.type
         target.imSize = stimSize; % whole grating square
         target.stimSize = stimSize;
         target.size = 1.5; % 0.5 % sigma of gaussian aperture
-        target.spatialFreq = 4;
+        target.spatialFreq = spatialFreq; %4;
         target.center = targetCenter;
         target.blurRadius = blurRadius;
         target.backgroundColor = backgroundColor;
