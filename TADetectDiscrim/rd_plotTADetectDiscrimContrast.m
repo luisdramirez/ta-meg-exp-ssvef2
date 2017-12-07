@@ -3,13 +3,13 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'R0817_20171019';
-runs = 1:12;
+subject = 'rdtest';
+runs = 1:8;
 date = '';
 
 plotLevel = 1;
-saveFile = 1;
-saveFigs = 1;
+saveFile = 0;
+saveFigs = 0;
 [acc, ~, responseData_all, responseData_labels, io] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
@@ -69,6 +69,24 @@ for iT = 1:2
     end
 end
 
+%% count every combo
+for iT = 1:2
+    for iTT = 1:2
+        for iNTT = 1:2
+            for iP = 1:2
+                for iNP = 1:2
+                    for iV = 1:2
+                        iNT = 3 - iT;
+                        w = b.responseTarget==iT & b.targetType==iTT & b.nontargetType==iNTT ...
+                            & b.targetPedestal==iP & b.nontargetPedestal==iNP & b.cueValidity==cvs(iV);
+                        ttpAll{iV,iNP,iP,iNTT,iTT,iT} = [b.responseTarget(w) b.targetPedestal(w) b.nontargetPedestal(w) b.cueValidity(w) b.acc(w)];
+                        ttpAcc(iV,iNP,iP,iNTT,iTT,iT) = nanmean(b.acc(w));
+                    end
+                end
+            end
+        end
+    end
+end
 
 %% Organize response time by target
 % nT = sum(b.responseTarget == 1);
@@ -142,7 +160,7 @@ f(3) = figure;
 for iT = 1:2
     subplot(1,2,iT)
     bar(ttAcc(:,:,iT)')
-    set(gca,'XTickLabel',{'dec','inc'})
+    set(gca,'XTickLabel',{'tt1','tt2'})
     if iT==1
         xlabel('target type')
         ylabel('proportion correct')
@@ -160,7 +178,8 @@ for iT = 1:2
 %     set(gca,'XTickLabel',{'p1-dec','p1-inc','p2-dec','p2-inc'})
     set(gca,'XTickLabel',responseOptions)
     if iT == 1
-        xlabel('contrast level')
+        xlabel('stimulus number')
+%         xlabel('contrast level')
         ylabel('proportion correct')
     end
     ylim(ylims)
@@ -169,11 +188,12 @@ end
 legend('valid','invalid')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
-f(5) = figure;
+f(5) = figure('Position',[235 265 915 370]);
 for iT = 1:2
     subplot(1,2,iT)
     bar([typeAcc(:,:,1,iT) typeAcc(:,:,2,iT)]')
-    set(gca, 'XTickLabel',{'dec-dec','dec-inc','inc-inc','inc-dec'})
+    set(gca, 'XTickLabel',{'tt1-tt1','tt1-tt2','tt2-tt2','tt2-tt1'})
+%     set(gca, 'XTickLabel',{'dec-dec','dec-inc','inc-inc','inc-dec'})
     if iT == 1
         ylabel('proportion correct')
     end

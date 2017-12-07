@@ -48,8 +48,9 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
-rootDir = pathToMEGExpt;
+% rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
+rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';
@@ -135,11 +136,13 @@ for n = 1:length(df)
     responseData_all = [responseData_all; temp];
     
     % target pos type
-    targetPos = stim.order.posBlockOrder';
-    targetPosType = targetPos;
-    targetPosType(targetPos>=1 & targetPos<=4) = 1;
-    targetPosType(targetPos>=5 & targetPos<=8) = 2;
-    targetPosType_all = [targetPosType_all; targetPosType];
+    if isfield(stim.order,'posBlockOrder')
+        targetPos = stim.order.posBlockOrder';
+        targetPosType = targetPos;
+        targetPosType(targetPos>=1 & targetPos<=4) = 1;
+        targetPosType(targetPos>=5 & targetPos<=8) = 2;
+        targetPosType_all = [targetPosType_all; targetPosType];
+    end
     
     % target contrast
     if isfield(dd.response.target,'contrast')
