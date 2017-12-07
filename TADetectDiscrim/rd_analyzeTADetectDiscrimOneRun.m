@@ -50,10 +50,12 @@ response_correct = responseData_all(:,11);
 targetAxis = responseData_all(:,13:14);
 targetPedestal = responseData_all(:,15:16);
 
-targetPos = stim.order.posBlockOrder';
-targetPosType = targetPos;
-targetPosType(targetPos>=1 & targetPos<=4) = 1;
-targetPosType(targetPos>=5 & targetPos<=8) = 2;
+if isfield(stim.order,'posBlockOrder')
+    targetPos = stim.order.posBlockOrder';
+    targetPosType = targetPos;
+    targetPosType(targetPos>=1 & targetPos<=4) = 1;
+    targetPosType(targetPos>=5 & targetPos<=8) = 2;
+end
 
 % convert target type and response data for computing detection rate
 DetectTargetType = responseData_all(:,7:8);
