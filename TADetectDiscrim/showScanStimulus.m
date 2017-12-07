@@ -64,7 +64,7 @@ if staircase && exist('staircase.mat','file')
     end
 else
     % MANUAL SETTINGS
-    tilts = [-7.5 7.5]; % starting settings: [-6 6] [relative to the base orientation]
+    tilts = [-3 3]; % starting settings: [-6 6] [relative to the base orientation]
     patchContrast = 0.4;
 %     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
@@ -72,7 +72,7 @@ else
     shifts = [0 0]; % phase shifts
     % patchSize = 1; % for cb target (this should be set in makeTADetectDiscrimStim, but just testing for now)
 end
-soundAmp = 0.10; % 0.10 for MEG
+soundAmp = 1; % 0.10 for MEG
 
 % input checks
 if nargin < 2
