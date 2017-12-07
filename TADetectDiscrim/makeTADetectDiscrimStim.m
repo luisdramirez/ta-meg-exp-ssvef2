@@ -158,6 +158,7 @@ radialCB.gradientAngles = [-135 -45 135 45]; % top left higher contrast, top rig
 
 noise.orientationBandwidth = 10;
 noise.spatialFreqBandwidthFactor = 2;
+noise.luminanceDiffThresh = 0.005;
 
 % fixation
 fixDiam = 0.15;
@@ -225,13 +226,18 @@ for iPhase = 1:numel(phases)
                     radialCB.thetaCycles, radialCB.E, radialCB.A, radialCB.b);
             case 'noise'
                 for iTrial = 1:length(blockOrder)
-                    im1 = makeFilteredNoise2(stimSize, contrast/2, orientation, ...
-                        noise.orientationBandwidth, spatialFreq/noise.spatialFreqBandwidthFactor, ...
-                        spatialFreq*noise.spatialFreqBandwidthFactor, pixelsPerDegree, 0);
-                    im2 = makeFilteredNoise2(stimSize, contrast/2, orientation+90, ...
-                        noise.orientationBandwidth, spatialFreq/noise.spatialFreqBandwidthFactor, ...
-                        spatialFreq*noise.spatialFreqBandwidthFactor, pixelsPerDegree, 0);
-                    im = (im1 - 0.5) + (im2 - 0.5) + 0.5;
+                    luminanceDiff = 1;
+                    while luminanceDiff > noise.luminanceDiffThresh
+                        im1 = makeFilteredNoise2(stimSize, contrast/2, orientation, ...
+                            noise.orientationBandwidth, spatialFreq/noise.spatialFreqBandwidthFactor, ...
+                            spatialFreq*noise.spatialFreqBandwidthFactor, pixelsPerDegree, 0);
+                        im2 = makeFilteredNoise2(stimSize, contrast/2, orientation+90, ...
+                            noise.orientationBandwidth, spatialFreq/noise.spatialFreqBandwidthFactor, ...
+                            spatialFreq*noise.spatialFreqBandwidthFactor, pixelsPerDegree, 0);
+                        im = (im1 - 0.5) + (im2 - 0.5) + 0.5;
+                        immasked = maskWithAnnulus(im, length(im), 0, blurRadius, backgroundColor); % only for luminance testing
+                        luminanceDiff = abs(mean(immasked(:))-.5);
+                    end
                     if iPhase==1
                         s{iPhase, iContrast, iTrial} = im;   
                     elseif iPhase==2
