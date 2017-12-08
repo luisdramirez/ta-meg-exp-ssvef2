@@ -102,7 +102,7 @@ end
 %% stim setup  
 stimType = 'noise'; %'grating' 'checkerboard' 'bullseye' 'radialcb' 'spiralcb' 'radialcbgrad' 'noise' 
 stimSize = 4;
-spatialFreq = 1.5; %3;
+spatialFreq = 4; %3;
 orientation = 0;
 possibleContrasts = [
     0.2812
