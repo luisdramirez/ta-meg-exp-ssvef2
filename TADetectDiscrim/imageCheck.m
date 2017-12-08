@@ -85,13 +85,13 @@ for i = 1:size(targs,3)
 end
 
 fs = p.pixelsPerDegree;
-N = size(t,1);
+N = size(im,1);
 df = fs/N;
 sampleIndex = -N/2:N/2-1;
 f = sampleIndex*df;
 
-% im = tFFT(:,:,i);
-im = fftshift(fft2(im0));
+im = imFFT(:,:,1);
+% im = fftshift(fft2(im0));
 figure
 imagesc(abs(im));
 set(gca,'Clim',[0 80])
@@ -102,6 +102,14 @@ set(gca,'YTick',11:10:size(im,1))
 set(gca,'YTickLabel',round(f(11:10:size(im,1))*10)/10)
 xlabel('spatial frequency (cpd)')
 % xtickformat('%.1f')
+
+nbins = 20;
+[Zr, R] = radialavg(abs(im),nbins,0,0);
+figure
+plot(R(2:end),Zr(2:end))
+set(gca,'XTickLabel',round((0:f(end)/5:f(end))*10)/10)
+xlabel('spatial frequency (cpd)')
+ylabel('amplitude')
 
 
 fH = figure;
