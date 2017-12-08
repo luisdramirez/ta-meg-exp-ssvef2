@@ -9,7 +9,10 @@ contrast = p.contrasts(1);
 orientation = p.orientation;
 spatialFreq = p.spatialFreq;
 pixelsPerDegree = p.pixelsPerDegree;
+blurRadius = p.blurRadius;
+backgroundColor = p.backgroundColor;
 
+iContrast = 1;
 for iPhase = 1:2
     for iTrial = 1:length(blockOrder)
         luminanceDiff = 1;
@@ -31,6 +34,21 @@ for iPhase = 1:2
         end
     end
 end
+ims = maskWithAnnulus(s{1,1,1}, length(im), 0, blurRadius, backgroundColor);
+bgim = ims(:,:,1)*255;
+targ0 = buildColorGrating(target.pixelsPerDegree, [target.imSize target.imSize], ...
+    target.spatialFreq, tilt, phase, target.contrast, 0, 'bw');
+if size(bgim,1)~=size(targ0,1)
+    if size(targ0,1)==size(bgim,1)+2
+        targ0 = targ0(2:end-1,2:end-1);
+    else
+        targ0 = targ0(2:end,2:end);
+    end
+end
+targ1 = (targ0-.5) + (bgim/255-.5) + .5;
+targ = maskWithAnnulus(targ1, size(bgim,1), 0, ...
+    target.blurRadius, target.backgroundColor);
+targs = targ; 
 
 % if images already made, skip to here
 ims = stimulus.images/255;
