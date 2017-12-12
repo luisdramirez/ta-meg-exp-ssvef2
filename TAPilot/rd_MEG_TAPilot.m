@@ -20,11 +20,16 @@ commandwindow
 % RD, July 2014
 
 %% Settings
-stimfile = sprintf('%s_taDetectDiscrim', subjectID);
 displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
-frameRate = 60;
-useKbQueue = 0;
 use_eyetracker = false;
+
+stimfile = sprintf('%s_taDetectDiscrim', subjectID);
+frameRate = 60;
+if strfind(displayName, 'meg')
+    useKbQueue = 1;
+else
+    useKbQueue = 0;
+end
 pregeneratedStimuli = true;
 removeImages = false; % remove images from stimulus structure? default is true, use false for noise stimType
 

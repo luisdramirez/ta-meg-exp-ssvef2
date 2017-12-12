@@ -136,8 +136,8 @@ possibleContrasts = [
     0.8235
     0.8557
     0.8892];
-stimContrast = 0.7; % 0.64
-targetContrast = 0.7; % 0.64
+stimContrast = 0.6; % 0.64
+targetContrast = 0.6; % 0.64
 % contrasts = [stimContrast targetContrast];
 contrasts = stimContrast;
 blurRadius = 0.2;
@@ -936,7 +936,9 @@ stimulus.fixSeq = fixSeq;
 stimulus.srcRect = srcRect;
 stimulus.destRect = destRect;
 stimulus.trigSeq = trigSeq;
-stimulus.diodeSeq = diodeSeq;
+if strfind(displayName,'meg')
+    stimulus.diodeSeq = diodeSeq;
+end
 stimulus.keyCodeSeq = keyCodeSeq;
 stimulus.soundSeq = cueSeq;
 stimulus.target = target;
