@@ -10,7 +10,7 @@ fprintf('detection: %d%%\n', round(detect*100))
 fprintf('discrimination: %d%%\n\n', round(discrim*100))
 
 %% adjust contrast
-updateTilt = 0; % only update tilt if contrast is in a good range
+updateTilt = 1; % 0 % if 0, only update tilt if contrast is in a good range. if 1, always update.
 
 c = round(logspace(-1,0,10)*100)/100;
 [val, cIdx] = min(abs(c-contrast)); % find c closest to contrast

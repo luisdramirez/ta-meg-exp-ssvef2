@@ -46,15 +46,20 @@ nFramesPerFlip = 3;
 triggersOn = 1;
 
 % staircase? (adjustment between runs)
-staircase = 0; % set to 0 for first run of the day
+staircase = 1; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
     s = load('staircase.mat');
     switch stimulus.target.type
         case 'cb'
-            tilts = [-s.tilt s.tilt];
-            patchContrast = s.contrast;
+            if strcmp(stimulus.target.stimType, 'noise')
+                tilts = [-s.tilt s.tilt];
+                patchContrast = 0.4;
+            else
+                tilts = [-s.tilt s.tilt];
+                patchContrast = s.contrast;
+            end
             fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = %.2f\ntilt = %1.1f\n\n\n\n', patchContrast, tilts(2))
         case 'contrast'
             patchContrast = s.contrasts;
@@ -64,7 +69,7 @@ if staircase && exist('staircase.mat','file')
     end
 else
     % MANUAL SETTINGS
-    tilts = [-2.5 2.5]; % starting settings: [-6 6] [relative to the base orientation]
+    tilts = [-5 5]; % starting settings: [-6 6] [relative to the base orientation]
     patchContrast = 0.4;
 %     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
