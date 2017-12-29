@@ -48,10 +48,10 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
-rootDir = pathToMEGExpt;
+% rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
-% rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
+rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = pwd;
@@ -147,6 +147,11 @@ for n = 1:length(df)
     % target contrast
     if isfield(dd.response.target,'contrast')
         targetContrast(n,:) = dd.response.target.contrast;
+    end
+    
+    % target tilt
+    if isfield(dd.response.target,'tilts')
+        targetTilts(n,:) = dd.response.target.tilts;
     end
 end
 
@@ -294,6 +299,9 @@ all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_st
 
 if exist('targetContrast','var')
     accuracy.targetContrast = targetContrast;
+end
+if exist('targetTilts','var')
+    accuracy.targetTilts = targetTilts;
 end
 
 %% plot

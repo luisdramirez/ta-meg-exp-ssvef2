@@ -3,8 +3,8 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'rdnoise_sf1pt5_contrast60';
-runs = 13:16;
+subject = 'afnoise';
+runs = 1:10;
 date = '';
 
 plotLevel = 1;
@@ -152,9 +152,15 @@ title('T2')
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 
 f(2) = figure;
+subplot(1,2,1)
 plot(acc.targetContrast)
-xlabel('run')
 ylabel('target contrast')
+subplot(1,2,2)
+if isfield(acc,'targetTilts')
+    plot(acc.targetTilts(:,2))
+end
+xlabel('run')
+ylabel('target tilt')
 
 f(3) = figure;
 for iT = 1:2
