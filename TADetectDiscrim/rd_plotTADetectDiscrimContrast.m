@@ -4,7 +4,7 @@
 
 %% initial analysis
 subject = 'afnoise';
-runs = 1:10;
+runs = 21:24
 date = '';
 
 plotLevel = 1;

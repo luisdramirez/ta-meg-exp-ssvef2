@@ -46,7 +46,7 @@ nFramesPerFlip = 3;
 triggersOn = 1;
 
 % staircase? (adjustment between runs)
-staircase = 1; % set to 0 for first run of the day
+staircase = 0; % set to 0 for first run of the day
 
 % set target difficulty
 if staircase && exist('staircase.mat','file')
@@ -69,7 +69,7 @@ if staircase && exist('staircase.mat','file')
     end
 else
     % MANUAL SETTINGS
-    tilts = [-5 5]; % starting settings: [-6 6] [relative to the base orientation]
+    tilts = [-1.5 1.5]; % starting settings: [-6 6] [relative to the base orientation]
     patchContrast = 0.4;
 %     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
