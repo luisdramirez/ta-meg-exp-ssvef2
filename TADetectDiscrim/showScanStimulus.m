@@ -69,7 +69,7 @@ if staircase && exist('staircase.mat','file')
     end
 else
     % MANUAL SETTINGS
-    tilts = [-1.5 1.5]; % starting settings: [-6 6] [relative to the base orientation]
+    tilts = [-4.5 4.5]; % starting settings: [-6 6] [relative to the base orientation]
     patchContrast = 0.4;
 %     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
