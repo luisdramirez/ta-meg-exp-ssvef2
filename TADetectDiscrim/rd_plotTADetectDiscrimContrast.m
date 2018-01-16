@@ -3,8 +3,8 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'afnoise';
-runs = 21:24
+subject = 'mrnoise';
+runs = 7:16
 date = '';
 
 plotLevel = 1;
