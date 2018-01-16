@@ -20,7 +20,7 @@ commandwindow
 % RD, July 2014
 
 %% Settings
-displayName = 'Carrasco_L1'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
+displayName = 'meg_lcd'; % 'meg_lcd', 'Carrasco_L2', 'Carrasco_L1'
 use_eyetracker = true;
 
 stimfile = sprintf('%s_taDetectDiscrim', subjectID);
