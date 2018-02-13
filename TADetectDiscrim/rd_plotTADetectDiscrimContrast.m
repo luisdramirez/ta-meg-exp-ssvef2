@@ -3,11 +3,11 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'rdnoise_sf1pt5_contrast60';
-runs = 13:16;
+subject = 'hlnoise';
+runs = 1:14;
 date = '';
 
-plotLevel = 1;
+plotLevel = 3;
 saveFile = 0;
 saveFigs = 0;
 [acc, ~, responseData_all, responseData_labels, io] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);

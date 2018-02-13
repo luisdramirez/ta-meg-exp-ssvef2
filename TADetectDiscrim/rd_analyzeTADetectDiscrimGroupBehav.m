@@ -2,12 +2,26 @@
 
 %% setup
 exptDir = pathToExpt;
+% exptDir = '/Local/Users/denison/Data/TANoise/Behavior';
+% exptDir = '/Volumes/DRIVE1/DATA/rachel/MEG/TADetectDiscrim/Behavior';
 
 % subjects = {'rd','lr','mj','af','xw'};
 % startRuns = [211, 211, 221, 221, 221];
 
-subjects = {'mj'};
-startRuns = 1;
+subjects = {'jpnoise'};
+startRuns = 16;
+
+% subjects = {'R0817_20171212','R0817_20171213','R1187_20180105','R1187_20180108',...
+%     'R0983_20180111','R0983_20180112','R0898_20180112','R0898_20180116'};
+
+% subjects = {'R0817_20150504', 'R0973_20150727', 'R0974_20150728', ...
+%     'R0861_20150813', 'R0504_20150805', 'R0983_20150813', ...
+%     'R0898_20150828', 'R0436_20150904', 'R1018_20151118', ...
+%     'R1019_20151118','R1021_20151120','R1026_20151211', ...
+%     'R0852_20151211','R1027_20151216','R1028_20151216',...
+%             'R1029_20151222'}; % N=16 TADetectDiscrim
+% subjects = subjects([1 2 4 5 7 8 10 12 14 16]);
+% startRuns = repmat(1,numel(subjects));
 
 nSubjects = numel(subjects);
 
@@ -15,6 +29,7 @@ nSubjects = numel(subjects);
 for iSubject = 1:nSubjects
     sessionDir = subjects{iSubject}; 
     behavDir = sprintf('%s/analysis/%s', exptDir, sessionDir);
+%     behavDir = sprintf('%s/%s/analysis', exptDir, sessionDir);
     behavFile = dir(sprintf('%s/*%d*.mat', behavDir, startRuns(iSubject)));
     b = load(sprintf('%s/%s', behavDir, behavFile.name));
     behav(iSubject) = behavior(b); % update behav with more info

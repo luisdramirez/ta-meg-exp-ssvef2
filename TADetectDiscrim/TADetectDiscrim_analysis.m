@@ -48,17 +48,32 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 
 %% combine responseData for all runs
 % get the data from the server using pathToExpt
-rootDir = pathToMEGExpt;
+% rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
-% rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
+% rootDir = '/Local/Users/denison/Data/TANoise/Behavior';
+rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = pwd;
-dataDir = sprintf('%s/data/%s', rootDir, subject);
-stimDir = sprintf('%s/stimuli', rootDir);
-analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
-figDir = sprintf('%s/figures/%s',rootDir,subject);
+
+
+switch rootDir(1:4)
+    case '/Vol'
+        % usual
+        dataDir = sprintf('%s/data/%s', rootDir, subject);
+        stimDir = sprintf('%s/stimuli', rootDir);
+        analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
+        figDir = sprintf('%s/figures/%s',rootDir,subject);
+    case '/Loc'
+        % special
+        dataDir = sprintf('%s/%s/data', rootDir, subject);
+        stimDir = sprintf('%s/%s/stimuli', rootDir, subject);
+        analysisDir = sprintf('%s/%s/analysis',rootDir,subject);
+        figDir = sprintf('%s/%s/figures',rootDir,subject);
+    otherwise
+        error('rootDir not recognized')
+end
 
 if ~exist(analysisDir,'dir')
     mkdir(analysisDir);

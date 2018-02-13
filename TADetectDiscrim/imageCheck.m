@@ -2,6 +2,7 @@
 
 % load stimulus
 
+%% make images
 blockOrder = order.blockOrder;
 noise = p.noise;
 stimSize = p.stimSize;
@@ -11,6 +12,10 @@ spatialFreq = p.spatialFreq;
 pixelsPerDegree = p.pixelsPerDegree;
 blurRadius = p.blurRadius;
 backgroundColor = p.backgroundColor;
+target = stimulus.target;
+tilt = 5; 
+phase = 0;
+target.contrast = .4;
 
 iContrast = 1;
 for iPhase = 1:2
@@ -50,7 +55,7 @@ targ = maskWithAnnulus(targ1, size(bgim,1), 0, ...
     target.blurRadius, target.backgroundColor);
 targs = targ; 
 
-% if images already made, skip to here
+%% if images already made, skip to here
 ims = stimulus.images/255;
 target = stimulus.target;
 target.contrast = .4;
@@ -80,12 +85,28 @@ for iT = 1:numel(tt)
         targ = maskWithAnnulus(targ1, size(bgim,1), 0, ...
             target.blurRadius, target.backgroundColor);
         targs(:,:,iT) = targ; %%% debug
+        targsp(:,:,iT,iPhase) = targ; %%% debug
         % target.textures(iT,iPhase) = Screen('MakeTexture', display.windowPtr, targ.*255);
     end
 end
 
+%% View sample images
+figure
+imshow(ims(:,:,3)) % first stimulus trial
+imshow(ims(:,:,4))
+imshow(targsp(:,:,1,1))
+imshow(targsp(:,:,1,2))
 
+for i = 1:2:39
+    imshow(ims(:,:,3))
+    M(i) = getframe(gcf);
+    imshow(ims(:,:,4))
+    M(i+1) = getframe(gcf);
+end
 
+movie(M)
+
+%% FFT
 for i = 1:size(ims,3)
     im = ims(:,:,i);
     imContrast(i) = std(im(:));
@@ -108,6 +129,7 @@ df = fs/N;
 sampleIndex = -N/2:N/2-1;
 f = sampleIndex*df;
 
+%% plots
 im = imFFT(:,:,1);
 % im = fftshift(fft2(im0));
 figure
