@@ -53,8 +53,13 @@ if staircase && exist('staircase.mat','file')
     s = load('staircase.mat');
     switch stimulus.target.type
         case 'cb'
-            tilts = [-s.tilt s.tilt];
-            patchContrast = s.contrast;
+            if strcmp(stimulus.target.stimType, 'noise')
+                tilts = [-s.tilt s.tilt];
+                patchContrast = 0.4;
+            else
+                tilts = [-s.tilt s.tilt];
+                patchContrast = s.contrast;
+            end
             fprintf('\n\n\n\nSTAIRCASE UPDATE:\ncontrast = %.2f\ntilt = %1.1f\n\n\n\n', patchContrast, tilts(2))
         case 'contrast'
             patchContrast = s.contrasts;

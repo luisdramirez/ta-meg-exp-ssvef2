@@ -163,6 +163,11 @@ for n = 1:length(df)
     if isfield(dd.response.target,'contrast')
         targetContrast(n,:) = dd.response.target.contrast;
     end
+    
+    % target tilt
+    if isfield(dd.response.target,'tilts')
+        targetTilts(n,:) = dd.response.target.tilts;
+    end
 end
 
 %% extract block order from responseData_all
@@ -309,6 +314,9 @@ all_stes = [accuracy.Hit_stes,accuracy.FA_stes,accuracy.Miss_stes,accuracy.CR_st
 
 if exist('targetContrast','var')
     accuracy.targetContrast = targetContrast;
+end
+if exist('targetTilts','var')
+    accuracy.targetTilts = targetTilts;
 end
 
 %% plot
