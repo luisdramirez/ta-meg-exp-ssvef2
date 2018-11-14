@@ -50,8 +50,8 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
-% rootDir = '/Local/Users/denison/Data/TANoise/Behavior';
-rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
+rootDir = '/Local/Users/denison/Data/TANoise/Behavior';
+% rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';

@@ -3,13 +3,13 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'hlnoise';
-runs = 1:14;
+subject = 'R0817_20180419';
+runs = 9:12;
 date = '';
 
-plotLevel = 3;
-saveFile = 0;
-saveFigs = 0;
+plotLevel = 1;
+saveFile = 1;
+saveFigs = 1;
 [acc, ~, responseData_all, responseData_labels, io] = TADetectDiscrim_analysis(subject, runs, date, plotLevel, saveFile, saveFigs);
 rd_supertitle2(sprintf('%s, runs %d-%d', subject, runs(1), runs(end)))
 

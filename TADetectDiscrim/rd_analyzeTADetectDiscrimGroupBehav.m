@@ -1,35 +1,39 @@
 % rd_analyzeTADetectDiscrimGroupBehav.m
 
 %% setup
-exptDir = pathToExpt;
+% exptDir = pathToExpt;
 % exptDir = '/Local/Users/denison/Data/TANoise/Behavior';
 % exptDir = '/Volumes/DRIVE1/DATA/rachel/MEG/TADetectDiscrim/Behavior';
+exptDir = '/Local/Users/denison/Data/TADetectDiscrim/Behavior';
 
 % subjects = {'rd','lr','mj','af','xw'};
 % startRuns = [211, 211, 221, 221, 221];
 
-subjects = {'jpnoise'};
-startRuns = 16;
+% subjects = {'jpnoise'};
+% startRuns = 16;
 
 % subjects = {'R0817_20171212','R0817_20171213','R1187_20180105','R1187_20180108',...
-%     'R0983_20180111','R0983_20180112','R0898_20180112','R0898_20180116'};
-
-% subjects = {'R0817_20150504', 'R0973_20150727', 'R0974_20150728', ...
-%     'R0861_20150813', 'R0504_20150805', 'R0983_20150813', ...
-%     'R0898_20150828', 'R0436_20150904', 'R1018_20151118', ...
-%     'R1019_20151118','R1021_20151120','R1026_20151211', ...
-%     'R0852_20151211','R1027_20151216','R1028_20151216',...
-%             'R1029_20151222'}; % N=16 TADetectDiscrim
-% subjects = subjects([1 2 4 5 7 8 10 12 14 16]);
+%     'R0983_20180111','R0983_20180112','R0898_20180112','R0898_20180116',...
+%     'R1021_20180208','R1021_20180212','R1103_20180213','R1103_20180215',...
+%     'R0959_20180219','R0959_20180306'}; % TANoise
 % startRuns = repmat(1,numel(subjects));
+
+subjects = {'R0817_20150504', 'R0973_20150727', 'R0974_20150728', ...
+    'R0861_20150813', 'R0504_20150805', 'R0983_20150813', ...
+    'R0898_20150828', 'R0436_20150904', 'R1018_20151118', ...
+    'R1019_20151118','R1021_20151120','R1026_20151211', ...
+    'R0852_20151211','R1027_20151216','R1028_20151216',...
+            'R1029_20151222'}; % N=16 TADetectDiscrim
+% subjects = subjects([1 2 4 5 7 8 10 12 14 16]);
+startRuns = repmat(1,numel(subjects));
 
 nSubjects = numel(subjects);
 
 %% load data
 for iSubject = 1:nSubjects
     sessionDir = subjects{iSubject}; 
-    behavDir = sprintf('%s/analysis/%s', exptDir, sessionDir);
-%     behavDir = sprintf('%s/%s/analysis', exptDir, sessionDir);
+%     behavDir = sprintf('%s/analysis/%s', exptDir, sessionDir);
+    behavDir = sprintf('%s/%s/analysis', exptDir, sessionDir);
     behavFile = dir(sprintf('%s/*%d*.mat', behavDir, startRuns(iSubject)));
     b = load(sprintf('%s/%s', behavDir, behavFile.name));
     behav(iSubject) = behavior(b); % update behav with more info
@@ -118,6 +122,37 @@ fa(fa==0) = .01;
 groupData.dprimeDetect = norminv(h) - norminv(fa);
 groupData.critDetect = -.5 * (norminv(h) + norminv(fa));
 
+%% P/A
+for iS = 1:nSubjects
+    t = behav(iS).responseTarget;
+    v = behav(iS).cueValidity;
+    acc = behav(iS).acc;
+    
+    tPA = double(behav(iS).targetType > 0);
+    ntPA = double(behav(iS).nontargetType > 0);
+    tPA(isnan(behav(iS).targetType)) = NaN;
+    ntPA(isnan(behav(iS).nontargetType)) = NaN;
+    
+    PAs = [1 0]; % [pres abs]
+    
+    for iT = 1:numel(targets)
+        wt = t==targets(iT);
+        for iV = 1:numel(cueValidities)
+            wv = v==cueValidities(iV);
+            for iPATarget = 1:numel(PAs)
+                wtpa = tPA==PAs(iPATarget);
+                for iPANontarget = 1:numel(PAs)
+                    wntpa = ntPA==PAs(iPANontarget);
+                    
+                    w = wt & wv & wtpa & wntpa;
+                    
+                    groupData.paAcc(iV,iT,iPATarget,iPANontarget,iS) = nanmean(acc(w));
+                end
+            end
+        end
+    end
+end
+
 %% confusion matrix
 responseOptions = unique(behav(end).correctResponse(~isnan(behav(end).correctResponse)));
 responseOptionsM = [0; responseOptions]; % include missed trials
@@ -139,8 +174,9 @@ measures = fields(groupData);
 nM = numel(measures);
 for iM = 1:nM
     m = measures{iM};
-    groupMean.(m) = mean(groupData.(m),3);
-    groupSte.(m) = std(groupData.(m),0,3)./sqrt(nSubjects);
+    sdim = numel(size(groupData.(m))); % subject dim is always the last dim
+    groupMean.(m) = mean(groupData.(m),sdim);
+    groupSte.(m) = std(groupData.(m),0,sdim)./sqrt(nSubjects);
 end
 
 %% plot group data
@@ -180,6 +216,33 @@ set(gca,'XTick',1:numel(responseOptionsM))
 set(gca,'XTickLabel',responseOptionsM)
 set(gca,'YTick',1:numel(responseOptions))
 colorbar
+
+%% plot PA data
+names = {'P','A'};
+m = 'paAcc';
+figure
+for iPATarget = 1:2
+    for iPANontarget = 1:2
+        subplot(2,2,(iPANontarget-1)*2+iPATarget)
+        hold on
+        p1 = errorbar(groupMean.(m)(:,:,iPATarget,iPANontarget)', ...
+            groupSte.(m)(:,:,iPATarget,iPANontarget)','.','MarkerSize',20);
+        set(p1(2),'color','r')
+        plot([.5 2.5],[.33 .33],'--k')
+        xlim([.5 2.5])
+        ylim([0 1])
+        set(gca,'XTick',[1 2])
+        set(gca,'XTickLabel',{'T1','T2'})
+        if iPATarget==1 && iPANontarget==1
+            ylabel('Proportion correct')
+        end
+        box off
+        title(sprintf('target %s, nontarget %s', names{iPATarget}, names{iPANontarget}));
+%         set(gca,'LineWidth',1)
+    end
+end
+legend('valid','invalid')
+% rd_supertitle2(m);
 
 %% plot individual data
 indivM = {'overallAcc'};

@@ -132,6 +132,9 @@ end
 % targetAxis = targetAxis (1:N + numel(q) * fix(N / n));
 % targetAxis = [NaN,targetAxis]';
 %% Create final output matrix
+% if numel(rData.response)<41
+%     rData.response(41) = NaN;
+% end
 
 runLabels = {'run number', 'trial number','fast side','cue condition','attended side',... 
     'target condition','target type T1','target type T2','key code', 'response', 'correct', 'RT',...
