@@ -520,7 +520,7 @@ for iFrame = 1:numel(seqtiming)
     time = seqtiming(iFrame);
     % start a new block when it's time
     if blockIdx < nBlocks && ...
-            time >= blockStartTimes(blockIdx+1) - 0.00001;
+            time >= blockStartTimes(blockIdx+1) - 0.00001
         blockIdx = blockIdx+1;
         blockName = blockNames{blockOrder(blockIdx)};
         attBlockName = attBlockNames{attBlockOrder(blockIdx)};
