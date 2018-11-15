@@ -40,7 +40,7 @@ keyCodes = KbName(keyNames);
 
 %% timing setup
 refrate = 60; % (Hz)
-nFramesPerTarget = 6; % 8
+nFramesPerTarget = 3; %6; % 8
 targetDur = nFramesPerTarget/refrate; % (s)
 targetLeadTime = 1.5; % (s) % no targets in first part of block
 targetSOA = 18/60; %18/60 = .300; 15/60 = .250; 16/60 = .267; %0.6; % (s) % SOA between targets (- difference from .8)
@@ -78,12 +78,13 @@ blockNames = {'blank','fast-left'}; % fast-left, slow-left
 attBlockNames = {'no-att','att-right'}; % att-right
 targetBlockNames = {'no-targ','pres-pres'};
 % targetBlockNames = {'no-targ','pres-pres','pres-abs','abs-pres','abs-abs'};
-cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
+cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2','3-1','3-2'}; % 2-1 = cueT2,postcueT1, 3-2 = neutral cue,postcueT2
+% cueBlockNames = {'no-cue','1-1','1-2','2-1','2-2'}; % 2-1 = cueT2,postcueT1
 % cueBlockNames = {'no-cue','1-1','2-2'};
 % [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder] ...
 %     = block_gen(blockNames,attBlockNames, targetBlockNames, cueBlockNames, run, target.catchTrials);
 [blockOrder, attBlockOrder, targetBlockOrder, cueBlockOrder, targetTypeBlockOrder, targetPedestalBlockOrder] = ...
-    block_gen3(subjectID, run, stimDir);
+    block_gen4(subjectID, run, stimDir);
 
 %%% debugging %%%
 % blockOrder = blockOrder(1:6);
@@ -136,8 +137,8 @@ possibleContrasts = [
     0.8235
     0.8557
     0.8892];
-stimContrast = 0.6; % 0.64
-targetContrast = 0.6; % 0.64
+stimContrast = 0; %0.6; % 0.64
+targetContrast = 0; %0.6; % 0.64
 % contrasts = [stimContrast targetContrast];
 contrasts = stimContrast;
 blurRadius = 0.2;
@@ -175,6 +176,7 @@ for iTone = 1:numel(cueFreqs)
     tone = MakeBeep(cueFreqs(iTone), cueDur, Fs);
     cueTones(iTone,:) = applyEnvelope(tone, Fs);
 end
+cueTones(3,:) = (cueTones(1,:) + cueTones(2,:))/2;
 
 %% trigger setup
 triggerOption = 'conditionID'; % 'conditionID','combinatorial'
@@ -856,13 +858,17 @@ for iFrame = 1:numel(seqtiming)
                     case 'no-cue' % blank
                         trig = 7;
                     case '1-1'
-                        trig = 1;
+                        trig = 1; % 1 % let the trig reflect the cue only in TA2
                     case '1-2'
-                        trig = 2;
+                        trig = 1; % 2
                     case '2-1'
-                        trig = 3;
+                        trig = 2; % 3
                     case '2-2'
-                        trig = 4;
+                        trig = 2; % 4
+                    case '3-1'
+                        trig = 3;
+                    case '3-2'
+                        trig = 3;
                     otherwise
                         error('cueBlock not recognized')
                 end

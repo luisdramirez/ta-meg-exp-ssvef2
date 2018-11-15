@@ -55,7 +55,7 @@ if staircase && exist('staircase.mat','file')
         case 'cb'
             if strcmp(stimulus.target.stimType, 'noise')
                 tilts = [-s.tilt s.tilt];
-                patchContrast = 0.4;
+                patchContrast = 1; %0.4;
             else
                 tilts = [-s.tilt s.tilt];
                 patchContrast = s.contrast;
@@ -70,7 +70,7 @@ if staircase && exist('staircase.mat','file')
 else
     % MANUAL SETTINGS
     tilts = [-2.5 2.5]; % starting settings: [-6 6] [relative to the base orientation]
-    patchContrast = 0.4;
+    patchContrast = 1; %0.4;
 %     patchContrast = [.1 .2 .85 .95]; % rd-40
 %     patchContrast = [0 .2 .8 .95]; % starting values 40
     dotSize = 0.3; % in degrees
@@ -202,11 +202,12 @@ if isfield(stimulus, 'target')
             target.contrast = patchContrast;
             % target.size = patchSize;
             if strcmp(target.stimType,'noise')
+                nTrialsPerMiniblock = 20; %4;
                 % add to background, no transparency
                 tt = target.targetTypes;
                 tp = target.targetPedestals;
                 ntrials = length(stimulus.itiSeq);
-                blankidx = 1:5:ntrials;
+                blankidx = 1:nTrialsPerMiniblock+1:ntrials;
                 targidx = setdiff(1:ntrials, blankidx);
                 for iT = 1:numel(tt)
                     trialNum = ceil(iT/2);
