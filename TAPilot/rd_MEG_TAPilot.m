@@ -137,7 +137,7 @@ params.removeImages = removeImages;
 doRetinotopyScan(params);
 
 %% Check timing results
-f = dir('~/Desktop/2018*.mat');
+f = dir('~/Desktop/2019*.mat');
 fileName = fullfile('~', 'Desktop', f(end).name);
 load(fileName);
 figure(101); clf
