@@ -3,7 +3,7 @@
 % plot performance and contrast by run
 
 %% initial analysis
-subject = 'R1373_20181128';
+subject = 'R0817_20190625';
 runs = 1:12;
 date = '';
 

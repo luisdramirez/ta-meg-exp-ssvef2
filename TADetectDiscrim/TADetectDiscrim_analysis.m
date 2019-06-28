@@ -50,7 +50,8 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 % get the data from the server using pathToExpt
 % rootDir = pathToMEGExpt;
 % rootDir = pathToExpt;
-rootDir = '/Local/Users/denison/Data/TA2/Behavior';
+rootDir = pathToTA2('Behavior');
+% rootDir = '/Local/Users/denison/Data/TA2/Behavior';
 % rootDir = '/Local/Users/denison/Data/TANoise/Behavior';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
@@ -59,14 +60,29 @@ rootDir = '/Local/Users/denison/Data/TA2/Behavior';
 % rootDir = pwd;
 
 
-switch rootDir(1:4)
-    case '/Vol'
+% try different directory configurations to see if one works
+dataDirTry1 = sprintf('%s/data/%s', rootDir, subject);
+fileTry1 = dir(sprintf('%s/*%d.mat', dataDirTry1, runs(1)));
+
+dataDirTry2 = sprintf('%s/%s/data', rootDir, subject);
+fileTry2 = dir(sprintf('%s/*%d.mat', dataDirTry2, runs(1)));
+
+if ~isempty(fileTry1) && isempty(fileTry2)
+    directoryStructureType = 1;
+elseif isempty(fileTry1) && ~isempty(fileTry2)
+    directoryStructureType = 2;
+else
+    error('Could not find sample file in either directory structure type.')
+end
+    
+switch directoryStructureType
+    case 1
         % usual
         dataDir = sprintf('%s/data/%s', rootDir, subject);
         stimDir = sprintf('%s/stimuli', rootDir);
         analysisDir = sprintf('%s/analysis/%s',rootDir,subject);
         figDir = sprintf('%s/figures/%s',rootDir,subject);
-    case '/Loc'
+    case 2
         % special
         dataDir = sprintf('%s/%s/data', rootDir, subject);
         stimDir = sprintf('%s/%s/stimuli', rootDir, subject);

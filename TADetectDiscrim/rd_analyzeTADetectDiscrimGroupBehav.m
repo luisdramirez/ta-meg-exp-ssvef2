@@ -5,7 +5,8 @@
 % exptDir = '/Local/Users/denison/Data/TANoise/Behavior';
 % exptDir = '/Volumes/DRIVE1/DATA/rachel/MEG/TADetectDiscrim/Behavior';
 % exptDir = '/Local/Users/denison/Data/TADetectDiscrim/Behavior';
-exptDir = '/Local/Users/denison/Data/TA2/Behavior';
+% exptDir = '/Local/Users/denison/Data/TA2/Behavior';
+exptDir = pathToTA2('Behavior');
 
 % subjects = {'rd','lr','mj','af','xw'};
 % startRuns = [211, 211, 221, 221, 221];
@@ -30,7 +31,7 @@ exptDir = '/Local/Users/denison/Data/TA2/Behavior';
 
 subjects = {'R0817_20181120', 'R0890_20181121', 'R0959_20181128', ...
     'R1103_20181121', 'R1187_20181119', 'R1373_20181128', ...
-    'R1452_20181119'}; % N=7 TA2
+    'R1452_20181119','R1507_20190621'}; % N=8 TA2
 % subjects = subjects([1 2 4 5 7 8 10 12 14 16]);
 startRuns = repmat(1,numel(subjects));
 
