@@ -83,6 +83,8 @@ for trialNum = 1 : trialCount
     keyIdx = find(keyCodes==keyVal);
     if ~isempty(keyIdx)
         rData.response(trialNum,1) = keyIdx;
+    else
+        rData.response(trialNum,1) = NaN; % invalid response key
     end
 %     switch keyVal
 %         case keyCodes(1)

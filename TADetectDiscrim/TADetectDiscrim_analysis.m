@@ -53,7 +53,8 @@ subjectStr = sprintf('%s_taDetectDiscrim', subject);
 rootDir = pathToTA2('Behavior');
 % rootDir = '/Local/Users/denison/Data/TA2/Behavior';
 % rootDir = '/Local/Users/denison/Data/TANoise/Behavior';
-% rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
+% rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current_Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TA2';
+% rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current_Experiments/Rachel/TA_MEG/Behav_Pilot&Training/TANoise';
 % rootDir = '~/Desktop/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 % rootDir = '/Volumes/purplab/EXPERIMENTS/1_Current Experiments/Luis/ta-meg-exp-ssvef2/TADetectDiscrim';
 %rootDir = '/Users/luisramirez/Documents/CarrascoLabMEG/ta-meg-exp-ssvef2/TADetectDiscrim';
@@ -130,7 +131,11 @@ end
 %% load exp params from a sample run
 % assumes all runs have identical params
 expNum = regexp(df(1).name, '_taDetectDiscrim(\d*).mat','tokens');
-stim = load(sprintf('%s/%s%s.mat', stimDir, subjectStr, expNum{1}{1}));
+try
+    stim = load(sprintf('%s/%s%s.mat', stimDir, subjectStr, expNum{1}{1}));
+catch
+    stim = load(sprintf('%s/%s/%s%s.mat', stimDir, subject, subjectStr, expNum{1}{1}));
+end
 
 trialCount = length(stim.p.blockOrder);
 respSecs = stim.p.respDur;
@@ -150,7 +155,11 @@ for n = 1:length(df)
     name = df(n).name;
     dd = load(sprintf('%s/%s',dataDir,name));
     expNum = regexp(name,'_taDetectDiscrim(\d*).mat','tokens');
-    stim = load(sprintf('%s/%s%s.mat', stimDir, subjectStr, expNum{1}{1}));
+    try
+        stim = load(sprintf('%s/%s%s.mat', stimDir, subjectStr, expNum{1}{1}));
+    catch
+        stim = load(sprintf('%s/%s/%s%s.mat', stimDir, subject, subjectStr, expNum{1}{1}));
+    end
     if isfield(stim.stimulus,'itiSeq')
         itiSeq = stim.stimulus.itiSeq;
     else
